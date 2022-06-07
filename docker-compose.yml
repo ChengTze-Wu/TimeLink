@@ -1,0 +1,21 @@
+version: "3.3"
+
+services:
+    linebot_test_app:
+        image: chengtze/timelink_linebot_test
+        env_file:
+            - ./.env
+        ports:
+            - "8000:8000"
+        command: gunicorn -w 2 -b 0.0.0.0:8000 wsgi:app
+
+    nginx:
+        image: chengtze/timelink_nginx
+        volumes:
+            - ./certificate.crt:/etc/ssl/certificate.crt
+            - ./private.key:/etc/ssl/private.key
+        ports:
+            - "80:80"
+            - "443:443"
+        depends_on:
+            - linebot_test_app

@@ -1,0 +1,45 @@
+{% extends "layout/base.html" %}
+<!-- title -->
+{% block title %}Group | {% endblock %}
+<!-- main -->
+{% block main %}
+
+<form action="{{ url_for('group.link') }}" method="post">
+    <div class="mb-2">
+        <label for="name" class="form-label">群組名稱</label>
+        <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            required
+        />
+    </div>
+    <div class="mb-2">
+        <label for="claim" class="form-label">LineBot認證碼</label>
+        <input
+            type="text"
+            class="form-control"
+            id="claim"
+            name="groupId"
+            required
+        />
+    </div>
+    <button type="submit" class="btn btn-claim">連結</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">群組名稱</th>
+            <th scope="col">連結日期</th>
+        </tr>
+    </thead>
+    <tbody id="group_list"></tbody>
+</table>
+
+{% endblock %}
+<!-- script -->
+{% block script %}
+<script src="{{ url_for('static', filename='js/group.js') }}"></script>
+{% endblock %}

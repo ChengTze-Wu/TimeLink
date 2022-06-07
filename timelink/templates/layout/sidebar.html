@@ -1,0 +1,38 @@
+<div class="sidebar">
+    <div>
+        <a class="logo" href="{{ url_for('pages.index') }}"
+            >Time<span style="color: #44ad53">Link</span></a
+        >
+    </div>
+
+    <nav class="nav">
+        <ul class="nav_items">
+            <li>
+                <a class="nav_item" href="{{ url_for('pages.group') }}"
+                    >Line群組管理</a
+                >
+            </li>
+            <li>
+                <a class="nav_item" href="{{ url_for('pages.service') }}"
+                    >服務管理</a
+                >
+            </li>
+            <!-- <li>
+                <a class="nav_item" href="{{ url_for('pages.reserve') }}"
+                    >預約管理</a
+                >
+            </li> -->
+            <!-- <li>
+                <a class="nav_item" href="{{ url_for('pages.member') }}"
+                    >成員管理</a
+                >
+            </li> -->
+        </ul>
+    </nav>
+
+    <div class="signout_icon">
+        <a href="{{ url_for('user.signout') }}"
+            ><i class="fa-solid fa-arrow-right-from-bracket"></i
+        ></a>
+    </div>
+</div>

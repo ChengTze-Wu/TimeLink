@@ -1,0 +1,91 @@
+/* css reset */
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+ul {
+    list-style: none;
+}
+a,
+a:hover,
+a:visited {
+    text-decoration: none;
+    color: white;
+}
+/* var */
+:root {
+    --main-color: #0f6fc5;
+    --secondary-color: #272c33;
+    --mode-color: #e7e7e7;
+    --mode-card-color: #414a58;
+    --mode-card-text: #e7e7e7;
+}
+
+.split-container {
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    position: relative;
+    min-width: 250px;
+    background-color: var(--secondary-color);
+    color: white;
+}
+.signout_icon {
+    position: absolute;
+    font-size: 22px;
+    bottom: 0;
+    right: 0;
+    margin: 0 20px 20px 0;
+}
+.signout_icon:hover {
+    opacity: 0.7;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 60px;
+    border-bottom: 2px solid var(--mode-color);
+    font-size: 28px;
+}
+.logo:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+.nav_items {
+    width: 100%;
+    padding: 0;
+}
+.nav_item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    font-size: 15px;
+    width: 100%;
+}
+.nav_item:hover {
+    cursor: pointer;
+    background-color: #414a58;
+}
+
+.main {
+    overflow-y: auto;
+    scrollbar-color: var(--mode-card-color) var(--mode-color);
+    scrollbar-width: thin;
+    margin-left: 40px;
+}
+
+.btn-claim {
+    color: white;
+    background-color: #44ad53;
+}
+.btn-services {
+    color: white;
+    background-color: #44ad53;
+}

@@ -1,0 +1,12 @@
+.env
+venv/
+timelink.cc/
+*.sh
+.DS_Store
+__pycache__/
+
+note.sql
+
+node_modules/
+package-lock.json
+package.json
