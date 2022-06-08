@@ -3,7 +3,13 @@
 {% block title %}HOME | {% endblock %}
 <!-- main -->
 {% block main %}
-<ul>
-    <li>請先至Line群組管理，註冊TimeLink Bot，以開通後台功能。</li>
-</ul>
+
+<h3>TimeLink Guideline</h3>
+<p>STEP1. Line掃描QRCODE加入TimeLink好友。</p>
+<img
+    style="max-width: 300px"
+    src="{{ url_for('static', filename='img/timelink_qr.png') }}"
+/>
+<p>STEP2. 至Line群組管理，註冊TimeLink Bot，以開通後台功能。</p>
+
 {% endblock %}

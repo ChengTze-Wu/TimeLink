@@ -18,6 +18,3 @@ app.register_blueprint(controller.apis.group, url_prefix="/api")
 app.register_blueprint(controller.apis.user, url_prefix="/api")
 # pages
 app.register_blueprint(controller.pages)
-
-if __name__ == "__main__":
-    app.run(debug=True, port=3000)
