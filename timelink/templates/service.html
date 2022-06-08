@@ -3,49 +3,72 @@
 {% block title %}Service | {% endblock %}
 <!-- main -->
 {% block main %}
-<form class="mb-3" action="{{ url_for('service.add_service') }}" method="post">
-    <div class="mb-3">
-        <label for="select_group" class="form-label">群組名稱</label>
-        <select name="group_id" id="select_group" class="form-select">
-            <option selected>已連結群組</option>
-        </select>
+<div class="row">
+    <form class="col-3" onsubmit="return false">
+        <div class="mb-3">
+            <h4>新增服務</h4>
+            <label for="select_group" class="form-label">群組名稱*</span></label>
+            <select
+                name="group_id"
+                id="select_group"
+                class="form-select"
+                style="height: 100px"
+                required
+                multiple
+            ></select>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">服務名稱*</label>
+            <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">價格*</label>
+            <input
+                type="number"
+                class="form-control"
+                id="price"
+                name="price"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">類型</label>
+            <input type="text" class="form-control" id="type" name="type" />
+        </div>
+        <button id="add_service" type="submit">新增</button>
+    </form>
+    <div class="col-9">
+        <div class="d-flex align-items-baseline">
+            <h4>服務列表</h4>
+            <div
+                class="ms-2 spinner spinner-border text-success d-none"
+                role="status"
+            >
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <table class="table table-hover">
+            <thead class="table_head">
+                <tr>
+                    <th scope="col">服務名稱</th>
+                    <th scope="col">價格</th>
+                    <th scope="col">類型</th>
+                    <th scope="col">所在群組</th>
+                </tr>
+            </thead>
+            <tbody id="services_list"></tbody>
+        </table>
     </div>
-    <div class="mb-3">
-        <label for="name" class="form-label">服務名稱</label>
-        <input
-            type="text"
-            class="form-control"
-            id="name"
-            name="name"
-            required
-        />
-    </div>
-    <div class="mb-3">
-        <label for="price" class="form-label">價格</label>
-        <input
-            type="number"
-            class="form-control"
-            id="price"
-            name="price"
-            required
-        />
-    </div>
-    <button type="submit" class="btn btn-services">新增</button>
-</form>
-
-<h2>服務列表</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">服務名稱</th>
-            <th scope="col">價格</th>
-            <th scope="col">所在群組</th>
-        </tr>
-    </thead>
-    <tbody id="services_list"></tbody>
-</table>
+</div>
 {% endblock %}
 <!-- script -->
+
 {% block script %}
 <script src="{{ url_for('static', filename='js/service.js') }}"></script>
 {% endblock %}

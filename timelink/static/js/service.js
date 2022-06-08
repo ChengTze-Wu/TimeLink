@@ -1,23 +1,25 @@
 // view
-function renderServices(name, price, group_name) {
+function renderServices(name, type, price, group_name) {
     const servicesList = document.getElementById("services_list");
-
     const trnode = document.createElement("tr");
-    const snameNode = document.createElement("td");
-    const spricNode = document.createElement("td");
+    const nameNode = document.createElement("td");
+    const typeNode = document.createElement("td");
+    const priceNode = document.createElement("td");
     const groupNameNode = document.createElement("td");
 
-    snameNode.textContent = name;
-    spricNode.textContent = price;
+    nameNode.textContent = name;
+    typeNode.textContent = type;
+    priceNode.textContent = price;
     groupNameNode.textContent = group_name;
 
-    trnode.appendChild(snameNode);
-    trnode.appendChild(spricNode);
+    trnode.appendChild(nameNode);
+    trnode.appendChild(priceNode);
+    trnode.appendChild(typeNode);
     trnode.appendChild(groupNameNode);
     servicesList.appendChild(trnode);
 }
 
-function renderSelect(id, name) {
+function renderOption(id, name) {
     const selectGroup = document.getElementById("select_group");
     const groupOption = document.createElement("option");
     groupOption.setAttribute("value", id);
@@ -25,26 +27,91 @@ function renderSelect(id, name) {
     selectGroup.appendChild(groupOption);
 }
 
-function showSerivces() {
-    getDataFromApi("groups_option").then((d) => {
-        if (!d["error"]) {
-            d["data"].forEach((r) => {
-                const id = r.id;
-                const name = r.name;
-                renderSelect(id, name);
-            });
-        }
+function startSpinner() {
+    const spinners = document.querySelectorAll(".spinner");
+    spinners.forEach((spinner) => {
+        spinner.classList.remove("d-none");
     });
-    getDataFromApi("services").then((d) => {
-        if (!d["error"]) {
-            d["data"].forEach((r) => {
-                const name = r.name;
-                const price = r.price;
-                const group_name = r.group_name;
-                renderServices(name, price, group_name);
+}
+function stopSpinner() {
+    const spinners = document.querySelectorAll(".spinner");
+    spinners.forEach((spinner) => {
+        spinner.classList.add("d-none");
+    });
+}
+// controller
+
+function cleanServices() {
+    const servicesList = document.getElementById("services_list");
+    while (servicesList.lastElementChild) {
+        servicesList.removeChild(servicesList.lastElementChild);
+    }
+}
+
+function addService() {
+    const submit = document.getElementById("add_service");
+    submit.addEventListener("click", async () => {
+        const name = document.getElementById("name");
+        const price = document.getElementById("price");
+        const type = document.getElementById("type");
+        const groupId = document.getElementById("select_group");
+        if (name.value == "" || price.value == "" || groupId.value == "") {
+        } else {
+            startSpinner();
+            const resp = await postDataToApi("service", {
+                name: name.value,
+                price: price.value,
+                type: type.value,
+                groupId: groupId.value,
             });
+            if (resp["ok"]) {
+                name.value = "";
+                price.value = "";
+                groupId.value = "";
+                type.value = "";
+            }
+            await showServices();
+            stopSpinner();
         }
     });
 }
 
-showSerivces();
+async function showServices() {
+    cleanServices();
+    const resp = await getDataFromApi("services");
+    if (!resp["error"]) {
+        resp["data"].forEach((d) => {
+            const name = d.name;
+            const type = d.type;
+            const price = d.price;
+            const group_name = d.group_name;
+            renderServices(name, type, price, group_name);
+        });
+    }
+}
+
+async function showGroupsOption() {
+    const resp = await getDataFromApi("groups_option");
+    if (!resp["error"]) {
+        resp["data"].forEach((d) => {
+            const id = d.id;
+            const name = d.name;
+            renderOption(id, name);
+        });
+    }
+}
+
+async function init() {
+    showGroupsOption();
+    startSpinner();
+    await showServices();
+    stopSpinner();
+}
+
+// main exc
+async function main() {
+    await init();
+    addService();
+}
+
+main();

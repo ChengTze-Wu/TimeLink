@@ -1,5 +1,4 @@
 import os
-from unittest import result
 import mysql.connector
 
 rds_config = {
@@ -14,12 +13,12 @@ cnx = mysql.connector.connect(pool_name="service",
                               pool_size=5,
                               **rds_config)
 
-def create(name, price, user_id, group_id):
+def create(name, price, type, user_id, group_id):
     try:
         cnx = mysql.connector.connect(pool_name="service")
         cursor = cnx.cursor()
-        query = ("insert into Service (name, price, user_id, group_id) values (%s, %s, %s, %s)")
-        data = (name, price, user_id, group_id)
+        query = ("insert into Service (name, price, type, user_id, group_id) values (%s, %s, %s, %s, %s)")
+        data = (name, price, type, user_id, group_id)
         
         cursor.execute(query, data)
         cnx.commit()
@@ -32,21 +31,27 @@ def create(name, price, user_id, group_id):
         cursor.close()
         cnx.close()
         
-def get_all_by_user(user_id):
+def get_all_by_user_id(user_id):
     try:
         cnx = mysql.connector.connect(pool_name="service")
         cursor = cnx.cursor()
         
         data = (user_id,)
-        query = ("select Service.name, Service.price, Line_Group.name from Service INNER JOIN Line_Group ON Service.user_id = Line_Group.user_id where Service.user_id = %s")
+        query = ("select Service.name, Service.type, Service.price, Line_Group.name from Service INNER JOIN Line_Group ON Service.group_id = Line_Group.id where Service.user_id = %s")
     
         cursor.execute(query, data)
         result = cursor.fetchall()
         datas = []
         for data in result:
+            if not data[1]:
+                type = "無"
+            else:
+                type = data[1]
+            
             datas.append({"name": data[0],
-                            "price": data[1],
-                            "group_name":data[2]})
+                            "type": type,
+                            "price": data[2],
+                            "group_name":data[3]})
             
         return {"data": datas}
     except Exception as e:

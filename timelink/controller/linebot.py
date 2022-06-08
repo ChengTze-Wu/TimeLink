@@ -1,7 +1,5 @@
 import os
 import model
-from dotenv import load_dotenv
-load_dotenv()
 
 from flask import (
     Blueprint, request, abort
@@ -69,7 +67,7 @@ def message_text(event):
                 
                 line_bot_api.reply_message(
                         event.reply_token,
-                        TextSendMessage(f"{user_name}，為您查看服務列表：\n{service_msg}")
+                        TextSendMessage(f"{user_name}，為您查看服務列表：{service_msg}")
                 )
             elif "預約" in event.message.text:
                 line_bot_api.reply_message(

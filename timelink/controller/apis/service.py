@@ -9,16 +9,19 @@ service = Blueprint('service', __name__)
 @service.route("/service", methods=["POST"])
 def add_service():
     try:
-        name = request.form["name"]
-        price = request.form["price"]
-        group_id = request.form["group_id"]
+        data = request.get_json()
+        name = data["name"]
+        price = data["price"]
+        type = data["type"]
+        group_id = data["groupId"]
+
         usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
         user_id = usertoken["id"]
         
-        resp = model.service.create(name=name, price=price, group_id=group_id, user_id=user_id)
-        return redirect(url_for('pages.service'))
-    except Exception:
-        return redirect(url_for('pages.service'))
+        resp = model.service.create(name=name, type=type, price=price, group_id=group_id, user_id=user_id)
+        return resp
+    except Exception as e:
+        return {'error':str(e)}, 405
     
     
 @service.route("/groups_option", methods=["GET"])
@@ -36,8 +39,14 @@ def get_services():
     try:
         usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
         user_id = usertoken["id"]
-        resp = model.service.get_all_by_user(user_id=user_id)
-        
+        resp = model.service.get_all_by_user_id(user_id=user_id)
         return resp
     except Exception as e:
         return {'error':str(e)}, 405
+    
+@service.route("/service", methods=["DELETE"])
+def delete_service():
+    try:
+        return {"ok": True}
+    except Exception as e:
+        return {'error': str(e)}, 405
