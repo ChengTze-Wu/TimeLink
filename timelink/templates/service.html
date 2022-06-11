@@ -7,7 +7,7 @@
     <form class="col-3" onsubmit="return false">
         <div class="mb-3">
             <h4>新增服務</h4>
-            <label for="select_group" class="form-label">群組名稱*</span></label>
+            <label for="select_group" class="form-label">群組名稱*</label>
             <select
                 name="group_id"
                 id="select_group"
@@ -43,7 +43,7 @@
         </div>
         <button id="add_service" type="submit">新增</button>
     </form>
-    <div class="col-9">
+    <div class="col-9 position-relative">
         <div class="d-flex align-items-baseline">
             <h4>服務列表</h4>
             <div
@@ -53,13 +53,14 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <table class="table table-hover">
+        <table class="table table-hover border-success">
             <thead class="table_head">
                 <tr>
                     <th scope="col">服務名稱</th>
                     <th scope="col">價格</th>
                     <th scope="col">類型</th>
                     <th scope="col">所在群組</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody id="services_list"></tbody>

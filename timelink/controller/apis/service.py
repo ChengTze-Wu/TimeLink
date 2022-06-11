@@ -47,6 +47,8 @@ def get_services():
 @service.route("/service", methods=["DELETE"])
 def delete_service():
     try:
-        return {"ok": True}
+        id = request.get_data(as_text=True)
+        resp = model.service.delete(id=id)
+        return resp
     except Exception as e:
         return {'error': str(e)}, 405

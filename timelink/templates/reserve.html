@@ -1,24 +1,10 @@
 {% extends "layout/base.html" %}
+<!-- custom -->
+{% block custom %} {% endblock %}
 <!-- title -->
 {% block title %}Reserve | {% endblock %}
 <!-- main -->
-{% block main %}
-<h2>預約列表</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">USER_ID</th>
-            <th scope="col">名字</th>
-            <th scope="col">預約服務</th>
-            <th scope="col">預約日期</th>
-            <th scope="col">預約時段</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr id="reserves_list"></tr>
-    </tbody>
-</table>
-{% endblock %}
+{% block main %} {% endblock %}
 <!-- script -->
 {% block script %}
 <script src="{{ url_for('static', filename='js/reserve.js') }}"></script>

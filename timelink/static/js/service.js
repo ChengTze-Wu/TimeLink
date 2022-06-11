@@ -1,21 +1,33 @@
 // view
-function renderServices(name, type, price, group_name) {
+function renderServices(id, name, type, price, group_name) {
     const servicesList = document.getElementById("services_list");
     const trnode = document.createElement("tr");
     const nameNode = document.createElement("td");
     const typeNode = document.createElement("td");
     const priceNode = document.createElement("td");
     const groupNameNode = document.createElement("td");
+    const editNode = document.createElement("td");
+    const trash = document.createElement("i");
 
     nameNode.textContent = name;
     typeNode.textContent = type;
     priceNode.textContent = price;
     groupNameNode.textContent = group_name;
 
+    editNode.style = "width:100px;";
+
+    editNode.classList = "text-center";
+    trash.classList = "trash fa-solid fa-trash";
+    trash.setAttribute("service-id", id);
+
     trnode.appendChild(nameNode);
     trnode.appendChild(priceNode);
     trnode.appendChild(typeNode);
     trnode.appendChild(groupNameNode);
+
+    editNode.appendChild(trash);
+    trnode.appendChild(editNode);
+
     servicesList.appendChild(trnode);
 }
 
@@ -40,7 +52,6 @@ function stopSpinner() {
     });
 }
 // controller
-
 function cleanServices() {
     const servicesList = document.getElementById("services_list");
     while (servicesList.lastElementChild) {
@@ -76,18 +87,35 @@ function addService() {
     });
 }
 
+function deleteService() {
+    const trashBtns = document.querySelectorAll(".trash");
+    trashBtns.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            startSpinner();
+            const id = btn.getAttribute("service-id");
+            const resp = await deleteDataToApi("service", id);
+            if (!resp["error"]) {
+                await showServices();
+            }
+            stopSpinner();
+        });
+    });
+}
+
 async function showServices() {
     cleanServices();
     const resp = await getDataFromApi("services");
     if (!resp["error"]) {
         resp["data"].forEach((d) => {
+            const id = d.id;
             const name = d.name;
             const type = d.type;
             const price = d.price;
             const group_name = d.group_name;
-            renderServices(name, type, price, group_name);
+            renderServices(id, name, type, price, group_name);
         });
     }
+    deleteService();
 }
 
 async function showGroupsOption() {
