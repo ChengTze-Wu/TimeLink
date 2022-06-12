@@ -11,7 +11,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, JoinEvent
+    MessageEvent, TextMessage, TextSendMessage, JoinEvent, MemberJoinedEvent
 )
 
 # linebot
@@ -42,6 +42,11 @@ def handle_join(event):
             event.reply_token,
             TextSendMessage("歡迎加入我，請輸入 tl 以查看各項功能。")
     )
+    
+@handler.add(MemberJoinedEvent)
+def handle_member_join(event):
+    line_bot_api.push_message(event.source.group_id, TextSendMessage(text=f'你好，請點選我的頭像，並加入我，\n即可開始使用TimeLink機器人!'))
+
 
 @handler.add(MessageEvent, message=TextMessage)
 def message_text(event):

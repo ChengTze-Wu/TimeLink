@@ -4,5 +4,6 @@ import model
 
 member = Blueprint('member', __name__)
 
-usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
-user_id = usertoken["id"]
+# usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+# user_id = usertoken["id"]
+
