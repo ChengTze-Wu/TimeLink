@@ -1,6 +1,10 @@
 # TimeLink
 
-為 Line 機器人預約系統，本系統分為兩部分:
+Line 機器人預約系統
+
+工作室與顧客溝通之橋樑，顧客能透過TimeLink LINE Bot預約工作室所提供的服務；而工作室亦能透過TimeLink後台管理系統，管理顧客。
+
+本系統分為兩部分:
 
 TimeLink LINE Bot： LINE 客戶端在群組中，溝通之機器人
 
