@@ -1,8 +1,8 @@
 # TimeLink
 
-Line 機器人預約系統
+TimeLine為工作室與顧客溝通之橋樑。
 
-工作室與顧客溝通之橋樑，顧客能透過TimeLink LINE Bot預約工作室所提供的服務；而工作室亦能透過TimeLink後台管理系統，管理顧客。
+顧客能透過TimeLink LINE Bot在Line群組預約工作室所提供之服務；而工作室亦能透過TimeLink後台管理系統，管理Line群組內之顧客。
 
 本系統分為兩部分:
 
