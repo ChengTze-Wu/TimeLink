@@ -20,9 +20,7 @@ TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管�
 
 ### Line 群組
 
-點此 [測試群組](https://line.me/ti/g/AkOrb1nN4N) 加入 Line 群組
-
-或掃描 QRcode：
+Line掃描 QRcode 加入群組：
 
 <img src="./img/test_group_qr.JPG" alt="Group QRcode" width="200" height="200">
 
