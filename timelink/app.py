@@ -1,9 +1,10 @@
 import os
-from flask import Flask
-import controller
 from dotenv import load_dotenv
+from flask import Flask
 
 load_dotenv()
+import controller
+
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
