@@ -18,9 +18,13 @@ TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管�
 
 ## Demo Link
 
-### Line 群組
+### TimeLink LINE Bot
 
+<<<<<<< HEAD
 Line 掃描 QRcode 加入 Demo 群組：
+=======
+LINE 掃描 QRcode 加入 Demo 群組以使用機器人：
+>>>>>>> bdab3eff0e968c9cd9e364903ee8cd4ca537c8bc
 
 <img src="./img/test_group_qr.JPG" alt="Group QRcode" width="200" height="200">
 
@@ -44,7 +48,6 @@ Line 掃描 QRcode 加入 Demo 群組：
     -   LINE Messaging API
 -   HTML, CSS, JavaScript
     -   AJAX
-    -   bootstrap 5
 
 ### Backend Architecture
 
