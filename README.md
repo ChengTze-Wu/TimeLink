@@ -1,8 +1,8 @@
 # TimeLink
 
-TimeLine為工作室與顧客溝通之橋樑。
+TimeLine 為工作室與顧客溝通之橋樑。
 
-顧客能透過TimeLink LINE Bot在Line群組預約工作室所提供之服務；而工作室亦能透過TimeLink後台管理系統，管理Line群組內之顧客。
+顧客能透過 TimeLink LINE Bot 在 Line 群組預約工作室所提供之服務；而工作室亦能透過 TimeLink 後台管理系統，管理 Line 群組內之顧客。
 
 本系統分為兩部分:
 
@@ -20,7 +20,7 @@ TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管�
 
 ### Line 群組
 
-Line掃描 QRcode 加入Demo群組：
+Line 掃描 QRcode 加入 Demo 群組：
 
 <img src="./img/test_group_qr.JPG" alt="Group QRcode" width="200" height="200">
 
