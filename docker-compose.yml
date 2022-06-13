@@ -1,15 +1,25 @@
 version: "3.3"
 
 services:
-    linebot_test_app:
-        image: chengtze/timelink_linebot_test
+    timelink_web:
+        image: chengtze/timelink_web
         env_file:
             - ./.env
         environment:
             - TZ="Asia/Taipei"
         ports:
             - "8000:8000"
-        command: gunicorn -w 2 -b 0.0.0.0:8000 wsgi:app
+        command: gunicorn -w 2 -b :8000 wsgi:app
+
+    timelink_bot:
+        image: chengtze/timelink_bot
+        env_file:
+            - ./.env
+        environment:
+            - TZ="Asia/Taipei"
+        ports:
+            - "5000:5000"
+        command: gunicorn -w 2 -b :5000 app:linebot
 
     nginx:
         image: chengtze/timelink_nginx
@@ -22,4 +32,5 @@ services:
             - "80:80"
             - "443:443"
         depends_on:
-            - linebot_test_app
+            - timelink_web
+            - timelink_bot
