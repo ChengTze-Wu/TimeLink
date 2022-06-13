@@ -44,7 +44,6 @@ LINE 掃描 QRcode 加入 Demo 群組以使用機器人：
     -   LINE Messaging API
 -   HTML, CSS, JavaScript
     -   AJAX
-    -   bootstrap 5
 
 ### Backend Architecture
 
