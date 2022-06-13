@@ -2,7 +2,7 @@ import os
 import model
 
 from flask import (
-    Blueprint, request, abort
+    Flask, request, abort
 )
 from linebot import (
     LineBotApi, WebhookHandler
@@ -15,7 +15,7 @@ from linebot.models import (
 )
 
 # linebot
-linebot = Blueprint('linebot', __name__)
+linebot = Flask(__name__)
 
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET_KEY'))
