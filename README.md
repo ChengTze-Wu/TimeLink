@@ -8,11 +8,11 @@ TimeLine 為工作室與顧客溝通之橋樑。
 
 TimeLink LINE Bot： LINE 客戶端在群組中，溝通之機器人
 
-![TimeLink Line bot](./img/demo_bot.gif)
+![TimeLink Line bot](https://d43czlgw2x7ve.cloudfront.net/timelink/demo_bot.gif)
 
 TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管理系統。
 
-<img src="./img/demo_web.png" alt="TimeLink Web" width="500" height="300">
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/demo_web.png" alt="TimeLink Web" width="500" height="300">
 
 <br>
 
@@ -22,7 +22,7 @@ TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管�
 
 LINE 掃描 QRcode 加入 Demo 群組以使用機器人：
 
-<img src="./img/test_group_qr.JPG" alt="Group QRcode" width="200" height="200">
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/test_group_qr.JPG" alt="Group QRcode" width="200" height="200">
 
 ### TimeLink 管理系統
 
@@ -47,10 +47,10 @@ LINE 掃描 QRcode 加入 Demo 群組以使用機器人：
 
 ### Backend Architecture
 
-<img src="./img/Backend_Architecture.png" alt="Backend Architecture" >
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/Backend_Architecture.png" alt="Backend Architecture" >
 
 -   使用 Docker, Docker-Compose 快速部署上 AWS Ec2
 -   使用 Nginx 做反向代理
--   支援 HTTPS
+-   HTTPS
 -   使用 Gunicorn 作為 Flask 的 Web Server Gateway Interface
 -   使用 AWS RDS 雲端 MySql 資料庫
