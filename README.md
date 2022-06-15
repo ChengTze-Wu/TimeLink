@@ -8,7 +8,7 @@ TimeLine 為工作室與顧客溝通之橋樑。
 
 TimeLink LINE Bot： LINE 客戶端在群組中，溝通之機器人
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/demo_bot.gif" alt="TimeLink Bot">
+![TimeLink Line bot](./rm_static/demo_bot.gif)
 
 TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管理系統。
 
