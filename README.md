@@ -1,6 +1,6 @@
 # TimeLink
 
-TimeLine 為工作室與顧客溝通之橋樑。
+TimeLink 為工作室與顧客溝通之橋樑。
 
 顧客能透過 TimeLink LINE Bot 在 Line 群組預約工作室所提供之服務；而工作室亦能透過 TimeLink 後台管理系統，管理 Line 群組內之顧客。
 
