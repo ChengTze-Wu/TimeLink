@@ -71,7 +71,7 @@ def get_all_by_group_id(group_id):
         datas = []
         for data in result:
             datas.append({"group_name": data[0],
-                        "mamber_name": data[1]})
+                        "member_name": data[1]})
             
         return {"data": datas}
     except Exception as e:

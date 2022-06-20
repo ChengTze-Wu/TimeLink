@@ -2,7 +2,7 @@
 
 TimeLine 為工作室與顧客溝通之橋樑。
 
-顧客能透過 TimeLink LINE Bot 在 Line 群組預約工作室所提供之服務；而工作室亦能透過 TimeLink 後台管理系統，管理 Line 群組內之顧客。
+顧客能透過 TimeLink LINE Bot 在 Line 群組預約工作室所提供之服務；而工作室亦能透過 TimeLink 後台管理系統，管理 Line 群組內之事務。
 
 本系統分為兩部分:
 
@@ -12,7 +12,7 @@ TimeLink LINE Bot： LINE 客戶端在群組中，溝通之機器人
 
 TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管理系統。
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/demo_web.png" alt="TimeLink Web" width="500" height="300">
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/demo_web.png" alt="TimeLink Web" width="800">
 
 <br>
 
