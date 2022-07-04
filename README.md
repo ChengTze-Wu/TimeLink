@@ -1,6 +1,5 @@
 # TimeLink
 
-
 TimeLine is the bridge between studios and customers.
 
 Customers can view the services provided by the studio in the Line group through the TimeLink LINE Bot, and the studio can also manage the affairs in the Line group through the TimeLink management system.
@@ -39,6 +38,7 @@ The system can manage robots in multiple groups, and each robot can have differe
     -   View: the presentation layer, containing the HTML templates and static files.
     -   Controller: the business logic layer, containing the api calls and the business logic.
 -   Using <b>Docker</b> for containerization, <b>Docker Compose</b> for deployment.
--   Using <b>Gunicorn</b> for Web Server Gateway Interface, <b>Nginx</b> for reverse proxy.
+-   Using <b>Gunicorn</b> for Web Server Gateway Interface, <b>Nginx</b> for reverse proxy and SSL certificate.
 -   Using <b>AWS RDS</b> (MySQL) for database, EC2 for server.
+-   Support <b>SSL</b> for HTTPS,
 -   Using <b>Line Messaging API</b> on LINE Bot Server.
