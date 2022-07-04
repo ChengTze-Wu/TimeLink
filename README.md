@@ -1,56 +1,44 @@
 # TimeLink
 
-TimeLine 為工作室與顧客溝通之橋樑。
+TimeLine is the bridge between studios and customers.
 
-顧客能透過 TimeLink LINE Bot 在 Line 群組預約工作室所提供之服務；而工作室亦能透過 TimeLink 後台管理系統，管理 Line 群組內之事務。
+Customers can view the services provided by the studio in the Line group through the TimeLink LINE Bot, and the studio can also manage the affairs in the Line group through the TimeLink management system.
 
-本系統分為兩部分:
+The system can manage robots in multiple groups, and each robot can have different service information.
+The system is divided into two parts:
 
-TimeLink LINE Bot： LINE 客戶端在群組中，溝通之機器人
+-   <h3>TimeLink LINE Bot</h3>
 
-![TimeLink Line bot](./rm_static/demo_bot.gif)
+    ![TimeLink Line bot](./rm_static/demo_bot.gif)
 
-TimeLink 後台管理系統： 工作室端用以管理 LINE 群組之後台管理系統。
+-   <h3>TimeLink Management System</h3>
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/demo_web.png" alt="TimeLink Web" width="800">
+      <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/demo_web.png" alt="TimeLink Web" width="800">
 
 <br>
 
-## Demo Link
+## Management System Link
 
-### TimeLink LINE Bot
+[TimeLink](https://timelink.cc)
 
-LINE 掃描 QRcode 加入 Demo 群組以使用機器人：
-
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/test_group_qr.JPG" alt="Group QRcode" width="200" height="200">
-
-### TimeLink 管理系統
-
-點此 [TimeLink 後台](https://timelink.cc) 連結
-
-後台測試帳密：
-
--   username: test
--   password: test
+-   Test User for Login：
+    -   Username: test
+    -   Password: test
 
 <br>
 
 ## Technique
 
-### Language
-
--   Python
-    -   flask
-    -   LINE Messaging API
--   HTML, CSS, JavaScript
-    -   AJAX
-
-### Backend Architecture
+### Backend Architecture Diagram
 
 <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/Backend_Architecture.png" alt="Backend Architecture" >
 
--   使用 Docker, Docker-Compose 快速部署上 AWS Ec2
--   使用 Nginx 做反向代理
--   HTTPS
--   使用 Gunicorn 作為 Flask 的 Web Server Gateway Interface
--   使用 AWS RDS 雲端 MySql 資料庫
+-   Powered by <b>Flask</b>
+-   Following the <b>MVC pattern</b>, the website is divided into three parts:
+    -   Model: the data layer, containing the database connection and operations.
+    -   View: the presentation layer, containing the HTML templates and static files.
+    -   Controller: the business logic layer, containing the api calls and the business logic.
+-   Using <b>Docker</b> for containerization, <b>Docker Compose</b> for deployment.
+-   Using <b>Gunicorn</b> for Web Server Gateway Interface, <b>Nginx</b> for reverse proxy.
+-   Using <b>AWS RDS</b> (MySQL) for database, EC2 for server.
+-   Using <b>Line Messaging API</b> on LINE Bot Server.
