@@ -1,6 +1,19 @@
 version: "3.3"
 
 services:
+    taipei_oneday:
+        image: chengtze/taipei_oneday
+        env_file:
+            - ./taipei_oneday/.env
+        environment:
+            - TZ="Asia/Taipei"
+        volumes:
+            - ./certificate.crt:/etc/ssl/certificate.crt
+            - ./private.key:/etc/ssl/private.key
+        ports:
+            - "3000:3000"
+        command: gunicorn -w 2 -b :3000 app:app
+
     timelink_web:
         image: chengtze/timelink_web
         env_file:
@@ -32,5 +45,6 @@ services:
             - "80:80"
             - "443:443"
         depends_on:
+            - taipei_oneday
             - timelink_web
             - timelink_bot
