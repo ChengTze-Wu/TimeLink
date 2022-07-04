@@ -1,11 +1,11 @@
 # TimeLink
 
+
 TimeLine is the bridge between studios and customers.
 
 Customers can view the services provided by the studio in the Line group through the TimeLink LINE Bot, and the studio can also manage the affairs in the Line group through the TimeLink management system.
 
-The system can manage robots in multiple groups, and each robot can have different service information.
-The system is divided into two parts:
+The system can manage robots in multiple groups, and each robot can have different service information. The system is divided into two parts:
 
 -   <h3>TimeLink LINE Bot</h3>
 
