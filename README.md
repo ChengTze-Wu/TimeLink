@@ -39,6 +39,6 @@ The system can manage robots in multiple groups, and each robot can have differe
     -   Controller: the business logic layer, containing the api calls and the business logic.
 -   Using <b>Docker</b> for containerization, <b>Docker Compose</b> for deployment.
 -   Using <b>Gunicorn</b> for Web Server Gateway Interface, <b>Nginx</b> for reverse proxy and SSL certificate.
--   Using <b>AWS RDS</b> (MySQL) for database, EC2 for server.
--   Support <b>SSL</b> for HTTPS,
+-   Using <b>AWS RDS</b> (MySQL) for database, <b>EC2</b> for server.
+-   Support <b>SSL</b> for HTTPS.
 -   Using <b>Line Messaging API</b> on LINE Bot Server.
