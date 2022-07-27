@@ -1,4 +1,4 @@
-{% extends "layout/base.html" %}
+{% extends "board/layout/base.html" %}
 <!-- custom -->
 {% block custom %} {% endblock %}
 <!-- title -->
@@ -7,5 +7,8 @@
 {% block main %} {% endblock %}
 <!-- script -->
 {% block script %}
-<script src="{{ url_for('static', filename='js/reserve.js') }}"></script>
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/reserve.js') }}"
+></script>
 {% endblock %}

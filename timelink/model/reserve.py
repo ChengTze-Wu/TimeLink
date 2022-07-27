@@ -12,3 +12,4 @@ rds_config = {
 cnx = mysql.connector.connect(pool_name="reserve",
                               pool_size=5,
                               **rds_config)
+

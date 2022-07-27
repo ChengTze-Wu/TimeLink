@@ -90,7 +90,7 @@ def get_group_id_by_groupId(groupId):
         cursor.execute(query, data)
         result = cursor.fetchone()
             
-        return {"data": result[0]}
+        return result[0]
     except Exception as e:
         raise e
     finally:

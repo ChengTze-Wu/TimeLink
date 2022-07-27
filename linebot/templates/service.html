@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TimeLink Booking System</title>
+
+        <link
+            href="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/css/date-time-picker-component.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/js/date-time-picker-component.min.js"></script>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script
+            charset="utf-8"
+            src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+        ></script>
+        <script>
+            function renderService(data) {
+                const container = document.getElementById("container");
+                const service = document.createElement("div");
+                const datetime = document.createElement("div");
+                service.className = "service";
+                service.innerHTML = `
+                    <h1 class="service-name">${data.name}</h1>
+                    <p class="service-price">NT$ ${data.price}</p>
+                `;
+                datetime.className = "datetime";
+                datetime.innerHTML = `
+                    <label for="select_date">選擇預約日期</label>
+                    <div id="select_date"></div>
+                    <label for="select_time">選擇預約時間</label>
+                    <select name="select_time" id="select_time">
+                        <option value="08:00">08:00</option>
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="12:00">12:00</option>
+                        <option value="13:00">13:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                        <option value="18:00">18:00</option>
+                        <option value="19:00">19:00</option>
+                        <option value="20:00">20:00</option>
+                        <option value="21:00">21:00</option>
+                        <option value="22:00">22:00</option>
+                        <option value="23:00">23:00</option>
+                    </select>
+                    <br>
+                    <button id="btn_submit">預約</button>
+                    <button id="btn_cancel">取消</button>
+                `;
+                container.appendChild(service);
+                container.appendChild(datetime);
+                datePicker();
+            }
+
+            function showSpinner() {
+                const container = document.getElementById("container");
+                container.textContent = "讀取中...";
+            }
+
+            function closeSpinner() {
+                const container = document.getElementById("container");
+                container.textContent = "";
+            }
+
+            async function createService(service_id) {
+                await showSpinner();
+                const resp = await fetch(`/api/service/${service_id}`, {
+                    method: "GET",
+                });
+                const jsonData = await resp.json();
+                await closeSpinner();
+                jsonData["data"].forEach((data) => {
+                    renderService(data);
+                });
+            }
+
+            if (liff.isInClient()) {
+                liff.init({
+                    liffId: "1657198810-v359xpYa",
+                })
+                    .then(() => {
+                        const service_id = location.pathname.split("/")[3];
+                        createService(service_id);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                document.getElementById("container").innerHTML =
+                    "<p>網頁版建置中...</p>";
+            }
+
+            function datePicker() {
+                let it = {
+                    jan: "ㄧ",
+                    feb: "二",
+                    mar: "三",
+                    apr: "四",
+                    may: "五",
+                    jun: "六",
+                    jul: "七",
+                    aug: "八",
+                    sep: "九",
+                    oct: "十",
+                    nov: "十一",
+                    dec: "十二",
+                    jan_: "ㄧ月",
+                    feb_: "二月",
+                    mar_: "三月",
+                    apr_: "四月",
+                    may_: "五月",
+                    jun_: "六月",
+                    jul_: "七月",
+                    aug_: "八月",
+                    sep_: "九月",
+                    oct_: "十月",
+                    nov_: "十一月",
+                    dec_: "十二月",
+                    mon: "一",
+                    tue: "二",
+                    wed: "三",
+                    thu: "四",
+                    fri: "五",
+                    sat: "六",
+                    sun: "日",
+                    mon_: "星期一",
+                    tue_: "星期二",
+                    wed_: "星期三",
+                    thu_: "星期四",
+                    fri_: "星期五",
+                    sat_: "星期六",
+                    sun_: "星期日",
+                    done: "預訂",
+                };
+
+                new DateTimePickerComponent.DatePicker(`select_date`, {
+                    l10n: it,
+                });
+            }
+        </script>
+    </body>
+</html>

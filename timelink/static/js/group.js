@@ -1,3 +1,4 @@
+import * as apiFetch from "./module/apiFetch.js";
 // view
 function renderGroups(name, createDatetime) {
     const groupList = document.getElementById("group_list");
@@ -13,8 +14,20 @@ function renderGroups(name, createDatetime) {
     groupList.appendChild(trnode);
 }
 
+function renderInputHint(target, message) {
+    const hint = document.createElement("div");
+    hint.textContent = message;
+    target.parentNode.appendChild(hint);
+    target.style = "outline: 1px solid red;";
+    setTimeout(() => {
+        target.style = "";
+        target.parentNode.removeChild(hint);
+    }, 1000);
+}
+
+// controller
 function showGroups() {
-    getDataFromApi("groups").then((d) => {
+    apiFetch.getDataFromApi("groups").then((d) => {
         if (!d["error"]) {
             d["data"].forEach((r) => {
                 const name = r.name;
@@ -25,4 +38,21 @@ function showGroups() {
     });
 }
 
+function linkGroup() {
+    const linkBtn = document.getElementById("link_btn");
+    linkBtn.addEventListener("click", async () => {
+        const groupId = document.getElementById("groupId");
+        if (groupId.validity.valid) {
+            const resp = await apiFetch.postDataToApi("group", {
+                data: { groupId: groupId.value },
+            });
+
+            console.log(resp);
+        } else {
+            renderInputHint(groupId, groupId.validationMessage);
+        }
+    });
+}
+
 showGroups();
+linkGroup();

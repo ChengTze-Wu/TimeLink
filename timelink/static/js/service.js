@@ -1,3 +1,4 @@
+import * as apiFetch from "./module/apiFetch.js";
 // view
 function renderServices(id, name, type, price, group_name) {
     const servicesList = document.getElementById("services_list");
@@ -66,20 +67,27 @@ function addService() {
         const price = document.getElementById("price");
         const type = document.getElementById("type");
         const groupId = document.getElementById("select_group");
+        const openTime = document.getElementById("openTime");
+        const closeTime = document.getElementById("closeTime");
+
         if (name.value == "" || price.value == "" || groupId.value == "") {
         } else {
             startSpinner();
-            const resp = await postDataToApi("service", {
+            const resp = await apiFetch.postDataToApi("service", {
                 name: name.value,
                 price: price.value,
                 type: type.value,
                 groupId: groupId.value,
+                openTime: openTime.value,
+                closeTime: closeTime.value,
             });
             if (resp["ok"]) {
                 name.value = "";
                 price.value = "";
                 groupId.value = "";
                 type.value = "";
+                openTime.value = "";
+                closeTime.value = "";
             }
             await showServices();
             stopSpinner();
@@ -93,7 +101,7 @@ function deleteService() {
         btn.addEventListener("click", async () => {
             startSpinner();
             const id = btn.getAttribute("service-id");
-            const resp = await deleteDataToApi("service", id);
+            const resp = await apiFetch.deleteDataFromApi("service", id);
             if (!resp["error"]) {
                 await showServices();
             }
@@ -104,7 +112,7 @@ function deleteService() {
 
 async function showServices() {
     cleanServices();
-    const resp = await getDataFromApi("services");
+    const resp = await apiFetch.getDataFromApi("services");
     if (!resp["error"]) {
         resp["data"].forEach((d) => {
             const id = d.id;
@@ -119,7 +127,7 @@ async function showServices() {
 }
 
 async function showGroupsOption() {
-    const resp = await getDataFromApi("groups_option");
+    const resp = await apiFetch.getDataFromApi("groups_option");
     if (!resp["error"]) {
         resp["data"].forEach((d) => {
             const id = d.id;
@@ -130,6 +138,18 @@ async function showGroupsOption() {
 }
 
 async function init() {
+    flatpickr("#openTime", {
+        enableTime: true,
+        noCalendar: true,
+        minuteIncrement: 30,
+        dateFormat: "H:i",
+    });
+    flatpickr("#closeTime", {
+        enableTime: true,
+        noCalendar: true,
+        minuteIncrement: 30,
+        dateFormat: "H:i",
+    });
     showGroupsOption();
     startSpinner();
     await showServices();

@@ -1,4 +1,12 @@
-{% extends "layout/base.html" %}
+{% extends "board/layout/base.html" %}
+<!-- style -->
+{% block style %}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% endblock %}
 <!-- title -->
 {% block title %}Service | {% endblock %}
 <!-- main -->
@@ -38,6 +46,26 @@
             />
         </div>
         <div class="mb-3">
+            <label for="openTime" class="form-label">開始營業時間*</label>
+            <input
+                type="time"
+                class="form-control"
+                id="openTime"
+                name="openTime"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="closeTime" class="form-label">結束營業時間*</label>
+            <input
+                type="time"
+                class="form-control"
+                id="closeTime"
+                name="closeTime"
+                required
+            />
+        </div>
+        <div class="mb-3">
             <label for="type" class="form-label">類型</label>
             <input type="text" class="form-control" id="type" name="type" />
         </div>
@@ -71,5 +99,8 @@
 <!-- script -->
 
 {% block script %}
-<script src="{{ url_for('static', filename='js/service.js') }}"></script>
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/service.js') }}"
+></script>
 {% endblock %}

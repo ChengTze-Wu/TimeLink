@@ -2,28 +2,41 @@ from flask import Blueprint, request, session, redirect, url_for
 # from werkzeug.security import generate_password_hash, check_password_hash
 import model
 import jwt
-from util import login_required
 
 
 user = Blueprint('user', __name__)
 
-@user.route("/signin", methods=["POST"])
-def signin():
+
+# Login / Logout
+@user.route("/auth", methods=["POST"])
+def login():
     try:
-        username = request.form["username"]
-        password = request.form["password"]
-        resp = model.user.verify(username)
+        request_json = request.get_json()
+        username = request_json["username"]
+        password = request_json["password"]
+        resp = model.user.auth(username)
         if resp["data"]:
             query_password = resp["data"]["password"]
             usertoken = {"id":resp["data"]["id"], "username":resp["data"]["username"]}
-        if query_password == password:
-            session["usertoken"] = jwt.encode(usertoken, "secret", algorithm="HS256")
-            return redirect(url_for("pages.index"))
-        return {'error': "登入失敗"}
+            if query_password == password:
+                session["usertoken"] = jwt.encode(usertoken, "secret", algorithm="HS256")
+                return {"ok": True, "message": "Login Successful."}, 200
+        return {'error': True, "message": "Login failed."}, 400
     except Exception as e:
-        return {'error': str(e)}, 405
+        return {'error': True, "message": "Server Error."}, 500
+    
+@user.route('/auth', methods=["DELETE"])
+def logout():
+    try:
+        session.pop('usertoken', None)
+        return {"ok": True, "message": "Logout Successful."}, 200
+    except Exception as e:
+        return {'error': True, "message": "Server Error."}, 500
 
-@user.route("/signup", methods=["POST"])
+
+
+
+@user.route("/user", methods=["POST"])
 def signup():
     try:
         username = request.form["username"]
@@ -34,13 +47,8 @@ def signup():
         phone = request.form["phone"]
         resp = model.user.create(username=username, password=password, name=name, email=email, phone=phone)
         if resp["data"]:
-            return redirect(url_for("pages.signin"))
+            return redirect(url_for("home.index"))
         else:
             return {"error": True}
     except Exception as e:
-        return {'error': str(e)}, 405
-    
-@user.route('/signout', methods=["GET"])
-def signout():
-    session.pop('usertoken', None)
-    return redirect(url_for('pages.signin'))
+        return {'error': str(e)}, 500

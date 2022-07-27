@@ -4,7 +4,7 @@ function claimTimeLinkBot() {
     submitClaim.addEventListener("click", () => {
         const claimData = document.getElementById("claim");
         const data = claimData.value;
-        postDataToApi("claim", data).then(() => {
+        apiFetch.postDataToApi("claim", data).then(() => {
             claimData.value = "";
             location.reload();
         });

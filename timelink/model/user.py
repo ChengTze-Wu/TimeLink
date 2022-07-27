@@ -31,29 +31,7 @@ def create(username, password, name, email, phone):
         cursor.close()
         cnx.close()
         
-def check(username):
-    try:
-        cnx = mysql.connector.connect(pool_name="user")
-        cursor = cnx.cursor()
-        
-        data = (username,)
-        query = ("select id from User where username = %s")
-        cursor.execute(query, data)
-        result = cursor.fetchone()
-        
-        if result:
-            return True
-        
-        return False
-    except Exception as e:
-        raise e
-    finally:
-        if cnx.in_transaction:
-            cnx.rollback()
-        cursor.close()
-        cnx.close()
-        
-def verify(username):
+def auth(username):
     try:
         cnx = mysql.connector.connect(pool_name="user")
         cursor = cnx.cursor()
