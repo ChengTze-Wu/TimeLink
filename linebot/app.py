@@ -37,10 +37,21 @@ def get_services():
 def get_service(service_id):
     try:
         resp = model.service.get_all_by_service_id(service_id=service_id)
-        
+
         return resp
     except Exception as e:
         return {'error':str(e)}, 405
+    
+@timelink_bot.route("/api/available_time/<service_id>", methods=["GET"])
+def get_available_time(service_id):
+    try:
+        resp = model.reserve.get_available_time(service_id=service_id)
+        print(resp)
+        return resp
+    except Exception as e:
+        return {'error':str(e)}, 405
+
+
 
 @timelink_bot.route("/liff/services", methods=['GET'])
 def liff_services():

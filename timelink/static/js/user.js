@@ -7,8 +7,8 @@ function login() {
         // const username = document.getElementById("username").value;
         // const password = document.getElementById("password").value;
         const data = {
-            username: "test",
-            password: "test",
+            username: "yaoop30507",
+            password: "a126840783",
         };
         const message = await apiFetch.postDataToApi("auth", data);
         if (message.status === 200) {
