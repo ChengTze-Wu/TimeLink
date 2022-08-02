@@ -191,7 +191,7 @@ def message_text(event):
                         event.reply_token,
                         TextSendMessage(f"{user_name}，為您查看服務列表：{service_msg}")
                 )
-            elif "預約記錄" in event.message.text:
+            elif "記錄" in event.message.text:
                 reserves = model.reserve.get_reserve_by_member_id_and_group_id(member_id=member_id, group_id=group_id)
                 reserve_record = ""
                 for reserve in reserves["data"]:
@@ -214,7 +214,7 @@ def message_text(event):
                         event.reply_token,
                         TextSendMessage("查看服務列表 請輸入： tl 服務\n"
                                         "預約服務 請輸入： tl 預約\n"
-                                        "查詢預約記錄 請輸入： tl 預約記錄")
+                                        "查詢預約記錄 請輸入： tl 記錄")
                 )
                 
 if __name__ == "__main__":
