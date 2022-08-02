@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 import model
+import datetime
 
 from flask import (
     Flask, request, abort, render_template
@@ -22,7 +23,7 @@ timelink_bot = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET_KEY'))
 
-# liff
+# liff API
 @timelink_bot.route("/api/services", methods=["GET"])
 def get_services():
     try:
@@ -33,7 +34,7 @@ def get_services():
     except Exception as e:
         return {'error':str(e)}, 405
     
-@timelink_bot.route("/api/service/<service_id>", methods=["GET"])
+@timelink_bot.route("/api/services/<service_id>", methods=["GET"])
 def get_service(service_id):
     try:
         resp = model.service.get_all_by_service_id(service_id=service_id)
@@ -42,15 +43,30 @@ def get_service(service_id):
     except Exception as e:
         return {'error':str(e)}, 405
     
-@timelink_bot.route("/api/available_time/<service_id>", methods=["GET"])
-def get_available_time(service_id):
+@timelink_bot.route("/api/reserves", methods=["GET"])
+def get_reserves():
     try:
-        resp = model.reserve.get_available_time(service_id=service_id)
-        print(resp)
+        query_string = request.args
+        if query_string["service_id"] and query_string["booking_date"]:
+            resp = model.reserve.get_available_time(service_id=query_string["service_id"], 
+                                                    booking_date=query_string["booking_date"])
         return resp
     except Exception as e:
         return {'error':str(e)}, 405
 
+@timelink_bot.route("/api/reserves", methods=["POST"])
+def create_reserve():
+    try:
+        data = request.get_json()
+        bookedDateTime = datetime.datetime.strptime(f"{data['booking_date']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
+        
+        member_id = model.member.get_member_id_by_userId(data["userId"])
+        resp = model.reserve.create(service_id=data["service_id"], 
+                                    member_id=member_id, 
+                                    bookedDateTime=bookedDateTime)
+        return resp
+    except Exception as e:
+        return {'error':str(e)}, 405
 
 
 @timelink_bot.route("/liff/services", methods=['GET'])
@@ -166,9 +182,7 @@ def message_text(event):
                 profile = line_bot_api.get_profile(event.source.user_id)
                 user_name = profile.display_name
                 # get group services
-                groupId = model.group.get_group_id_by_groupId(event.source.group_id)
-                
-                services = model.service.get_all_by_group_id(groupId)
+                services = model.service.get_all_by_groupId(event.source.group_id)
                 service_msg = ""
                 for service in services["data"]:
                     service_msg += f"\n{service['name']} | {service['price']}元"
@@ -176,6 +190,19 @@ def message_text(event):
                 line_bot_api.reply_message(
                         event.reply_token,
                         TextSendMessage(f"{user_name}，為您查看服務列表：{service_msg}")
+                )
+            elif "預約記錄" in event.message.text:
+                reserves = model.reserve.get_reserve_by_member_id_and_group_id(member_id=member_id, group_id=group_id)
+                reserve_record = ""
+                for reserve in reserves["data"]:
+                    reserve_record += f"\n{reserve['serviceName']} | {reserve['bookedDateTime']}"
+                    
+                profile = line_bot_api.get_profile(event.source.user_id)
+                user_name = profile.display_name
+                
+                line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage(f"{user_name}，為您查看預約記錄：{reserve_record}")
                 )
             elif "預約" in event.message.text:
                 line_bot_api.reply_message(
@@ -186,7 +213,8 @@ def message_text(event):
                 line_bot_api.reply_message(
                         event.reply_token,
                         TextSendMessage("查看服務列表 請輸入： tl 服務\n"
-                                        "預約服務 請輸入： tl 預約")
+                                        "預約服務 請輸入： tl 預約\n"
+                                        "查詢預約記錄 請輸入： tl 預約記錄")
                 )
                 
 if __name__ == "__main__":

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TimeLink Booking System</title>
+
+        <link
+            href="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/css/date-time-picker-component.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/js/date-time-picker-component.min.js"></script>
+    </head>
+    <body>
+        <div id="select_date"></div>
+        <div>
+            <select name="select" id="select">
+                <option value="">請先選擇預約日期</option>
+                <option value="34">34</option>
+            </select>
+        </div>
+        <button id="get">GET</button>
+        <script>
+            function get() {
+                const get = document.getElementById("get");
+                const select = document.getElementById("select");
+                get.addEventListener("click", function () {
+                    console.log(select.value);
+                });
+            }
+            function date() {
+                const select_date = document.getElementById("select_date");
+                select_date.addEventListener("click", function () {
+                    const date = document.querySelector(".date_output");
+                    console.log(date.value);
+                });
+            }
+            function datePicker() {
+                const ob = new DateTimePickerComponent.DatePicker(
+                    "select_date",
+                    {}
+                );
+                console.log(ob);
+                date();
+            }
+
+            datePicker();
+            get();
+        </script>
+    </body>
+</html>

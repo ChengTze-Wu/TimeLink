@@ -16,9 +16,10 @@
                 const service = document.createElement("div");
                 service.className = "service";
                 service.innerHTML = `
-                    <div class="service-name">${data.name}</div>
+                    <div class="service">
+                    <h2 class="service-name">${data.name}</h2>
                     <a href="/liff/service/${data.id}" class="service-url">點此預約</a>
-                    <hr>
+                    </div>
                 `;
                 container.appendChild(service);
             }
@@ -45,21 +46,16 @@
                 });
             }
 
-            if (liff.isInClient()) {
-                liff.init({
-                    liffId: "1657198810-v359xpYa",
+            liff.init({
+                liffId: "1657198810-v359xpYa",
+            })
+                .then(() => {
+                    const context = liff.getContext();
+                    createServices(context.groupId);
                 })
-                    .then(() => {
-                        const context = liff.getContext();
-                        createServices(context.groupId);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                document.getElementById("container").innerHTML =
-                    "<p>網頁版建置中...</p>";
-            }
+                .catch((err) => {
+                    console.log(err);
+                });
         </script>
     </body>
 </html>

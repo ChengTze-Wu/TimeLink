@@ -3,7 +3,10 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>TimeLink Booking System</title>
-
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/service.css') }}"
+        />
         <link
             href="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/css/date-time-picker-component.min.css"
             rel="stylesheet"
@@ -12,36 +15,49 @@
     </head>
     <body>
         <div id="container"></div>
+        <div class="footer">
+            <button id="submit">預約</button>
+            <button id="cancel">返回</button>
+        </div>
         <script
             charset="utf-8"
             src="https://static.line-scdn.net/liff/edge/2/sdk.js"
         ></script>
         <script>
-            function renderService(data) {
+            function renderServiceDate(data) {
                 const container = document.getElementById("container");
                 const service = document.createElement("div");
-                const datetime = document.createElement("div");
+                const selectDate = document.createElement("div");
                 service.className = "service";
                 service.innerHTML = `
-                    <h1 class="service-name">${data.name}</h1>
-                    <p class="service-price">NT$ ${data.price}</p>
+                    <h2 class="service-name">${data.name}</h2>
+                    <h3 class="service-price">NT$ ${data.price}</h3>
                 `;
-                datetime.className = "datetime";
-                datetime.innerHTML = `
+                selectDate.className = "selectDate";
+                selectDate.innerHTML = `
                     <label for="select_date">選擇預約日期</label>
                     <div id="select_date"></div>
-                    <label for="select_time">選擇預約時間</label>
-                    <select name="select_time" id="select_time">
-                        <option value="">請選擇時間</option>
+                    <label for="select_date">選擇預約時間</label>
+                    <select id="selectTime">
+                        <option value="">請先選擇預約日期</option>
                     </select>
-                    <br>
-                    <button id="btn_submit">預約</button>
-                    <button id="btn_cancel">取消</button>
                 `;
-
                 container.appendChild(service);
-                container.appendChild(datetime);
+                container.appendChild(selectDate);
                 datePicker();
+            }
+
+            function renderServiceTime(time) {
+                const selectTime = document.getElementById("selectTime");
+                const optionTime = document.createElement("option");
+                optionTime.value = time;
+                optionTime.textContent = time;
+                selectTime.appendChild(optionTime);
+            }
+
+            function removeServiceTime() {
+                const selectTime = document.getElementById("selectTime");
+                selectTime.innerHTML = "";
             }
 
             function showSpinner() {
@@ -54,33 +70,78 @@
                 container.textContent = "";
             }
 
-            async function createService(service_id) {
-                await showSpinner();
-                const resp = await fetch(`/api/service/${service_id}`, {
-                    method: "GET",
-                });
-                const JsonData = await resp.json();
-                await closeSpinner();
-                JsonData["data"].forEach((data) => {
-                    renderService(data);
+            function getPickTime(service_id) {
+                const select_date = document.getElementById("select_date");
+                select_date.addEventListener("click", async () => {
+                    const date = await document.querySelector(".date_output");
+                    const reserve = await fetch(
+                        `/api/reserves?service_id=${service_id}&booking_date=${date.value}`
+                    );
+                    const reserveTime = await reserve.json();
+                    await removeServiceTime();
+                    reserveTime["data"]["available_time"].forEach((time) => {
+                        renderServiceTime(time);
+                    });
                 });
             }
 
-            if (liff.isInClient()) {
-                liff.init({
-                    liffId: "1657198810-v359xpYa",
-                })
-                    .then(() => {
-                        const service_id = location.pathname.split("/")[3];
-                        createService(service_id);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                document.getElementById("container").innerHTML =
-                    "<p>網頁版建置中...</p>";
+            async function createService(service_id) {
+                await showSpinner();
+                const service = await fetch(`/api/services/${service_id}`);
+                const serviceData = await service.json();
+                await closeSpinner();
+                await serviceData["data"].forEach((data) => {
+                    renderServiceDate(data);
+                });
+                getPickTime(service_id);
             }
+
+            function cancel() {
+                const cancel = document.getElementById("cancel");
+                cancel.addEventListener("click", () => {
+                    location.href = "/liff/services";
+                });
+            }
+
+            function makeReserve(service_id, userId) {
+                const submit = document.getElementById("submit");
+                submit.addEventListener("click", async () => {
+                    const selectTime = document.getElementById("selectTime");
+                    const selectDate = document.querySelector(".date_output");
+                    const reserveResp = await fetch(`/api/reserves`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            service_id: service_id,
+                            userId: userId,
+                            booking_date: selectDate.value,
+                            booking_time: selectTime.value,
+                        }),
+                    });
+                    if (reserveResp.status === 201) {
+                        alert("預約成功");
+                        liff.closeWindow();
+                    } else {
+                        alert("預約失敗");
+                    }
+                });
+            }
+
+            liff.init({
+                liffId: "1657198810-v359xpYa",
+            })
+                .then(async () => {
+                    const context = liff.getContext();
+                    const service_id = location.pathname.split("/")[3];
+                    await createService(service_id);
+                    makeReserve(service_id, context.userId);
+                    cancel();
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
 
             function datePicker() {
                 let it = {
