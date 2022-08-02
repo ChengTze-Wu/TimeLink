@@ -24,7 +24,7 @@ line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET_KEY'))
 
 # liff API
-@timelink_bot.route("/api/services", methods=["GET"])
+@timelink_bot.route("/liff/api/services", methods=["GET"])
 def get_services():
     try:
         groupId = request.args.get("groupId")
@@ -34,7 +34,7 @@ def get_services():
     except Exception as e:
         return {'error':str(e)}, 405
     
-@timelink_bot.route("/api/services/<service_id>", methods=["GET"])
+@timelink_bot.route("/liff/api/services/<service_id>", methods=["GET"])
 def get_service(service_id):
     try:
         resp = model.service.get_all_by_service_id(service_id=service_id)
@@ -43,7 +43,7 @@ def get_service(service_id):
     except Exception as e:
         return {'error':str(e)}, 405
     
-@timelink_bot.route("/api/reserves", methods=["GET"])
+@timelink_bot.route("/liff/api/reserves", methods=["GET"])
 def get_reserves():
     try:
         query_string = request.args
@@ -54,7 +54,7 @@ def get_reserves():
     except Exception as e:
         return {'error':str(e)}, 405
 
-@timelink_bot.route("/api/reserves", methods=["POST"])
+@timelink_bot.route("/liff/api/reserves", methods=["POST"])
 def create_reserve():
     try:
         data = request.get_json()

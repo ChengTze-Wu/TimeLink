@@ -36,9 +36,12 @@
 
             async function createServices(groupId) {
                 await showSpinner();
-                const resp = await fetch(`/api/services?groupId=${groupId}`, {
-                    method: "GET",
-                });
+                const resp = await fetch(
+                    `/liff/api/services?groupId=${groupId}`,
+                    {
+                        method: "GET",
+                    }
+                );
                 const jsonData = await resp.json();
                 await closeSpinner();
                 jsonData["data"].forEach((data) => {

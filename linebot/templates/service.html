@@ -75,7 +75,7 @@
                 select_date.addEventListener("click", async () => {
                     const date = await document.querySelector(".date_output");
                     const reserve = await fetch(
-                        `/api/reserves?service_id=${service_id}&booking_date=${date.value}`
+                        `/liff/api/reserves?service_id=${service_id}&booking_date=${date.value}`
                     );
                     const reserveTime = await reserve.json();
                     await removeServiceTime();
@@ -87,7 +87,7 @@
 
             async function createService(service_id) {
                 await showSpinner();
-                const service = await fetch(`/api/services/${service_id}`);
+                const service = await fetch(`/liff/api/services/${service_id}`);
                 const serviceData = await service.json();
                 await closeSpinner();
                 await serviceData["data"].forEach((data) => {
@@ -108,7 +108,7 @@
                 submit.addEventListener("click", async () => {
                     const selectTime = document.getElementById("selectTime");
                     const selectDate = document.querySelector(".date_output");
-                    const reserveResp = await fetch(`/api/reserves`, {
+                    const reserveResp = await fetch(`/liff/api/reserves`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
