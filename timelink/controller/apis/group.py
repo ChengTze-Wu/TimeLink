@@ -14,26 +14,29 @@ def get_group_summary(groupId):
     headers = {'Authorization': "Bearer "+channel_access_token}
     try:
         resp = requests.get(url, headers=headers)
-        return resp.text
+        if resp.status_code == 400:
+            return {"data": None}
+        return {"data": json.loads(resp.text)}
     except Exception:
         return None
 
-@group.route("/link", methods=["POST"])
-def link():
+@group.route("/groups", methods=["POST"])
+def link_group():
     try:
-        name = request.form["name"]
-        groupId = request.form["groupId"]
+        data = request.get_json()
+        groupId = data["data"]["groupId"]
         usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
         user_id = usertoken["id"]
-        
+            
         group_summary = get_group_summary(groupId)
-        group_summary = json.loads(group_summary)
         
-        if group_summary["groupName"] == name:
-            resp = model.group.create(groupId=groupId, name=name, user_id=user_id)
-        return redirect(url_for('pages.group'))
+        if group_summary["data"]:
+            group_name = group_summary["data"]["groupName"]
+            resp = model.group.create(groupId=groupId, name=group_name, user_id=user_id)
+            return {"ok": True, "message": "Linking Successful."}, 200
+        return {"error": True, "message": "Linking failed."}, 400
     except Exception as e:
-        return redirect(url_for('pages.group'))
+        return {'error': True, "message": "Server Error."}, 500
 
 @group.route("/groups", methods=["GET"])
 def get_groups():
@@ -45,4 +48,4 @@ def get_groups():
         
         return resp
     except Exception as e:
-        return {'error': str(e)}, 405
+        return {'error': True, "message": "Server Error."}, 500

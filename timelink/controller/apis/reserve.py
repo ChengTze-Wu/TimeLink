@@ -1,9 +1,31 @@
 from flask import Blueprint, request
+import datetime
 import model
 
 reserve = Blueprint('reserve', __name__)
 
-@reserve.route("/reserve" , methods=["GET"])
+@reserve.route("/reserves" , methods=["POST"])
+def create_reserve():
+    try:
+        data = request.get_json()
+        bookedDateTime = datetime.datetime.strptime(f"{data['booking_date']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
+        
+        member_id = model.member.get_member_id_by_userId(data["userId"])
+        resp = model.reserve.create(service_id=data["service_id"], 
+                                    member_id=member_id, 
+                                    bookedDateTime=bookedDateTime)
+        return resp
+    except Exception as e:
+        return {'error':str(e)}, 500
+
+
+@reserve.route("/reserves", methods=["GET"])
 def get_reserves():
-    # return {'results':[{'id':'u0001', 'name':'晨晨', 'serve_name':'剪髮', 'date':'2022-5-18', 'time':'15:00'}]}
-    return {'error':True}, 405
+    try:
+        query_string = request.args
+        if query_string["service_id"] and query_string["booking_date"]:
+            resp = model.reserve.get_available_time(service_id=query_string["service_id"], 
+                                                    booking_date=query_string["booking_date"])
+        return resp
+    except Exception as e:
+        return {'error':str(e)}, 500

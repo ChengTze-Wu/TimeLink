@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <!-- meta -->
+        {% include 'board/layout/meta.html' %}
+        <!-- link -->
+        {% include 'board/layout/link.html' %}
+        <!-- style -->
+        {% block style %}{% endblock %}
+        <script
+            src="https://kit.fontawesome.com/1ed414d8e4.js"
+            crossorigin="anonymous"
+        ></script>
+
+        <title>{% block title %}{% endblock %}TimeLink</title>
+    </head>
+    <body>
+        <div class="split-container">
+            <!-- area-l -->
+            {% include'board/layout/sidebar.html' %}
+            <!-- area-r -->
+            <main class="container-fluid main-scroll pt-5">
+                <!-- main  -->
+                {% block main %}{% endblock %}
+            </main>
+        </div>
+
+        <!-- script -->
+        {% include'board/layout/script.html' %}
+        <!-- page script -->
+        {% block script %}{% endblock %}
+    </body>
+</html>

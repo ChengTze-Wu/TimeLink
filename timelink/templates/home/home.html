@@ -1,0 +1,100 @@
+{% extends "home/base.html" %}
+<!-- banner -->
+{% block banner %}
+<div class="banner w-full">
+    <img
+        class="opacity-75 object-cover w-full h-[432px]"
+        src="{{ url_for('static', filename='img/mobile.jpg') }}"
+    />
+</div>
+{% endblock %}
+
+<!-- main -->
+{% block main %}
+<div id="features">
+    <div
+        class="grid lg:grid-cols-3 lg:grid-rows-2 sm:grid-cols-2 sm:grid-rows-3 gap-4"
+    >
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icon-line.svg') }}" />
+            <h2>簡單易用</h2>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
+                deserunt cum dicta corrupti odio vel.
+            </p>
+        </div>
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icon-bot.svg') }}" />
+            <h2>自動更新</h2>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
+                deserunt cum dicta corrupti odio vel.
+            </p>
+        </div>
+        <div class="card">
+            <img
+                src="{{ url_for('static', filename='img/icon-calendar.svg') }}"
+            />
+            <h2>預約系統</h2>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
+                deserunt cum dicta corrupti odio vel.
+            </p>
+        </div>
+
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icon-list.svg') }}" />
+            <h2>記錄預約</h2>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
+                deserunt cum dicta corrupti odio vel.
+            </p>
+        </div>
+        <div class="card">
+            <img
+                src="{{ url_for('static', filename='img/icon-management.svg') }}"
+            />
+            <h2>管理系統</h2>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
+                deserunt cum dicta corrupti odio vel.
+            </p>
+        </div>
+        <div class="card">
+            <img src="{{ url_for('static', filename='img/icon-group.svg') }}" />
+            <h2>機器人管理</h2>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
+                deserunt cum dicta corrupti odio vel.
+            </p>
+        </div>
+    </div>
+</div>
+<!-- <div id="instruction">
+    <h2 class="text-center">使用TimeLink，只需三步驟。</h2>
+    <div class="grid grid-cols-3">
+        <div class="card">
+            <h3>1. 登入管理系統</h3>
+            <p>
+                請先登入管理系統，進入管理系統後，請選擇您要追蹤的網路時間軌跡。
+            </p>
+        </div>
+        <div class="card">
+            <h3>2. 預約時間軌跡</h3>
+            <p>請選擇您要預約的時間軌跡，並且選擇您要預約的時間。</p>
+        </div>
+        <div class="card">
+            <h3>3. 查看您的預約時間軌跡的趨勢</h3>
+            <p>請選擇您要查看的時間軌跡，並且選擇您要查看的時間。</p>
+        </div>
+    </div>
+</div>
+<div id="contact">
+    <h2 class="text-center">聯絡我們</h2>
+    <p>
+        <a href="mailto:chengtzewu@gmai.com">Gmail</a>
+    </p>
+</div> -->
+{% endblock %}
+<!-- page script -->
+{% block script %} {% endblock %}

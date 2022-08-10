@@ -1,0 +1,48 @@
+{% extends "board/layout/base.html" %}
+<!-- title -->
+{% block title %}Group | {% endblock %}
+<!-- style -->
+{% block style %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/group.css') }}"
+/>
+{% endblock %}
+<!-- main -->
+{% block main %}
+
+<div class="">
+    <h4><span style="color: #44ad53">Link</span> LineGroup and Linebot</h4>
+    <form onsubmit="return false">
+        <div class="">
+            <label for="groupId">LineBot 驗證碼</label>
+            <input
+                type="text"
+                class="groupId"
+                id="groupId"
+                name="groupId"
+                required
+            />
+        </div>
+        <button type="submit" id="link_btn">連結</button>
+    </form>
+</div>
+
+<table class="table" style="max-width: 500px">
+    <thead>
+        <tr>
+            <th scope="col">群組名稱</th>
+            <th scope="col">連結日期</th>
+        </tr>
+    </thead>
+    <tbody id="group_list"></tbody>
+</table>
+
+{% endblock %}
+<!-- script -->
+{% block script %}
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/group.js') }}"
+></script>
+{% endblock %}

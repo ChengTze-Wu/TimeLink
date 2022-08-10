@@ -1,0 +1,20 @@
+{% extends "board/layout/base.html" %}
+<!-- title -->
+{% block title %}DashBoard | {% endblock %}
+<!-- main -->
+{% block main %}
+
+<h3>Time<span style="color: #44ad53">Link</span> Guideline</h3>
+<h5>三步驟啟用 TimeLink Bot</h5>
+<p>
+    STEP1 Line 掃描 QRCODE 加入 Time<span style="color: #44ad53">Link </span
+    >好友。
+</p>
+<img
+    style="max-width: 250px"
+    src="{{ url_for('static', filename='img/timelink_qr.png') }}"
+/>
+<p>STEP2 將 TimeLink 邀請入你的群組內，並跟從指示。</p>
+<p>STEP3 至 Line 群組管理，註冊 TimeLink Bot ，以開通後台功能。</p>
+
+{% endblock %}

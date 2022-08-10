@@ -1,0 +1,36 @@
+<div class="sidebar">
+    <div>
+        <a class="logo" href="{{ url_for('board.index') }}"
+            >Time<span style="color: #44ad53">Link</span></a
+        >
+    </div>
+
+    <nav class="nav">
+        <ul class="nav_items">
+            <li>
+                <a class="nav_item" href="{{ url_for('board.group') }}"
+                    >Line群組管理</a
+                >
+            </li>
+            <li>
+                <a class="nav_item" href="{{ url_for('board.service') }}"
+                    >服務管理</a
+                >
+            </li>
+            <!-- <li>
+                <a class="nav_item" href="{{ url_for('board.reserve') }}"
+                    >預約管理</a
+                >
+            </li>
+            <li>
+                <a class="nav_item" href="{{ url_for('board.member') }}"
+                    >成員管理</a
+                >
+            </li> -->
+        </ul>
+    </nav>
+
+    <div class="signout_icon">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </div>
+</div>

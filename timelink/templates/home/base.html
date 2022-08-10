@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="ChengTze" />
+        <link
+            rel="icon"
+            href="{{ url_for('static', filename='img/timelink-logo.png') }}"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/main.css') }}"
+        />
+        <title>{% block title %}{% endblock %}TimeLink</title>
+    </head>
+    <body class="bg-primary-white">
+        <header
+            class="flex items-center w-full h-16 bg-secondary-blue shadow-lg justify-between px-8"
+        >
+            <div class="logo text-white">
+                <a href="/"
+                    ><h1>
+                        Time<span class="text-primary-green">Link</span>
+                    </h1></a
+                >
+            </div>
+            <nav class="flex items-center space-x-4">
+                <ul class="flex text-white space-x-3">
+                    <a class="hover:text-primary-green" href="/#features">
+                        <li>系統特色</li>
+                    </a>
+                    <!-- <a class="hover:text-primary-green" href="/#instruction">
+                        <li>使用說明</li>
+                    </a>
+                    <a class="hover:text-primary-green" href="/#contact">
+                        <li>聯絡我們</li>
+                    </a> -->
+                </ul>
+                <a href="/signup" class="btn">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                        />
+                    </svg>
+                    註冊
+                </a>
+                <button id="login_btn" class="btn">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                        />
+                    </svg>
+                    系統登入
+                </button>
+            </nav>
+        </header>
+        <!-- Login -->
+        <div
+            id="login_card"
+            class="absolute z-20 card h-fit w-72 top-[72px] right-8 invisible"
+        >
+            <form id="login-form" class="w-full grid grid-rows-4 gap-2">
+                <h2>管理系統登入</h2>
+                <input
+                    class="w-full h-12 outline-none border-[1px] border-gray-300 rounded-lg px-4 py-2 focus:border-primary-green"
+                    type="text"
+                    name="username"
+                    id="username"
+                    placeholder="Username"
+                    required
+                />
+                <input
+                    class="w-full h-12 outline-none border-[1px] border-gray-300 rounded-lg px-4 py-2 focus:border-primary-green"
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="Password"
+                    required
+                />
+                <button id="login_submit" class="btn-card self-end">
+                    登入
+                </button>
+            </form>
+            <svg
+                id="close_btn"
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-7 w-7 absolute right-4 top-4 hover:text-primary-green hover:cursor-pointer active:cursor-default"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+        </div>
+        {% block banner %}{% endblock %}
+        <main class="p-8">{% block main %}{% endblock %}</main>
+
+        <footer class="footer"></footer>
+        <!-- script -->
+        <script
+            type="module"
+            src="{{ url_for('static', filename='js/module/apiFetch.js') }}"
+        ></script>
+        <script
+            type="module"
+            src="{{ url_for('static', filename='js/login.js') }}"
+        ></script>
+        <!-- page script -->
+
+        {% block script %}{% endblock %}
+    </body>
+</html>

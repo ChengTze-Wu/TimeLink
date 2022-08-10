@@ -32,7 +32,7 @@ services:
             - TZ="Asia/Taipei"
         ports:
             - "5000:5000"
-        command: gunicorn -w 2 -b :5000 app:linebot
+        command: gunicorn -w 2 -b :5000 app:timelink_bot
 
     nginx:
         image: chengtze/timelink_nginx

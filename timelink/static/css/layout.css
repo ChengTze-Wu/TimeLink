@@ -49,6 +49,7 @@ body {
 }
 .signout_icon:hover {
     opacity: 0.7;
+    cursor: pointer;
 }
 .logo {
     display: flex;

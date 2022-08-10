@@ -1,0 +1,106 @@
+{% extends "board/layout/base.html" %}
+<!-- style -->
+{% block style %}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% endblock %}
+<!-- title -->
+{% block title %}Service | {% endblock %}
+<!-- main -->
+{% block main %}
+<div class="row">
+    <form class="col-3" onsubmit="return false">
+        <div class="mb-3">
+            <h4>新增服務</h4>
+            <label for="select_group" class="form-label">群組名稱*</label>
+            <select
+                name="group_id"
+                id="select_group"
+                class="form-select"
+                style="height: 100px"
+                required
+                multiple
+            ></select>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">服務名稱*</label>
+            <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">價格*</label>
+            <input
+                type="number"
+                class="form-control"
+                id="price"
+                name="price"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="openTime" class="form-label">開始營業時間*</label>
+            <input
+                type="time"
+                class="form-control"
+                id="openTime"
+                name="openTime"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="closeTime" class="form-label">結束營業時間*</label>
+            <input
+                type="time"
+                class="form-control"
+                id="closeTime"
+                name="closeTime"
+                required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">類型</label>
+            <input type="text" class="form-control" id="type" name="type" />
+        </div>
+        <button id="add_service" type="submit">新增</button>
+    </form>
+    <div class="col-9 position-relative">
+        <div class="d-flex align-items-baseline">
+            <h4>服務列表</h4>
+            <div
+                class="ms-2 spinner spinner-border text-success d-none"
+                role="status"
+            >
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <table class="table table-hover border-success">
+            <thead class="table_head">
+                <tr>
+                    <th scope="col">服務名稱</th>
+                    <th scope="col">價格</th>
+                    <th scope="col">類型</th>
+                    <th scope="col">所在群組</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody id="services_list"></tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+<!-- script -->
+
+{% block script %}
+<script
+    type="module"
+    src="{{ url_for('static', filename='js/service.js') }}"
+></script>
+{% endblock %}

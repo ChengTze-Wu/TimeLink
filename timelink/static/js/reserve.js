@@ -1,3 +1,4 @@
+import * as apiFetch from "./module/apiFetch.js";
 // view
 function renderReserves(uid, uname, rname, rdate, rtime) {
     const reservesList = document.getElementById("reserves_list");
@@ -21,7 +22,7 @@ function renderReserves(uid, uname, rname, rdate, rtime) {
 }
 
 function showReserves() {
-    getDataFromApi("reserves").then((d) => {
+    apiFetch.getDataFromApi("reserves").then((d) => {
         if (!d["error"]) {
             d["results"].forEach((r) => {
                 const uid = r.uid;

@@ -5,6 +5,8 @@ timelink.cc/
 .DS_Store
 __pycache__/
 
+src/
+
 note.sql
 
 node_modules/
