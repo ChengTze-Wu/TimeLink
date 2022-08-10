@@ -34,6 +34,7 @@ async function deleteDataFromApi(url, data = null) {
         headers: new Headers({ "Content-Type": "application/json" }),
     });
     const message = await resp.json();
+    message.status = resp.status;
     return message;
 }
 

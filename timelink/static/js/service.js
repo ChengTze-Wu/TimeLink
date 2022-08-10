@@ -73,7 +73,7 @@ function addService() {
         if (name.value == "" || price.value == "" || groupId.value == "") {
         } else {
             startSpinner();
-            const resp = await apiFetch.postDataToApi("service", {
+            const resp = await apiFetch.postDataToApi("services", {
                 name: name.value,
                 price: price.value,
                 type: type.value,
@@ -100,8 +100,10 @@ function deleteService() {
     trashBtns.forEach((btn) => {
         btn.addEventListener("click", async () => {
             startSpinner();
-            const id = btn.getAttribute("service-id");
-            const resp = await apiFetch.deleteDataFromApi("service", id);
+            const service_id = btn.getAttribute("service-id");
+            const resp = await apiFetch.deleteDataFromApi(
+                `services/${service_id}`
+            );
             if (!resp["error"]) {
                 await showServices();
             }
@@ -127,7 +129,7 @@ async function showServices() {
 }
 
 async function showGroupsOption() {
-    const resp = await apiFetch.getDataFromApi("groups_option");
+    const resp = await apiFetch.getDataFromApi("groups");
     if (!resp["error"]) {
         resp["data"].forEach((d) => {
             const id = d.id;

@@ -1,6 +1,6 @@
-from flask import Blueprint, request, session, redirect, url_for
-# from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Blueprint, request, session
 import model
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
 
@@ -16,9 +16,9 @@ def login():
         password = request_json["password"]
         resp = model.user.auth(username)
         if resp["data"]:
-            query_password = resp["data"]["password"]
-            usertoken = {"id":resp["data"]["id"], "username":resp["data"]["username"]}
-            if query_password == password:
+            hashed_password = resp["data"]["password"]
+            if check_password_hash(hashed_password, password):
+                usertoken = {"id":resp["data"]["id"], "username":resp["data"]["username"]}
                 session["usertoken"] = jwt.encode(usertoken, "secret", algorithm="HS256")
                 return {"ok": True, "message": "Login Successful."}, 200
         return {'error': True, "message": "Login failed."}, 400
@@ -39,16 +39,18 @@ def logout():
 @user.route("/user", methods=["POST"])
 def signup():
     try:
-        username = request.form["username"]
-        # hashed_password = generate_password_hash(request.form["password"])
-        password = request.form["password"]
-        name = request.form["name"]
-        email = request.form["email"]
-        phone = request.form["phone"]
-        resp = model.user.create(username=username, password=password, name=name, email=email, phone=phone)
+        request_json = request.get_json()
+        username = request_json["username"]
+        password = request_json["password"]
+        name = request_json["name"]
+        email = request_json["email"]
+        phone = request_json["phone"]
+        
+        hashed_password = generate_password_hash(password)
+        
+        resp = model.user.create(username=username, password=hashed_password, name=name, email=email, phone=phone)
         if resp["data"]:
-            return redirect(url_for("home.index"))
-        else:
-            return {"error": True}
+            return {"ok": True, "message": "Signup Successful."}, 200
+        return {"error": True, "message": "Signup failed."}, 400
     except Exception as e:
-        return {'error': str(e)}, 500
+        return  {'error': True, "message": "Server Error."}, 500

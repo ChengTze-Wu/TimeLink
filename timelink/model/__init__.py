@@ -1,1 +1,1 @@
-from model import service, user, group
+from model import service, user, group, reserve, member

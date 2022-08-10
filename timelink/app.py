@@ -17,3 +17,4 @@ app.register_blueprint(controller.apis.reserve, url_prefix="/api")
 # apps
 app.register_blueprint(controller.home)
 app.register_blueprint(controller.board, url_prefix="/board")
+app.register_blueprint(controller.liff, url_prefix="/liff")

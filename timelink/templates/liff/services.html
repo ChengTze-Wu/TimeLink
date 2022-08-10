@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TimeLink Booking System</title>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script
+            charset="utf-8"
+            src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+        ></script>
+        <script>
+            function renderService(data) {
+                const container = document.getElementById("container");
+                const service = document.createElement("div");
+                service.className = "service";
+                service.innerHTML = `
+                    <div class="service">
+                    <h2 class="service-name">${data.name}</h2>
+                    <a href="/liff/service/${data.id}" class="service-url">點此預約</a>
+                    </div>
+                `;
+                container.appendChild(service);
+            }
+
+            function showSpinner() {
+                const container = document.getElementById("container");
+                container.textContent = "讀取中...";
+            }
+
+            function closeSpinner() {
+                const container = document.getElementById("container");
+                container.textContent = "";
+            }
+
+            async function createServices(groupId) {
+                await showSpinner();
+                const resp = await fetch(`/api/services?groupId=${groupId}`, {
+                    method: "GET",
+                });
+                const jsonData = await resp.json();
+                await closeSpinner();
+                jsonData["data"].forEach((data) => {
+                    renderService(data);
+                });
+            }
+
+            liff.init({
+                liffId: "1657198810-v359xpYa",
+            })
+                .then(() => {
+                    const context = liff.getContext();
+                    createServices(context.groupId);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        </script>
+    </body>
+</html>

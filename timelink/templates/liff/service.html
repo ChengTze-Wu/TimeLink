@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TimeLink Booking System</title>
+        <style>
+            :root {
+                --main-color: #44ad53;
+                --secondary-color: #272c33;
+                --mode-color: #e7e7e7;
+                --mode-card-color: #414a58;
+            }
+
+            .footer {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+
+            #submit {
+                background-color: var(--main-color);
+                color: #fff;
+                border: none;
+                padding: 10px;
+                width: 50%;
+                font-size: 20px;
+            }
+
+            #cancel {
+                background-color: var(--mode-color);
+                color: var(--secondary-color);
+                border: none;
+                padding: 10px;
+                width: 50%;
+                font-size: 20px;
+            }
+
+            #selectTime {
+                font-size: 1.2rem;
+            }
+        </style>
+        <link
+            href="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/css/date-time-picker-component.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/js/date-time-picker-component.min.js"></script>
+    </head>
+    <body>
+        <div id="container"></div>
+        <div class="footer">
+            <button id="submit">預約</button>
+            <button id="cancel">返回</button>
+        </div>
+        <script
+            charset="utf-8"
+            src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+        ></script>
+        <script>
+            function renderServiceDate(data) {
+                const container = document.getElementById("container");
+                const service = document.createElement("div");
+                const selectDate = document.createElement("div");
+                service.className = "service";
+                service.innerHTML = `
+                    <h2 class="service-name">${data.name}</h2>
+                    <h3 class="service-price">NT$ ${data.price}</h3>
+                `;
+                selectDate.className = "selectDate";
+                selectDate.innerHTML = `
+                    <label for="select_date">選擇預約日期</label>
+                    <div id="select_date"></div>
+                    <label for="select_date">選擇預約時間</label>
+                    <select id="selectTime">
+                        <option value="">請先選擇預約日期</option>
+                    </select>
+                `;
+                container.appendChild(service);
+                container.appendChild(selectDate);
+                datePicker();
+            }
+
+            function renderServiceTime(time) {
+                const selectTime = document.getElementById("selectTime");
+                const optionTime = document.createElement("option");
+                optionTime.value = time;
+                optionTime.textContent = time;
+                selectTime.appendChild(optionTime);
+            }
+
+            function removeServiceTime() {
+                const selectTime = document.getElementById("selectTime");
+                selectTime.innerHTML = "";
+            }
+
+            function showSpinner() {
+                const container = document.getElementById("container");
+                container.textContent = "讀取中...";
+            }
+
+            function closeSpinner() {
+                const container = document.getElementById("container");
+                container.textContent = "";
+            }
+
+            function getPickTime(service_id) {
+                const select_date = document.getElementById("select_date");
+                select_date.addEventListener("click", async () => {
+                    const date = await document.querySelector(".date_output");
+                    const reserve = await fetch(
+                        `/api/reserves?service_id=${service_id}&booking_date=${date.value}`
+                    );
+                    const reserveTime = await reserve.json();
+                    await removeServiceTime();
+                    reserveTime["data"]["available_time"].forEach((time) => {
+                        renderServiceTime(time);
+                    });
+                });
+            }
+
+            async function createService(service_id) {
+                await showSpinner();
+                const service = await fetch(`/api/services/${service_id}`);
+                const serviceData = await service.json();
+                await closeSpinner();
+                await serviceData["data"].forEach((data) => {
+                    renderServiceDate(data);
+                });
+                getPickTime(service_id);
+            }
+
+            function cancel() {
+                const cancel = document.getElementById("cancel");
+                cancel.addEventListener("click", () => {
+                    location.href = "/liff/services";
+                });
+            }
+
+            function makeReserve(service_id, userId) {
+                const submit = document.getElementById("submit");
+                submit.addEventListener("click", async () => {
+                    const selectTime = document.getElementById("selectTime");
+                    const selectDate = document.querySelector(".date_output");
+                    const reserveResp = await fetch(`/api/reserves`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            service_id: service_id,
+                            userId: userId,
+                            booking_date: selectDate.value,
+                            booking_time: selectTime.value,
+                        }),
+                    });
+                    if (reserveResp.status === 201) {
+                        alert("預約成功");
+                        liff.closeWindow();
+                    } else {
+                        alert("預約失敗");
+                    }
+                });
+            }
+
+            liff.init({
+                liffId: "1657198810-v359xpYa",
+            })
+                .then(async () => {
+                    const context = liff.getContext();
+                    const service_id = location.pathname.split("/")[3];
+                    await createService(service_id);
+                    makeReserve(service_id, context.userId);
+                    cancel();
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+
+            function datePicker() {
+                let it = {
+                    jan: "ㄧ",
+                    feb: "二",
+                    mar: "三",
+                    apr: "四",
+                    may: "五",
+                    jun: "六",
+                    jul: "七",
+                    aug: "八",
+                    sep: "九",
+                    oct: "十",
+                    nov: "十一",
+                    dec: "十二",
+                    jan_: "ㄧ月",
+                    feb_: "二月",
+                    mar_: "三月",
+                    apr_: "四月",
+                    may_: "五月",
+                    jun_: "六月",
+                    jul_: "七月",
+                    aug_: "八月",
+                    sep_: "九月",
+                    oct_: "十月",
+                    nov_: "十一月",
+                    dec_: "十二月",
+                    mon: "一",
+                    tue: "二",
+                    wed: "三",
+                    thu: "四",
+                    fri: "五",
+                    sat: "六",
+                    sun: "日",
+                    mon_: "星期一",
+                    tue_: "星期二",
+                    wed_: "星期三",
+                    thu_: "星期四",
+                    fri_: "星期五",
+                    sat_: "星期六",
+                    sun_: "星期日",
+                    done: "預訂",
+                };
+
+                new DateTimePickerComponent.DatePicker(`select_date`, {
+                    l10n: it,
+                });
+            }
+        </script>
+    </body>
+</html>

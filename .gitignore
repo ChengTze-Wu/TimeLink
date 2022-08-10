@@ -5,7 +5,7 @@ timelink.cc/
 .DS_Store
 __pycache__/
 
-dashboard/
+src/
 
 note.sql
 

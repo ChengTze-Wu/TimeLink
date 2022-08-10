@@ -67,7 +67,8 @@ def get_all_by_user_id(user_id):
         cursor = cnx.cursor()
         
         data = (user_id,)
-        query = ("select Service.id, Service.name, Service.type, Service.price, Line_Group.name from Service INNER JOIN Line_Group ON Service.group_id = Line_Group.id where Service.user_id = %s")
+        query = ("select Service.id, Service.name, Service.type, Service.price, Line_Group.name from Service "
+                 "INNER JOIN Line_Group ON Service.group_id = Line_Group.id where Service.user_id = %s")
     
         cursor.execute(query, data)
         result = cursor.fetchall()
@@ -149,12 +150,12 @@ def get_all_by_groupId(groupId):
         cursor.close()
         cnx.close()
 
-def delete(id):
+def delete(service_id):
     try:
         cnx = mysql.connector.connect(pool_name="service")
         cursor = cnx.cursor()
         
-        data = (id,)
+        data = (service_id,)
         query = ("DELETE FROM Service WHERE id = %s;")
         
         cursor.execute(query, data)

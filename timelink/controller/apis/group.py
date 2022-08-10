@@ -20,7 +20,7 @@ def get_group_summary(groupId):
     except Exception:
         return None
 
-@group.route("/group", methods=["POST"])
+@group.route("/groups", methods=["POST"])
 def link_group():
     try:
         data = request.get_json()
@@ -33,8 +33,8 @@ def link_group():
         if group_summary["data"]:
             group_name = group_summary["data"]["groupName"]
             resp = model.group.create(groupId=groupId, name=group_name, user_id=user_id)
-            return {"ok": True, "message": "Insert Successful."}, 200
-        return {"error": True, "message": "Insert failed."}, 400
+            return {"ok": True, "message": "Linking Successful."}, 200
+        return {"error": True, "message": "Linking failed."}, 400
     except Exception as e:
         return {'error': True, "message": "Server Error."}, 500
 

@@ -43,7 +43,7 @@ function linkGroup() {
     linkBtn.addEventListener("click", async () => {
         const groupId = document.getElementById("groupId");
         if (groupId.validity.valid) {
-            const resp = await apiFetch.postDataToApi("group", {
+            const resp = await apiFetch.postDataToApi("groups", {
                 data: { groupId: groupId.value },
             });
 

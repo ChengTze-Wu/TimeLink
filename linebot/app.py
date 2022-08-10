@@ -23,62 +23,6 @@ timelink_bot = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET_KEY'))
 
-# liff API
-@timelink_bot.route("/liff/api/services", methods=["GET"])
-def get_services():
-    try:
-        groupId = request.args.get("groupId")
-        resp = model.service.get_all_by_groupId(groupId=groupId)
-        
-        return resp
-    except Exception as e:
-        return {'error':str(e)}, 405
-    
-@timelink_bot.route("/liff/api/services/<service_id>", methods=["GET"])
-def get_service(service_id):
-    try:
-        resp = model.service.get_all_by_service_id(service_id=service_id)
-
-        return resp
-    except Exception as e:
-        return {'error':str(e)}, 405
-    
-@timelink_bot.route("/liff/api/reserves", methods=["GET"])
-def get_reserves():
-    try:
-        query_string = request.args
-        if query_string["service_id"] and query_string["booking_date"]:
-            resp = model.reserve.get_available_time(service_id=query_string["service_id"], 
-                                                    booking_date=query_string["booking_date"])
-        return resp
-    except Exception as e:
-        return {'error':str(e)}, 405
-
-@timelink_bot.route("/liff/api/reserves", methods=["POST"])
-def create_reserve():
-    try:
-        data = request.get_json()
-        bookedDateTime = datetime.datetime.strptime(f"{data['booking_date']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
-        
-        member_id = model.member.get_member_id_by_userId(data["userId"])
-        resp = model.reserve.create(service_id=data["service_id"], 
-                                    member_id=member_id, 
-                                    bookedDateTime=bookedDateTime)
-        return resp
-    except Exception as e:
-        return {'error':str(e)}, 405
-
-
-@timelink_bot.route("/liff/services", methods=['GET'])
-def liff_services():
-    return render_template("services.html")
-
-@timelink_bot.route("/liff/service/<service_id>", methods=['GET'])
-def liff_service(service_id):
-    return render_template("service.html")
-
-
-# line bot
 @timelink_bot.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -164,11 +108,6 @@ def message_text(event):
         groups = model.group.get_all_groupId()["data"]
         group_ids = [group["groupId"] for group in groups]
         
-        group_id = model.group.get_group_id_by_groupId(groupId=event.source.group_id)
-        member_id = model.member.get_member_id_by_userId(userId=event.source.user_id)
-        
-        resp = model.manage.create(member_id=member_id, group_id=group_id)
-        
         if event.source.group_id not in group_ids:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -176,6 +115,10 @@ def message_text(event):
                                 f" {event.source.group_id} \n以綁定。")
             )
         else:
+            group_id = model.group.get_group_id_by_groupId(groupId=event.source.group_id)
+            member_id = model.member.get_member_id_by_userId(userId=event.source.user_id)
+        
+            resp = model.manage.create(member_id=member_id, group_id=group_id)
             # ️feature
             if "服務" in event.message.text:
                 # get user name

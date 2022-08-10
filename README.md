@@ -8,7 +8,8 @@ The system can manage robots in multiple groups, and each robot can have differe
 
 -   <h3>TimeLink LINE Bot</h3>
 
-    ![TimeLink Line bot](./rm_static/demo_bot.gif)
+    <img style="margin: 16px" src="./rm_static/demo_bot.gif" alt="TimeLink Web" width="300">
+    <img style="margin: 16px" src="./rm_static/booking.gif" alt="TimeLink Web" width="300">
 
 -   <h3>TimeLink Management System</h3>
 
