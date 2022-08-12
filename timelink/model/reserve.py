@@ -1,22 +1,9 @@
-import os
-import mysql.connector
+from . import db
 import datetime
-
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
-
-cnx = mysql.connector.connect(pool_name="reserve",
-                              pool_size=5,
-                              **rds_config)
 
 def get_available_time(service_id, booking_date, working_minutes=60):
     try:
-        cnx = mysql.connector.connect(pool_name="reserve")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (service_id, )
@@ -54,7 +41,7 @@ def get_available_time(service_id, booking_date, working_minutes=60):
         
 def create(service_id, member_id, bookedDateTime, status=None):
     try:
-        cnx = mysql.connector.connect(pool_name="reserve")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         query = ("insert into Reserve "
                  "(service_id, member_id, bookedDateTime, status) "
@@ -75,7 +62,7 @@ def create(service_id, member_id, bookedDateTime, status=None):
         
 def get_reserve_by_member_id_and_group_id(member_id, group_id):
     try:
-        cnx = mysql.connector.connect(pool_name="reserve")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (member_id, group_id)

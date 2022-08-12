@@ -1,21 +1,8 @@
-import os
-import mysql.connector
-
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
-
-cnx = mysql.connector.connect(pool_name="service",
-                              pool_size=5,
-                              **rds_config)
+from . import db
 
 def create(name, price, user_id, group_id, type=None, open_time=None, close_time=None, not_available_time=None):
     try:
-        cnx = mysql.connector.connect(pool_name="service")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         query = ("insert into Service "
                  "(name, price, type, user_id, group_id, openTime, closeTime, notAvailableTime) "
@@ -35,7 +22,7 @@ def create(name, price, user_id, group_id, type=None, open_time=None, close_time
         
 def get_all_by_service_id(service_id):
     try:
-        cnx = mysql.connector.connect(pool_name="service")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (service_id,)
@@ -63,7 +50,7 @@ def get_all_by_service_id(service_id):
         
 def get_all_by_user_id(user_id):
     try:
-        cnx = mysql.connector.connect(pool_name="service")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (user_id,)
@@ -96,7 +83,7 @@ def get_all_by_user_id(user_id):
 
 def get_all_by_group_id(group_id):
     try:
-        cnx = mysql.connector.connect(pool_name="service")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (group_id,)
@@ -123,7 +110,7 @@ def get_all_by_group_id(group_id):
         
 def get_all_by_groupId(groupId):
     try:
-        cnx = mysql.connector.connect(pool_name="service")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (groupId,)
@@ -152,7 +139,7 @@ def get_all_by_groupId(groupId):
 
 def delete(service_id):
     try:
-        cnx = mysql.connector.connect(pool_name="service")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (service_id,)
