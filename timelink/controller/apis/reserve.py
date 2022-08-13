@@ -1,10 +1,10 @@
 from flask import Blueprint, request
 import datetime
-import model
+from timelink import model
 
-reserve = Blueprint('reserve', __name__)
+bp = Blueprint('reserve', __name__, url_prefix='/api')
 
-@reserve.route("/reserves" , methods=["POST"])
+@bp.route("/reserves" , methods=["POST"])
 def create_reserve():
     try:
         data = request.get_json()
@@ -19,7 +19,7 @@ def create_reserve():
         return {'error':str(e)}, 500
 
 
-@reserve.route("/reserves", methods=["GET"])
+@bp.route("/reserves", methods=["GET"])
 def get_reserves():
     try:
         query_string = request.args

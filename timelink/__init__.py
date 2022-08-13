@@ -12,12 +12,17 @@ def create_app(test_config=None):
     from timelink.model import db
     db.init_app(app)
     
+    with app.app_context():
     # pages
-    from timelink.controller import home, board, liff
-    app.register_blueprint(home.bp)
-    app.register_blueprint(board.bp)
-    app.register_blueprint(liff.bp)
+        from . import controller
+        app.register_blueprint(controller.home.bp)
+        app.register_blueprint(controller.board.bp)
+        app.register_blueprint(controller.liff.bp)
+        # apis
+        app.register_blueprint(controller.apis.group.bp)
+        app.register_blueprint(controller.apis.member.bp)
+        app.register_blueprint(controller.apis.reserve.bp)
+        app.register_blueprint(controller.apis.service.bp)
+        app.register_blueprint(controller.apis.user.bp)
     
-    # apis
-
     return app

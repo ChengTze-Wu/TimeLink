@@ -1,15 +1,14 @@
-import os
 import requests
-from flask import Blueprint, session, request, redirect, url_for
+from flask import Blueprint, session, request, current_app
 import jwt
-import model
+from timelink import model
 import json
 
-group = Blueprint('group', __name__)
+bp = Blueprint('group', __name__, url_prefix='/api')
 
-channel_access_token = os.environ['LINE_CHANNEL_TOKEN']
 
-def get_group_summary(groupId):
+def get_group_summary(groupId): 
+    channel_access_token = current_app.config['LINE_CHANNEL_TOKEN']
     url = f'https://api.line.me/v2/bot/group/{groupId}/summary'
     headers = {'Authorization': "Bearer "+channel_access_token}
     try:
@@ -20,7 +19,7 @@ def get_group_summary(groupId):
     except Exception:
         return None
 
-@group.route("/groups", methods=["POST"])
+@bp.route("/groups", methods=["POST"])
 def link_group():
     try:
         data = request.get_json()
@@ -38,7 +37,7 @@ def link_group():
     except Exception as e:
         return {'error': True, "message": "Server Error."}, 500
 
-@group.route("/groups", methods=["GET"])
+@bp.route("/groups", methods=["GET"])
 def get_groups():
     try:
         usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])

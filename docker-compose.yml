@@ -22,7 +22,7 @@ services:
             - TZ="Asia/Taipei"
         ports:
             - "8000:8000"
-        command: gunicorn -w 2 -b :8000 wsgi:app
+        command: gunicorn -w 2 -b :8000 'timelink:create_app()'
 
     timelink_bot:
         image: chengtze/timelink_bot
