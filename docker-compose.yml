@@ -16,12 +16,13 @@ services:
 
     timelink_web:
         image: chengtze/timelink_web
-        env_file:
-            - ./.env
+        volumes:
+            - ./instance:/usr/src/instance
         environment:
             - TZ="Asia/Taipei"
         ports:
             - "8000:8000"
+        working_dir: /usr/src
         command: gunicorn -w 2 -b :8000 'timelink:create_app()'
 
     timelink_bot:
