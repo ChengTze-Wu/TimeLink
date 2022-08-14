@@ -1,21 +1,8 @@
-import os
-import mysql.connector
-
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
-
-cnx = mysql.connector.connect(pool_name="group",
-                              pool_size=5,
-                              **rds_config)
+from . import db
 
 def create(groupId, name, user_id):
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         data = (groupId, name, user_id)
         query = ("insert into Line_Group (groupId, name, user_id) values (%s, %s, %s)")
@@ -33,7 +20,7 @@ def create(groupId, name, user_id):
         
 def get_all_by_user(user_id):
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (user_id,)
@@ -60,7 +47,7 @@ def get_all_by_user(user_id):
         
 def get_all_groupId():
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
 
         query = ("select groupId from Line_Group")
@@ -82,7 +69,7 @@ def get_all_groupId():
     
 def get_group_id_by_groupId(groupId):
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
 
         data = (groupId,)

@@ -1,21 +1,8 @@
-import os
-import mysql.connector
-
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
-
-cnx = mysql.connector.connect(pool_name="user",
-                              pool_size=5,
-                              **rds_config)
+from . import db
 
 def create(username, password, name, email, phone):
     try:
-        cnx = mysql.connector.connect(pool_name="user")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         data = (username, password, name, email, phone)
         query = ("insert into User (username, password, name, email, phone) values (%s, %s, %s, %s, %s)")
@@ -33,7 +20,7 @@ def create(username, password, name, email, phone):
         
 def auth(username):
     try:
-        cnx = mysql.connector.connect(pool_name="user")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (username,)
@@ -54,7 +41,7 @@ def auth(username):
         
 def get_all():
     try:
-        cnx = mysql.connector.connect(pool_name="user")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         query = ("select * from User")

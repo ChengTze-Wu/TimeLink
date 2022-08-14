@@ -1,7 +1,11 @@
 .env
 venv/
 timelink.cc/
+instance/
+
 *.sh
+
+
 .DS_Store
 __pycache__/
 

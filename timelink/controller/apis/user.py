@@ -1,14 +1,14 @@
 from flask import Blueprint, request, session
-import model
+from timelink import model
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
 
-user = Blueprint('user', __name__)
+bp = Blueprint('user', __name__, url_prefix='/api')
 
 
 # Login / Logout
-@user.route("/auth", methods=["POST"])
+@bp.route("/auth", methods=["POST"])
 def login():
     try:
         request_json = request.get_json()
@@ -25,7 +25,7 @@ def login():
     except Exception as e:
         return {'error': True, "message": "Server Error."}, 500
     
-@user.route('/auth', methods=["DELETE"])
+@bp.route('/auth', methods=["DELETE"])
 def logout():
     try:
         session.pop('usertoken', None)
@@ -36,7 +36,7 @@ def logout():
 
 
 
-@user.route("/user", methods=["POST"])
+@bp.route("/user", methods=["POST"])
 def signup():
     try:
         request_json = request.get_json()
