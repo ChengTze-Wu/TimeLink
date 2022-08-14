@@ -34,6 +34,7 @@ The system can manage robots in multiple groups, and each robot can have differe
 <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/Backend_Architecture.png" alt="Backend Architecture" >
 
 -   Powered by <b>Flask</b>
+-   Following <b>Factory pattern</b> used to use different configuration for different environments.
 -   Following the <b>MVC pattern</b>, the website is divided into three parts:
     -   Model: the data layer, containing the database connection and operations.
     -   View: the presentation layer, containing the HTML templates and static files.
