@@ -5,9 +5,14 @@ instance/
 
 *.sh
 
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
 
 .DS_Store
 __pycache__/
+*.pyc
 
 src/
 
