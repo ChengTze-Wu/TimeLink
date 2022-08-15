@@ -15,8 +15,6 @@ def create(name, price, user_id, group_id, type=None, open_time=None, close_time
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -43,8 +41,6 @@ def get_all_by_service_id(service_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -76,8 +72,6 @@ def get_all_by_user_id(user_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
 
@@ -103,8 +97,6 @@ def get_all_by_group_id(group_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -132,8 +124,6 @@ def get_all_by_groupId(groupId):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
 
@@ -152,7 +142,5 @@ def delete(service_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()

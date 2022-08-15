@@ -13,8 +13,6 @@ def create(username, password, name, email, phone):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -34,8 +32,6 @@ def auth(username):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -62,8 +58,6 @@ def get_all():
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
