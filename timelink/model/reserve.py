@@ -34,8 +34,6 @@ def get_available_time(service_id, booking_date, working_minutes=60):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -54,8 +52,6 @@ def create(service_id, member_id, bookedDateTime, status=None):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -83,7 +79,5 @@ def get_reserve_by_member_id_and_group_id(member_id, group_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()

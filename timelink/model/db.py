@@ -8,8 +8,9 @@ def get_db():
     if 'db' not in g:
         # connect to the database and store connection pools in the global variable g
         g.db = mysql.connector.connect(pool_name="timelink", pool_size=30, **current_app.config['DATABASE'])
-        
-    return g.db
+        return g.db
+    else:
+        return mysql.connector.connect(pool_name="timelink")
   
       
 def init_db():

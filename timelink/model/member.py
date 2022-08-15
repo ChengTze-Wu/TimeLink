@@ -14,8 +14,6 @@ def create(userId, name):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -33,7 +31,5 @@ def get_member_id_by_userId(userId):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
