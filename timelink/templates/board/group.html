@@ -1,37 +1,77 @@
 {% extends "board/layout/base.html" %}
 <!-- title -->
 {% block title %}Group | {% endblock %}
-<!-- style -->
-{% block style %} {% endblock %}
 <!-- main -->
 {% block main %}
 
-<div class="">
-    <h4><span style="color: #44ad53">Link</span> LineGroup and Linebot</h4>
-    <form onsubmit="return false">
-        <div class="">
-            <label for="groupId">LineBot 驗證碼</label>
+<div class="card w-full h-fit mb-4">
+    <form id="link_form">
+        <div class="w-full flex items-center gap-4">
             <input
                 type="text"
-                class="groupId"
+                class="groupId input h-fit grow border border-gray-400 rounded-xl px-4 py-2"
                 id="groupId"
                 name="groupId"
+                placeholder="LineBot 驗證碼"
                 required
             />
+            <button class="hover:text-primary-green">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-10 w-10"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                </svg>
+            </button>
         </div>
-        <button type="submit" id="link_btn">連結</button>
     </form>
 </div>
 
-<table class="table" style="max-width: 500px">
-    <thead>
-        <tr>
-            <th scope="col">群組名稱</th>
-            <th scope="col">連結日期</th>
-        </tr>
-    </thead>
-    <tbody id="group_list"></tbody>
-</table>
+<div
+    id="groupsLoader"
+    class="loader loader--style3 absolute right-1/2 top-1/2 translate-y-[-50%] translate-x-[50%] hidden"
+>
+    <svg
+        version="1.1"
+        id="loader-1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        x="0px"
+        y="0px"
+        width="60px"
+        height="60px"
+        viewBox="0 0 50 50"
+        style="enable-background: new 0 0 50 50"
+        xml:space="preserve"
+    >
+        <path
+            fill="#44ad53"
+            d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z"
+        >
+            <animateTransform
+                attributeType="xml"
+                attributeName="transform"
+                type="rotate"
+                from="0 25 25"
+                to="360 25 25"
+                dur="0.6s"
+                repeatCount="indefinite"
+            />
+        </path>
+    </svg>
+</div>
+<!-- Group INFO -->
+<div id="groups" class="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
+    <!-- Fetch data -->
+</div>
 
 {% endblock %}
 <!-- script -->

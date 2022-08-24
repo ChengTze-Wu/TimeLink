@@ -14,12 +14,12 @@
 
         <title>{% block title %}{% endblock %}TimeLink</title>
     </head>
-    <body>
-        <div class="split-container">
+    <body class="overflow-hidden">
+        <div class="flex bg-primary-white h-screen">
             <!-- area-l -->
             {% include'board/layout/sidebar.html' %}
             <!-- area-r -->
-            <main class="container-fluid main-scroll pt-5">
+            <main class="basis-4/5 px-8 py-16 overflow-y-auto relative">
                 <!-- main  -->
                 {% block main %}{% endblock %}
             </main>

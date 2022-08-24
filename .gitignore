@@ -14,8 +14,6 @@ htmlcov/
 __pycache__/
 *.pyc
 
-src/
-
 note.sql
 
 node_modules/

@@ -34,8 +34,6 @@ def logout():
         return {'error': True, "message": "Server Error."}, 500
 
 
-
-
 @bp.route("/user", methods=["POST"])
 def signup():
     try:
@@ -52,5 +50,18 @@ def signup():
         if resp["data"]:
             return {"ok": True, "message": "Signup Successful."}, 200
         return {"error": True, "message": "Signup failed."}, 400
+    except Exception as e:
+        return  {'error': True, "message": "Server Error."}, 500
+    
+
+@bp.route("/user", methods=["GET"])
+def get():
+    try:
+        usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+        username = usertoken["username"]
+        user_id = usertoken["id"]
+        
+       
+        return {"data": {"username": username, "user_id": user_id}}, 200
     except Exception as e:
         return  {'error': True, "message": "Server Error."}, 500

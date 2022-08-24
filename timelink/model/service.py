@@ -89,6 +89,8 @@ def get_all_by_group_id(group_id):
         for data in result:
             datas.append({"id": data[0],
                         "name": data[1],
+                        "price": data[2],
+                        "type": data[3],
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
                         "notAvailableTime": str(data[9])})

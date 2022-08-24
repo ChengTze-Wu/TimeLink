@@ -13,7 +13,7 @@ def add_service():
         name = data["name"]
         price = data["price"]
         type = data["type"]
-        group_id = data["groupId"]
+        group_id = data["group_id"]
         openTime = data["openTime"]
         closeTime = data["closeTime"]
 
@@ -28,9 +28,11 @@ def add_service():
 @bp.route("/services", methods=["GET"])
 def get_services():
     try:
-        groupId = request.args.get("groupId")
-        if groupId:
-            resp = model.service.get_all_by_groupId(groupId=groupId)
+        queryString = request.args
+        if "groupId" in queryString:
+            resp = model.service.get_all_by_groupId(groupId=queryString["groupId"])
+        elif "group_id" in queryString:
+            resp = model.service.get_all_by_group_id(group_id=queryString["group_id"])
         else:
             usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
             user_id = usertoken["id"]

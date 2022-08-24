@@ -7,97 +7,160 @@
 />
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 {% endblock %}
+
 <!-- title -->
 {% block title %}Service | {% endblock %}
+
 <!-- main -->
 {% block main %}
-<div class="row">
-    <form class="col-3" onsubmit="return false">
-        <div class="mb-3">
-            <h4>新增服務</h4>
-            <label for="select_group" class="form-label">群組名稱*</label>
-            <select
-                name="group_id"
-                id="select_group"
-                class="form-select"
-                style="height: 100px"
-                required
-                multiple
-            ></select>
-        </div>
-        <div class="mb-3">
-            <label for="name" class="form-label">服務名稱*</label>
-            <input
-                type="text"
-                class="form-control"
-                id="name"
-                name="name"
-                required
-            />
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">價格*</label>
-            <input
-                type="number"
-                class="form-control"
-                id="price"
-                name="price"
-                required
-            />
-        </div>
-        <div class="mb-3">
-            <label for="openTime" class="form-label">開始營業時間*</label>
-            <input
-                type="time"
-                class="form-control"
-                id="openTime"
-                name="openTime"
-                required
-            />
-        </div>
-        <div class="mb-3">
-            <label for="closeTime" class="form-label">結束營業時間*</label>
-            <input
-                type="time"
-                class="form-control"
-                id="closeTime"
-                name="closeTime"
-                required
-            />
-        </div>
-        <div class="mb-3">
-            <label for="type" class="form-label">類型</label>
-            <input type="text" class="form-control" id="type" name="type" />
-        </div>
-        <button id="add_service" type="submit">新增</button>
-    </form>
-    <div class="col-9 position-relative">
-        <div class="d-flex align-items-baseline">
-            <h4>服務列表</h4>
+<div class="flex gap-4 h-full">
+    <div class="flex flex-col h-full w-1/2 gap-4">
+        <!-- Show Groups -->
+        <div class="card p-4 basis-1/5 overflow-x-auto flex items-center">
             <div
-                class="ms-2 spinner spinner-border text-success d-none"
-                role="status"
+                id="groups_container"
+                class="flex flex-nowrap items-center gap-4 relative w-full"
             >
-                <span class="visually-hidden">Loading...</span>
+                <!-- loader -->
+                <div
+                    id="groupsLoader"
+                    class="loader loader--style3 absolute right-1/2 top-1/2 translate-y-[-50%] translate-x-[50%] hidden"
+                >
+                    <svg
+                        version="1.1"
+                        id="loader-1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        width="40px"
+                        height="40px"
+                        viewBox="0 0 50 50"
+                        style="enable-background: new 0 0 50 50"
+                        xml:space="preserve"
+                    >
+                        <path
+                            fill="#44ad53"
+                            d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z"
+                        >
+                            <animateTransform
+                                attributeType="xml"
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 25 25"
+                                to="360 25 25"
+                                dur="0.6s"
+                                repeatCount="indefinite"
+                            />
+                        </path>
+                    </svg>
+                </div>
+                <!-- fetch group data -->
             </div>
         </div>
-        <table class="table table-hover border-success">
-            <thead class="table_head">
-                <tr>
-                    <th scope="col">服務名稱</th>
-                    <th scope="col">價格</th>
-                    <th scope="col">類型</th>
-                    <th scope="col">所在群組</th>
-                    <th scope="col"></th>
+
+        <!-- Add Service -->
+        <div class="card p-8 basis-4/5">
+            <form class="flex flex-col gap-8" id="service_form">
+                <h2>服務新增</h2>
+                <input
+                    placeholder="服務名稱"
+                    class="input"
+                    type="text"
+                    name="name"
+                    required
+                />
+                <input
+                    placeholder="價格"
+                    class="input"
+                    type="number"
+                    min="0"
+                    name="price"
+                    required
+                />
+                <input
+                    placeholder="種類"
+                    class="input"
+                    type="text"
+                    name="type"
+                />
+                <div class="flex gap-4">
+                    <input
+                        placeholder="開始時間"
+                        class="input"
+                        type="datetime"
+                        id="openTime"
+                        name="openTime"
+                        required
+                    />
+                    <input
+                        placeholder="結束時間"
+                        class="input"
+                        type="datetime"
+                        id="closeTime"
+                        name="closeTime"
+                        required
+                    />
+                </div>
+                <button class="btn-card" type="submit">新增</button>
+            </form>
+        </div>
+    </div>
+    <div class="card h-full w-1/2 relative">
+        <table class="w-full h-fit border-collapse bg-whitetext-sm shadow-sm">
+            <thead class="w-full bg-secondary-gray">
+                <tr class="text-white font-semibold">
+                    <th class="w-1/6 border border-slate-300 p-1">服務</th>
+                    <th class="w-1/6 border border-slate-300 p-1">價格</th>
+                    <th class="w-1/6 border border-slate-300 p-1">種類</th>
+                    <th class="w-1/6 border border-slate-300 p-1">開始時間</th>
+                    <th class="w-1/6 border border-slate-300 p-1">結束時間</th>
+                    <th class="w-1/6 border border-slate-300 p-1">管理</th>
                 </tr>
             </thead>
-            <tbody id="services_list"></tbody>
+            <tbody id="services_container" class="text-secondary-gray">
+                <!-- loader -->
+                <div
+                    id="servicesLoader"
+                    class="loader loader--style3 absolute right-1/2 top-1/2 translate-y-[-50%] translate-x-[50%] hidden"
+                >
+                    <svg
+                        version="1.1"
+                        id="loader-1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        width="50px"
+                        height="50px"
+                        viewBox="0 0 50 50"
+                        style="enable-background: new 0 0 50 50"
+                        xml:space="preserve"
+                    >
+                        <path
+                            fill="#44ad53"
+                            d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z"
+                        >
+                            <animateTransform
+                                attributeType="xml"
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 25 25"
+                                to="360 25 25"
+                                dur="0.6s"
+                                repeatCount="indefinite"
+                            />
+                        </path>
+                    </svg>
+                </div>
+                <!-- fetched data -->
+            </tbody>
         </table>
     </div>
 </div>
 {% endblock %}
-<!-- script -->
 
+<!-- script -->
 {% block script %}
 <script
     type="module"

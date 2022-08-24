@@ -1,142 +1,186 @@
 import * as apiFetch from "./module/apiFetch.js";
 // view
-function renderServices(id, name, type, price, group_name) {
-    const servicesList = document.getElementById("services_list");
-    const trnode = document.createElement("tr");
-    const nameNode = document.createElement("td");
-    const typeNode = document.createElement("td");
-    const priceNode = document.createElement("td");
-    const groupNameNode = document.createElement("td");
-    const editNode = document.createElement("td");
-    const trash = document.createElement("i");
-
-    nameNode.textContent = name;
-    typeNode.textContent = type;
-    priceNode.textContent = price;
-    groupNameNode.textContent = group_name;
-
-    editNode.style = "width:100px;";
-
-    editNode.classList = "text-center";
-    trash.classList = "trash fa-solid fa-trash";
-    trash.setAttribute("service-id", id);
-
-    trnode.appendChild(nameNode);
-    trnode.appendChild(priceNode);
-    trnode.appendChild(typeNode);
-    trnode.appendChild(groupNameNode);
-
-    editNode.appendChild(trash);
-    trnode.appendChild(editNode);
-
-    servicesList.appendChild(trnode);
+function alert(message) {
+    const alert = document.createElement("div");
+    alert.classList.add(
+        "fixed",
+        "top-1",
+        "right-1/2",
+        "w-fit",
+        "h-fit",
+        "z-10",
+        "translate-x-[50%]"
+    );
+    alert.innerHTML = `
+        <div class="bg-red-500 opacity-90 p-3 rounded-xl">
+            <p class="text-white text-center">${message}</p>
+        </div> 
+    `;
+    document.body.appendChild(alert);
+    setTimeout(() => {
+        alert.remove();
+    }, 1000);
 }
 
-function renderOption(id, name) {
-    const selectGroup = document.getElementById("select_group");
-    const groupOption = document.createElement("option");
-    groupOption.setAttribute("value", id);
-    groupOption.textContent = name;
-    selectGroup.appendChild(groupOption);
+function renderMessage(node, message) {
+    const messageP = document.createElement("p");
+    messageP.className =
+        "absolute right-1/2 top-1/2 translate-y-[-50%] translate-x-[50%] w-full text-center text-gray-500";
+    messageP.textContent = message;
+    node.appendChild(messageP);
 }
 
-function startSpinner() {
-    const spinners = document.querySelectorAll(".spinner");
-    spinners.forEach((spinner) => {
-        spinner.classList.remove("d-none");
-    });
+function renderGroup(name, image, id) {
+    const container = document.getElementById("groups_container");
+    const group = document.createElement("button");
+    group.classList.add("flex-none");
+    group.setAttribute("data-id", id);
+    group.innerHTML = `
+        <img class="w-12 h-12 mx-auto mb-1 rounded-full" src="${image}" alt="${name}">
+        <p class="text-center">${name}</p>
+    `;
+    container.appendChild(group);
 }
-function stopSpinner() {
-    const spinners = document.querySelectorAll(".spinner");
-    spinners.forEach((spinner) => {
-        spinner.classList.add("d-none");
-    });
+
+function renderServices(name, price, type, openTime, closeTime) {
+    const container = document.getElementById("services_container");
+    const service = document.createElement("tr");
+    service.classList.add(
+        "border-b",
+        "border-gray-300",
+        "hover:bg-gray-100",
+        "text-center"
+    );
+    service.innerHTML = `
+        <td>${name}</td>
+        <td>${price}</td>
+        <td>${type}</td>
+        <td>${openTime}</td>
+        <td>${closeTime}</td>
+        <td>
+            <button class="hover:text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        </td>`;
+    container.appendChild(service);
 }
-// controller
+
 function cleanServices() {
-    const servicesList = document.getElementById("services_list");
-    while (servicesList.lastElementChild) {
-        servicesList.removeChild(servicesList.lastElementChild);
+    const container = document.getElementById("services_container");
+    container.innerHTML = "";
+}
+
+// controller
+async function showServices(group_id) {
+    cleanServices();
+    // spinner start
+    document.getElementById("servicesLoader").classList.remove("hidden");
+    const response = await apiFetch.get(`services?group_id=${group_id}`);
+    // spinner end
+    document.getElementById("servicesLoader").classList.add("hidden");
+    if (response.data.length > 0) {
+        response.data.forEach((service) => {
+            renderServices(
+                service.name,
+                service.price,
+                service.type,
+                service.openTime,
+                service.closeTime
+            );
+        });
+    } else {
+        renderMessage(
+            document.getElementById("services_container"),
+            "此群組尚無服務，請新增。"
+        );
     }
 }
 
-function addService() {
-    const submit = document.getElementById("add_service");
-    submit.addEventListener("click", async () => {
-        const name = document.getElementById("name");
-        const price = document.getElementById("price");
-        const type = document.getElementById("type");
-        const groupId = document.getElementById("select_group");
-        const openTime = document.getElementById("openTime");
-        const closeTime = document.getElementById("closeTime");
+async function showGroups() {
+    // spinner start
+    document.getElementById("servicesLoader").classList.remove("hidden");
+    document.getElementById("groupsLoader").classList.remove("hidden");
+    const response = await apiFetch.get("groups");
+    // spinner end
+    document.getElementById("servicesLoader").classList.add("hidden");
+    document.getElementById("groupsLoader").classList.add("hidden");
+    if (response.data.length > 0) {
+        response.data.forEach((group) => {
+            renderGroup(group.name, group.image, group.id);
+        });
+        renderMessage(
+            document.getElementById("services_container"),
+            "請選擇群組。"
+        );
+    } else {
+        renderMessage(
+            document.getElementById("groups_container"),
+            "尚無群組，請至'Line群組管理'連結群組。"
+        );
+    }
+}
 
-        if (name.value == "" || price.value == "" || groupId.value == "") {
-        } else {
-            startSpinner();
-            const resp = await apiFetch.postDataToApi("services", {
-                name: name.value,
-                price: price.value,
-                type: type.value,
-                groupId: groupId.value,
-                openTime: openTime.value,
-                closeTime: closeTime.value,
-            });
-            if (resp["ok"]) {
-                name.value = "";
-                price.value = "";
-                groupId.value = "";
-                type.value = "";
-                openTime.value = "";
-                closeTime.value = "";
+function clickGroup() {
+    const container = document.getElementById("groups_container");
+    const groups = container.querySelectorAll("button");
+    let lastClicked;
+    groups.forEach((group) => {
+        group.addEventListener("click", async () => {
+            // clean last clicked hint
+            if (lastClicked) {
+                lastClicked.querySelector("img").classList.remove("border-2");
+                lastClicked
+                    .querySelector("p")
+                    .classList.remove("text-primary-green");
+                lastClicked.removeAttribute("disabled");
             }
-            await showServices();
-            stopSpinner();
+            // click hint
+            group.setAttribute("disabled", true);
+            const image = group.querySelector("img");
+            const name = group.querySelector("p");
+            image.classList.add("border-2", "border-primary-green");
+            name.classList.add("text-primary-green");
+            // set last clicked
+            lastClicked = group;
+
+            // get services
+            const id = group.getAttribute("data-id");
+
+            await showServices(id);
+        });
+    });
+}
+
+function createService() {
+    const serviceForm = document.getElementById("service_form");
+    serviceForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(serviceForm);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        const group = document
+            .getElementById("groups_container")
+            .querySelector("button[disabled]");
+
+        if (group) {
+            data.group_id = group.getAttribute("data-id");
+            const response = await apiFetch.post("services", data);
+            if (response.status === 201) {
+                serviceForm.reset();
+                showServices(data.group_id);
+            } else {
+                alert("Something went wrong");
+            }
+        } else {
+            alert("請先選擇群組");
+            return;
         }
     });
-}
-
-function deleteService() {
-    const trashBtns = document.querySelectorAll(".trash");
-    trashBtns.forEach((btn) => {
-        btn.addEventListener("click", async () => {
-            startSpinner();
-            const service_id = btn.getAttribute("service-id");
-            const resp = await apiFetch.deleteDataFromApi(
-                `services/${service_id}`
-            );
-            if (!resp["error"]) {
-                await showServices();
-            }
-            stopSpinner();
-        });
-    });
-}
-
-async function showServices() {
-    cleanServices();
-    const resp = await apiFetch.getDataFromApi("services");
-    if (!resp["error"]) {
-        resp["data"].forEach((d) => {
-            const id = d.id;
-            const name = d.name;
-            const type = d.type;
-            const price = d.price;
-            const group_name = d.group_name;
-            renderServices(id, name, type, price, group_name);
-        });
-    }
-    deleteService();
-}
-
-async function showGroupsOption() {
-    const resp = await apiFetch.getDataFromApi("groups");
-    if (!resp["error"]) {
-        resp["data"].forEach((d) => {
-            const id = d.id;
-            const name = d.name;
-            renderOption(id, name);
-        });
-    }
 }
 
 async function init() {
@@ -152,16 +196,14 @@ async function init() {
         minuteIncrement: 30,
         dateFormat: "H:i",
     });
-    showGroupsOption();
-    startSpinner();
-    await showServices();
-    stopSpinner();
 }
 
 // main exc
 async function main() {
     await init();
-    addService();
+    await showGroups();
+    clickGroup();
+    createService();
 }
 
 main();
