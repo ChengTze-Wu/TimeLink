@@ -66,7 +66,7 @@ function renderReserve(
     serviceTd.className = "border border-slate-300 p-1";
     bookedDateTimeTd.className = "border border-slate-300 p-1";
     createDateTmeTd.className = "border border-slate-300 p-1";
-    actionTd.className = "border border-slate-300 p-1";
+    actionTd.className = "border border-slate-300 p-1 text-center";
     trashBtn.className = "trash hover:text-red-500 hover:cursor-pointer";
 
     actionTd.appendChild(trashBtn);

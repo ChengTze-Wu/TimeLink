@@ -1,6 +1,5 @@
-import secrets
 from flask import (
-    Blueprint, request, session, make_response
+    Blueprint, request, session, current_app
 )
 import datetime
 from timelink import model
@@ -8,6 +7,9 @@ import jwt
 
 
 bp = Blueprint('reserve', __name__, url_prefix='/api')
+
+
+SECRET_KEY = current_app.config['SECRET_KEY']
 
 
 @bp.route("/reserves" , methods=["POST"])
@@ -36,7 +38,7 @@ def get():
             resp = model.reserve.get_available_time(service_id=query_string["service_id"], 
                                                     booking_date=query_string["booking_date"]) 
         elif "group_id" in query_string:
-            usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+            usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
             user_id = usertoken["id"]
             resp = model.reserve.get_reserve_by_user_id_and_group_id(user_id=user_id, 
                                                                      group_id=query_string["group_id"])

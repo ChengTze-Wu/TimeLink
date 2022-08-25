@@ -4,9 +4,9 @@ import jwt
 from timelink import model
 import json
 
-
 bp = Blueprint('group', __name__, url_prefix='/api')
 
+SECRET_KEY = current_app.config['SECRET_KEY']
 
 def get_group_summary(groupId): 
     channel_access_token = current_app.config['LINE_CHANNEL_TOKEN']
@@ -25,7 +25,7 @@ def create():
     try:
         data = request.get_json()
         groupId = data["data"]["groupId"]
-        usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+        usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
 
         group_summary = get_group_summary(groupId)
@@ -41,7 +41,7 @@ def create():
 @bp.route("/groups", methods=["GET"])
 def get():
     try:
-        usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+        usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
 
         data = model.group.get_all_by_user(user_id=user_id)

@@ -42,7 +42,7 @@ function renderGroup(name, image, id) {
     container.appendChild(group);
 }
 
-function renderServices(name, price, type, openTime, closeTime) {
+function renderServices(id, name, price, type, openTime, closeTime) {
     const container = document.getElementById("services_container");
     const service = document.createElement("tr");
     service.classList.add(
@@ -58,7 +58,7 @@ function renderServices(name, price, type, openTime, closeTime) {
         <td>${openTime}</td>
         <td>${closeTime}</td>
         <td>
-            <button class="hover:text-red-500">
+            <button data-id="${id}" class="delete_btn hover:text-red-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
@@ -83,6 +83,7 @@ async function showServices(group_id) {
     if (response.data.length > 0) {
         response.data.forEach((service) => {
             renderServices(
+                service.id,
                 service.name,
                 service.price,
                 service.type,
@@ -96,6 +97,7 @@ async function showServices(group_id) {
             "此群組尚無服務，請新增。"
         );
     }
+    deleteService(group_id);
 }
 
 async function showGroups() {
@@ -180,6 +182,21 @@ function createService() {
             alert("請先選擇群組");
             return;
         }
+    });
+}
+
+function deleteService(group_id) {
+    const deleteBtns = document.querySelectorAll(".delete_btn");
+    deleteBtns.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const service_id = btn.getAttribute("data-id");
+            const response = await apiFetch.remove(`services/${service_id}`);
+            if (response.status === 200) {
+                showServices(group_id);
+            } else {
+                alert("刪除失敗");
+            }
+        });
     });
 }
 
