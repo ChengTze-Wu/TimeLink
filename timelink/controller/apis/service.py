@@ -1,9 +1,12 @@
-from flask import Blueprint, request, session
+from flask import Blueprint, request, session, current_app
 from timelink import model
 import jwt
 
 
 bp = Blueprint('service', __name__, url_prefix='/api')
+
+
+SECRET_KEY = current_app.config['SECRET_KEY']
 
 
 @bp.route("/services", methods=["POST"])
@@ -13,11 +16,11 @@ def add_service():
         name = data["name"]
         price = data["price"]
         type = data["type"]
-        group_id = data["groupId"]
+        group_id = data["group_id"]
         openTime = data["openTime"]
         closeTime = data["closeTime"]
 
-        usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+        usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
         
         resp = model.service.create(name=name, type=type, price=price, group_id=group_id, user_id=user_id, open_time=openTime, close_time=closeTime)
@@ -28,17 +31,19 @@ def add_service():
 @bp.route("/services", methods=["GET"])
 def get_services():
     try:
-        groupId = request.args.get("groupId")
-        if groupId:
-            resp = model.service.get_all_by_groupId(groupId=groupId)
+        queryString = request.args
+        if "groupId" in queryString:
+            resp = model.service.get_all_by_groupId(groupId=queryString["groupId"])
+        elif "group_id" in queryString:
+            resp = model.service.get_all_by_group_id(group_id=queryString["group_id"])
         else:
-            usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+            usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
             user_id = usertoken["id"]
             resp = model.service.get_all_by_user_id(user_id=user_id)
         return resp
     except Exception as e:
         return {'error':str(e)}, 405
-    
+
 @bp.route("/services/<service_id>", methods=["GET"])
 def get_service(service_id):
     try:

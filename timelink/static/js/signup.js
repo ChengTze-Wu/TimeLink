@@ -9,7 +9,7 @@ function signup() {
         formData.forEach((value, key) => {
             data[key] = value;
         });
-        const response = await apiFetch.postDataToApi("user", data);
+        const response = await apiFetch.post("user", data);
         if (response.status === 200) {
             window.location.href = "/";
         } else {
