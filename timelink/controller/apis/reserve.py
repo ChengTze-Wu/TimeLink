@@ -1,11 +1,19 @@
-from flask import Blueprint, request
+from flask import (
+    Blueprint, request, session, current_app
+)
 import datetime
-import model
+from timelink import model
+import jwt
 
-reserve = Blueprint('reserve', __name__)
 
-@reserve.route("/reserves" , methods=["POST"])
-def create_reserve():
+bp = Blueprint('reserve', __name__, url_prefix='/api')
+
+
+SECRET_KEY = current_app.config['SECRET_KEY']
+
+
+@bp.route("/reserves" , methods=["POST"])
+def create():
     try:
         data = request.get_json()
         bookedDateTime = datetime.datetime.strptime(f"{data['booking_date']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
@@ -16,16 +24,34 @@ def create_reserve():
                                     bookedDateTime=bookedDateTime)
         return resp
     except Exception as e:
-        return {'error':str(e)}, 500
+        return {'message':str(e)}, 500
 
 
-@reserve.route("/reserves", methods=["GET"])
-def get_reserves():
+@bp.route("/reserves", methods=["GET"])
+def get():
     try:
-        query_string = request.args
-        if query_string["service_id"] and query_string["booking_date"]:
+        query_string = request.args.to_dict()
+        
+        resp = {"data": None}
+        
+        if "service_id" in query_string and "booking_date" in query_string:
             resp = model.reserve.get_available_time(service_id=query_string["service_id"], 
-                                                    booking_date=query_string["booking_date"])
+                                                    booking_date=query_string["booking_date"]) 
+        elif "group_id" in query_string:
+            usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
+            user_id = usertoken["id"]
+            resp = model.reserve.get_reserve_by_user_id_and_group_id(user_id=user_id, 
+                                                                     group_id=query_string["group_id"])
+
         return resp
     except Exception as e:
-        return {'error':str(e)}, 500
+        return {'message':str(e)}, 500
+    
+@bp.route("/reserves/<int:id>", methods=["DELETE"])
+def delete(id):
+    try:
+        model.reserve.delete_by_id(reserve_id=id)
+
+        return {"ok": True}, 200,
+    except Exception as e:
+        return {'message':str(e)}, 500

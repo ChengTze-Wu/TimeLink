@@ -1,21 +1,34 @@
-import os
-import mysql.connector
+from . import db
+from flask import current_app
+import json
+import requests
 
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
 
-cnx = mysql.connector.connect(pool_name="group",
-                              pool_size=5,
-                              **rds_config)
+def get_groupInfo(groupId=None): 
+    channel_access_token = current_app.config['LINE_CHANNEL_TOKEN']
+    url_info = f'https://api.line.me/v2/bot/group/{groupId}/summary'
+    url_count = f"https://api.line.me/v2/bot/group/{groupId}/members/count"
+    header = {'Authorization': "Bearer " + channel_access_token}
+    try:
+        resp_info = requests.get(url_info, headers=header)
+        if resp_info.status_code == 400:
+            return None
+        url_count = requests.get(url_count, headers=header)
+        
+        data_info = json.loads(resp_info.text)
+        data_count = json.loads(url_count.text)
+        
+        pictureUrl = data_info["pictureUrl"]
+        groupName = data_info["groupName"]
+        count = data_count["count"]
+        
+        return {"pictureUrl": pictureUrl, "groupName": groupName, "count": count}
+    except Exception:
+        return None
 
 def create(groupId, name, user_id):
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         data = (groupId, name, user_id)
         query = ("insert into Line_Group (groupId, name, user_id) values (%s, %s, %s)")
@@ -26,14 +39,12 @@ def create(groupId, name, user_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
 def get_all_by_user(user_id):
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (user_id,)
@@ -43,24 +54,24 @@ def get_all_by_user(user_id):
         
         datas = []
         for data in result:
+            groupInfo = get_groupInfo(data[1])
             datas.append({"id": data[0],
-                            "groupId": data[1],
-                            "name": data[2],
-                            "createDatetime": data[3],
+                            "image": groupInfo["pictureUrl"],
+                            "name": groupInfo["groupName"],
+                            "memberCount": groupInfo["count"],
+                            "createDate": data[3].strftime("%Y/%m/%d"),
                             "user_id": data[4]})
             
-        return {"data": datas}
+        return datas
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
 def get_all_groupId():
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
 
         query = ("select groupId from Line_Group")
@@ -75,14 +86,12 @@ def get_all_groupId():
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
     
 def get_group_id_by_groupId(groupId):
     try:
-        cnx = mysql.connector.connect(pool_name="group")
+        cnx = db.get_db()
         cursor = cnx.cursor()
 
         data = (groupId,)
@@ -94,8 +103,6 @@ def get_group_id_by_groupId(groupId):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         

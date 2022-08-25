@@ -1,9 +1,5 @@
-from flask import Blueprint, session, request, redirect, url_for
+from flask import Blueprint, session, request
 import jwt
-import model
+from timelink import model
 
-member = Blueprint('member', __name__)
-
-# usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
-# user_id = usertoken["id"]
-
+bp = Blueprint('member', __name__, url_prefix='/api')

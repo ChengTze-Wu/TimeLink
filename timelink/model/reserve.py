@@ -1,22 +1,28 @@
-import os
-import mysql.connector
+from flask import current_app
+from . import db
 import datetime
+import json
+import requests
 
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
 
-cnx = mysql.connector.connect(pool_name="reserve",
-                              pool_size=5,
-                              **rds_config)
+def get_image(groupId=None, userId=None): 
+    channel_access_token = current_app.config['LINE_CHANNEL_TOKEN']
+    url = f'https://api.line.me/v2/bot/group/{groupId}/member/{userId}'
+    header = {'Authorization': "Bearer " + channel_access_token}
+    try:
+        resp = requests.get(url, headers=header)
+        if resp.status_code == 400:
+            return None
+        data = json.loads(resp.text)
+        img_url = data["pictureUrl"]
+        return img_url
+    except Exception:
+        return None
+
 
 def get_available_time(service_id, booking_date, working_minutes=60):
     try:
-        cnx = mysql.connector.connect(pool_name="reserve")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (service_id, )
@@ -42,19 +48,17 @@ def get_available_time(service_id, booking_date, working_minutes=60):
                 if str(data[5].date()) == booking_date:
                     bookedTime = str(data[5].time())
                     available_time.remove(bookedTime)
-                    
+        
         return {"data": {"available_time": available_time}}
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
 def create(service_id, member_id, bookedDateTime, status=None):
     try:
-        cnx = mysql.connector.connect(pool_name="reserve")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         query = ("insert into Reserve "
                  "(service_id, member_id, bookedDateTime, status) "
@@ -67,15 +71,13 @@ def create(service_id, member_id, bookedDateTime, status=None):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
         
 def get_reserve_by_member_id_and_group_id(member_id, group_id):
     try:
-        cnx = mysql.connector.connect(pool_name="reserve")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (member_id, group_id)
@@ -96,7 +98,91 @@ def get_reserve_by_member_id_and_group_id(member_id, group_id):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
+        cursor.close()
+        cnx.close()
+        
+
+def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
+    """
+    ### Return Example ###
+    {
+        "data": [
+            {
+                "reserve_id": 1,
+                "member_id": 1,
+                "member_image": "xxxxx",
+                "member_name": "test",
+                "service_id": 1,
+                "service_name": "test",
+                "reserve_createDateTme": "2020-01-01 00:00:00",
+                "reserve_bookedDateTime": "2020-01-01 00:00:00"
+            },
+        ]
+        "group_id": 1,
+        "group_name": "test",
+    }
+    """
+    try:
+        cnx = db.get_db()
+        cursor = cnx.cursor()
+        
+        data = (user_id, group_id)
+        query = ("SELECT Line_Group.id, Line_Group.groupId, Line_Group.name, "
+                 "Member.id, Member.userId, Member.name, "
+                 "Service.id, Service.name, "
+                 "Reserve.id, Reserve.createDatetime, Reserve.bookedDateTime "
+                 "FROM (((Reserve INNER JOIN Service ON Reserve.service_id = Service.id) "
+                 "INNER JOIN Member ON Reserve.member_id = Member.id) " 
+                 "INNER JOIN Line_Group ON Service.group_id = Line_Group.id) "
+                 "WHERE Service.user_id = %s and Service.group_id = %s ")
+       
+        cursor.execute(query, data)
+        result = cursor.fetchall()
+        data = None
+        
+        if result:
+            reserves = []
+            member_exist = []
+            member_image = None
+            for data in result:
+                
+                if data[3] not in member_exist:
+                    # reduce number of requests of getting member image
+                    member_image = get_image(groupId=data[1], userId=data[4])
+                    member_exist.append(data[3])
+                
+                reserves.append({"reserve_id": data[8],
+                                "member_id": data[3],
+                                "member_image": member_image,
+                                "member_name": data[5],
+                                "service_id": data[6],
+                                "service_name": data[7],
+                                "reserve_createDateTme": data[9].strftime("%Y/%m/%d %H:%M:%S"),
+                                "reserve_bookedDateTime": data[10].strftime("%Y/%m/%d %H:00")})
+                
+            return {"group_id": result[0][0], "group_name": result[0][2], "data": reserves}
+        
+        return {"data": data}
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+        cnx.close()
+        
+
+def delete_by_id(reserve_id:int):
+    try:
+        cnx = db.get_db()
+        cursor = cnx.cursor()
+        
+        data = (reserve_id,)
+        query = ("DELETE FROM Reserve WHERE id = %s")
+       
+        cursor.execute(query, data)
+        cnx.commit()
+        return True
+    except Exception as e:
+        raise e
+    finally:
         cursor.close()
         cnx.close()

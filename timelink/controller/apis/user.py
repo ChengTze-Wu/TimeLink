@@ -1,14 +1,15 @@
-from flask import Blueprint, request, session
-import model
+from flask import Blueprint, request, session, current_app
+from timelink import model
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+import datetime
 
+bp = Blueprint('user', __name__, url_prefix='/api')
 
-user = Blueprint('user', __name__)
-
+SECRET_KEY = current_app.config['SECRET_KEY']
 
 # Login / Logout
-@user.route("/auth", methods=["POST"])
+@bp.route("/auth", methods=["POST"])
 def login():
     try:
         request_json = request.get_json()
@@ -18,14 +19,17 @@ def login():
         if resp["data"]:
             hashed_password = resp["data"]["password"]
             if check_password_hash(hashed_password, password):
-                usertoken = {"id":resp["data"]["id"], "username":resp["data"]["username"]}
-                session["usertoken"] = jwt.encode(usertoken, "secret", algorithm="HS256")
+               
+                usertoken = {"id":resp["data"]["id"], "username":resp["data"]["username"], 
+                             "exp":datetime.datetime.utcnow() + datetime.timedelta(hours=24)}
+                session["usertoken"] = jwt.encode(usertoken, SECRET_KEY, algorithm="HS256")
+
                 return {"ok": True, "message": "Login Successful."}, 200
         return {'error': True, "message": "Login failed."}, 400
     except Exception as e:
         return {'error': True, "message": "Server Error."}, 500
     
-@user.route('/auth', methods=["DELETE"])
+@bp.route('/auth', methods=["DELETE"])
 def logout():
     try:
         session.pop('usertoken', None)
@@ -34,9 +38,7 @@ def logout():
         return {'error': True, "message": "Server Error."}, 500
 
 
-
-
-@user.route("/user", methods=["POST"])
+@bp.route("/user", methods=["POST"])
 def signup():
     try:
         request_json = request.get_json()
@@ -52,5 +54,18 @@ def signup():
         if resp["data"]:
             return {"ok": True, "message": "Signup Successful."}, 200
         return {"error": True, "message": "Signup failed."}, 400
+    except Exception as e:
+        return  {'error': True, "message": "Server Error."}, 500
+    
+
+@bp.route("/user", methods=["GET"])
+def get():
+    try:
+        usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
+        username = usertoken["username"]
+        user_id = usertoken["id"]
+        
+       
+        return {"data": {"username": username, "user_id": user_id}}, 200
     except Exception as e:
         return  {'error': True, "message": "Server Error."}, 500

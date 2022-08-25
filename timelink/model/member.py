@@ -1,21 +1,8 @@
-import os
-import mysql.connector
-
-rds_config = {
-    'user': os.environ['DB_USER'],
-    'password': os.environ['DB_PASSWORD'],
-    'host': os.environ['DB_HOST'],
-    'port': os.environ['DB_PORT'],
-    'database': os.environ['DB_DATABASE']
-}
-
-cnx = mysql.connector.connect(pool_name="member",
-                              pool_size=5,
-                              **rds_config)
+from . import db
 
 def create(userId, name):
     try:
-        cnx = mysql.connector.connect(pool_name="member")
+        cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (userId, name)
@@ -27,14 +14,12 @@ def create(userId, name):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
 def get_member_id_by_userId(userId):
     try:
-        cnx = mysql.connector.connect(pool_name="member")
+        cnx = db.get_db()
         cursor = cnx.cursor()
 
         data = (userId,)
@@ -46,7 +31,5 @@ def get_member_id_by_userId(userId):
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()

@@ -1,23 +1,26 @@
-from flask import Blueprint, request, session
-import model
+from flask import Blueprint, request, session, current_app
+from timelink import model
 import jwt
 
 
-service = Blueprint('service', __name__)
+bp = Blueprint('service', __name__, url_prefix='/api')
 
 
-@service.route("/services", methods=["POST"])
+SECRET_KEY = current_app.config['SECRET_KEY']
+
+
+@bp.route("/services", methods=["POST"])
 def add_service():
     try:
         data = request.get_json()
         name = data["name"]
         price = data["price"]
         type = data["type"]
-        group_id = data["groupId"]
+        group_id = data["group_id"]
         openTime = data["openTime"]
         closeTime = data["closeTime"]
 
-        usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+        usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
         
         resp = model.service.create(name=name, type=type, price=price, group_id=group_id, user_id=user_id, open_time=openTime, close_time=closeTime)
@@ -25,21 +28,23 @@ def add_service():
     except Exception as e:
         return {'error':str(e)}, 405
     
-@service.route("/services", methods=["GET"])
+@bp.route("/services", methods=["GET"])
 def get_services():
     try:
-        groupId = request.args.get("groupId")
-        if groupId:
-            resp = model.service.get_all_by_groupId(groupId=groupId)
+        queryString = request.args
+        if "groupId" in queryString:
+            resp = model.service.get_all_by_groupId(groupId=queryString["groupId"])
+        elif "group_id" in queryString:
+            resp = model.service.get_all_by_group_id(group_id=queryString["group_id"])
         else:
-            usertoken = jwt.decode(session.get('usertoken'), "secret", algorithms=["HS256"])
+            usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
             user_id = usertoken["id"]
             resp = model.service.get_all_by_user_id(user_id=user_id)
         return resp
     except Exception as e:
         return {'error':str(e)}, 405
-    
-@service.route("/services/<service_id>", methods=["GET"])
+
+@bp.route("/services/<service_id>", methods=["GET"])
 def get_service(service_id):
     try:
         resp = model.service.get_all_by_service_id(service_id=service_id)
@@ -47,7 +52,7 @@ def get_service(service_id):
     except Exception as e:
         return {'error':str(e)}, 405
     
-@service.route("/services/<service_id>", methods=["DELETE"])
+@bp.route("/services/<service_id>", methods=["DELETE"])
 def delete_service(service_id):
     try:
         resp = model.service.delete(service_id=service_id)
