@@ -21,12 +21,8 @@ function login() {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(loginForm);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-        const response = await apiFetch.post("auth", data);
-        if (response.status === 200) {
+        const response = await apiFetch.post("auth", formData);
+        if (response.success) {
             window.location.href = "/board";
         } else {
             alert("Login failed");

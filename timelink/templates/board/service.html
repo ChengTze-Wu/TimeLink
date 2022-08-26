@@ -60,9 +60,10 @@
         </div>
 
         <!-- Add Service -->
-        <div class="card p-8 basis-4/5">
-            <form class="flex flex-col gap-8" id="service_form">
+        <div class="card basis-4/5">
+            <form class="flex flex-col gap-4" id="service_form">
                 <h2>服務新增</h2>
+
                 <input
                     placeholder="服務名稱"
                     class="input"
@@ -70,6 +71,15 @@
                     name="name"
                     required
                 />
+                <div class="input h-24 flex justify-between">
+                    <input
+                        id="img_input"
+                        type="file"
+                        name="imageFile"
+                        accept="image/*"
+                    />
+                    <img id="img_preview" class="h-20" />
+                </div>
                 <input
                     placeholder="價格"
                     class="input"

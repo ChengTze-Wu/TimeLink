@@ -80,8 +80,9 @@ async function showServices(group_id) {
     const response = await apiFetch.get(`services?group_id=${group_id}`);
     // spinner end
     document.getElementById("servicesLoader").classList.add("hidden");
-    if (response.data.length > 0) {
+    if (response.success) {
         response.data.forEach((service) => {
+            console.log(service);
             renderServices(
                 service.id,
                 service.name,
@@ -108,7 +109,7 @@ async function showGroups() {
     // spinner end
     document.getElementById("servicesLoader").classList.add("hidden");
     document.getElementById("groupsLoader").classList.add("hidden");
-    if (response.data.length > 0) {
+    if (response.success) {
         response.data.forEach((group) => {
             renderGroup(group.name, group.image, group.id);
         });
@@ -160,21 +161,17 @@ function createService() {
     serviceForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(serviceForm);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-
         const group = document
             .getElementById("groups_container")
             .querySelector("button[disabled]");
 
         if (group) {
-            data.group_id = group.getAttribute("data-id");
-            const response = await apiFetch.post("services", data);
-            if (response.status === 201) {
+            const group_id = group.getAttribute("data-id");
+            formData.append("group_id", group_id);
+            const response = await apiFetch.post("services", formData);
+            if (response.success) {
                 serviceForm.reset();
-                showServices(data.group_id);
+                showServices(group_id);
             } else {
                 alert("Something went wrong");
             }
@@ -191,12 +188,24 @@ function deleteService(group_id) {
         btn.addEventListener("click", async () => {
             const service_id = btn.getAttribute("data-id");
             const response = await apiFetch.remove(`services/${service_id}`);
-            if (response.status === 200) {
+            if (response.success) {
                 showServices(group_id);
             } else {
                 alert("刪除失敗");
             }
         });
+    });
+}
+
+function showInputImg() {
+    const input = document.getElementById("img_input");
+    input.addEventListener("change", () => {
+        const img = input.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(img);
+        reader.onload = (e) => {
+            document.getElementById("img_preview").src = e.target.result;
+        };
     });
 }
 
@@ -221,6 +230,7 @@ async function main() {
     await showGroups();
     clickGroup();
     createService();
+    showInputImg();
 }
 
 main();

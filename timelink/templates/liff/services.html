@@ -36,12 +36,12 @@
 
             async function createServices(groupId) {
                 await showSpinner();
-                const resp = await fetch(`/api/services?groupId=${groupId}`, {
-                    method: "GET",
-                });
-                const jsonData = await resp.json();
+                const response = await fetch(
+                    `/api/services?groupId=${groupId}`
+                );
+                const responseJson = await response.json();
                 await closeSpinner();
-                jsonData["data"].forEach((data) => {
+                responseJson.data.forEach((data) => {
                     renderService(data);
                 });
             }

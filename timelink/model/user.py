@@ -1,4 +1,5 @@
 from . import db
+from mysql.connector import IntegrityError
 
 def create(username, password, name, email, phone):
     try:
@@ -9,14 +10,14 @@ def create(username, password, name, email, phone):
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"data": True}
-    except Exception as e:
-        raise e
+        return True
+    except IntegrityError:
+        return False
     finally:
         cursor.close()
         cnx.close()
         
-def auth(username):
+def auth(username) -> dict:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
@@ -26,35 +27,9 @@ def auth(username):
         cursor.execute(query, data)
         result = cursor.fetchone()
         if result:
-            return {"data": {"id":result[0], "username":result[1], "password":result[2]}}
+            return {"id":result[0], "username":result[1], "password":result[2]}
         else:
-            return {"data": None}
-    except Exception as e:
-        raise e
-    finally:
-        cursor.close()
-        cnx.close()
-        
-def get_all():
-    try:
-        cnx = db.get_db()
-        cursor = cnx.cursor()
-        
-        query = ("select * from User")
-        cursor.execute(query)
-        result = cursor.fetchall()
-        
-        datas = []
-        for data in result:
-            datas.append({"id": data[0],
-                            "username": data[1],
-                            "password": data[2],
-                            "name": data[3],
-                            "email": data[4],
-                            "phone": data[5],
-                            "createDatetime": data[6]})
-            
-        return {"data": datas}
+            return {}
     except Exception as e:
         raise e
     finally:

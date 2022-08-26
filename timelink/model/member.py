@@ -1,4 +1,5 @@
 from . import db
+from mysql.connector import IntegrityError
 
 def create(userId, name):
     try:
@@ -10,7 +11,9 @@ def create(userId, name):
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"ok": True}
+        return True
+    except IntegrityError:
+        return False
     except Exception as e:
         raise e
     finally:

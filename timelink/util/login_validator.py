@@ -17,8 +17,8 @@ def login_required(func):
             username = usertoken["username"]
         else:
             username = ""
-        resp = model.user.auth(username=username)
-        if resp["data"] is None:
+        dbData = model.user.auth(username=username)
+        if not dbData:
             return redirect(url_for('home.index'))
         return func(*args, **kwargs)
     return decorated

@@ -1,17 +1,20 @@
 from . import db
+from mysql.connector import IntegrityError
 
-def create(name, price, user_id, group_id, type=None, open_time=None, close_time=None, not_available_time=None):
+def create(name, price, user_id, group_id, type=None, open_time=None, close_time=None, not_available_time=None, imgUrl=None) -> bool:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
         query = ("insert into Service "
-                 "(name, price, type, user_id, group_id, openTime, closeTime, notAvailableTime) "
-                 "values (%s, %s, %s, %s, %s, %s, %s, %s)")
-        data = (name, price, type, user_id, group_id, open_time, close_time, not_available_time)
+                 "(name, price, type, user_id, group_id, openTime, closeTime, notAvailableTime, imgUrl) "
+                 "values (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        data = (name, price, type, user_id, group_id, open_time, close_time, not_available_time, imgUrl)
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"ok": True}, 201
+        return True
+    except IntegrityError:
+        return False
     except Exception as e:
         raise e
     finally:
@@ -28,16 +31,16 @@ def get_all_by_service_id(service_id):
        
         cursor.execute(query, data)
         result = cursor.fetchall()
-        datas = []
+        data_set = []
         for data in result:
-            datas.append({"id": data[0],
+            data_set.append({"id": data[0],
                         "name": data[1],
                         "price": data[2],
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
                         "notAvailableTime": str(data[9])})
             
-        return {"data": datas}
+        return data_set
     except Exception as e:
         raise e
     finally:
@@ -55,20 +58,20 @@ def get_all_by_user_id(user_id):
     
         cursor.execute(query, data)
         result = cursor.fetchall()
-        datas = []
+        data_set = []
         for data in result:
             if not data[2]:
                 type = "無"
             else:
                 type = data[2]
             
-            datas.append({"id": data[0],
+            data_set.append({"id": data[0],
                         "name": data[1],
                         "type": type,
                         "price": data[3],
                         "group_name":data[4]})
             
-        return {"data": datas}
+        return data_set
     except Exception as e:
         raise e
     finally:
@@ -85,17 +88,19 @@ def get_all_by_group_id(group_id):
     
         cursor.execute(query, data)
         result = cursor.fetchall()
-        datas = []
+        
+        data_set = []
         for data in result:
-            datas.append({"id": data[0],
+            data_set.append({"id": data[0],
                         "name": data[1],
                         "price": data[2],
                         "type": data[3],
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
-                        "notAvailableTime": str(data[9])})
+                        "notAvailableTime": str(data[9]),
+                        "imgUrl": data[10]})
             
-        return {"data": datas}
+        return data_set
     except Exception as e:
         raise e
     finally:
@@ -113,16 +118,17 @@ def get_all_by_groupId(groupId):
        
         cursor.execute(query, data)
         result = cursor.fetchall()
-        datas = []
+        data_set = []
         for data in result:
-            datas.append({"id": data[0],
+            data_set.append({"id": data[0],
                         "name": data[1],
                         "price": data[2],
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
-                        "notAvailableTime": str(data[9])})
+                        "notAvailableTime": str(data[9]),
+                        "imgUrl": data[10]})
             
-        return {"data": datas}
+        return data_set
     except Exception as e:
         raise e
     finally:
@@ -139,8 +145,6 @@ def delete(service_id):
         
         cursor.execute(query, data)
         cnx.commit()
-        
-        return {"ok": True}, 200
     except Exception as e:
         raise e
     finally:
