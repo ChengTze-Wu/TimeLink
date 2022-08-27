@@ -2,10 +2,14 @@
 <html lang="zh-Hant">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/main.css') }}"
+        />
         <title>TimeLink Booking System</title>
     </head>
     <body>
-        <div id="container"></div>
+        <div class="grid grid-cols-3 w-full gap-2 p-2" id="container"></div>
         <script
             charset="utf-8"
             src="https://static.line-scdn.net/liff/edge/2/sdk.js"
@@ -14,12 +18,19 @@
             function renderService(data) {
                 const container = document.getElementById("container");
                 const service = document.createElement("div");
+
+                let imgUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
+                if (data.image) {
+                    imgUrl = data.image;
+                }
+
                 service.className = "service";
                 service.innerHTML = `
-                    <div class="service">
-                    <h2 class="service-name">${data.name}</h2>
-                    <a href="/liff/service/${data.id}" class="service-url">點此預約</a>
-                    </div>
+                    <h2 class="service-name text-center">${data.name}</h2>
+                    <img class="mb-2" src="${imgUrl}">
+                    <a class="btn-card w-fit mx-auto" href="/liff/service/${data.id}" class="service-url">點此預約</a>
+                   
                 `;
                 container.appendChild(service);
             }

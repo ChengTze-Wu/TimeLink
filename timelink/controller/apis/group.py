@@ -23,10 +23,11 @@ def get_group_summary(groupId):
 @bp.route("/groups", methods=["POST"])
 def create():
     try:
-        data = request.form.to_dict()
-        groupId = data["groupId"]
         usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
+        
+        data = request.form.to_dict()
+        groupId = data["groupId"]
 
         group_summary = get_group_summary(groupId)
 

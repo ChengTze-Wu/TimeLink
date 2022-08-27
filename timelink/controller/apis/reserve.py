@@ -14,20 +14,21 @@ SECRET_KEY = current_app.config['SECRET_KEY']
 
 @bp.route("/reserves" , methods=["POST"])
 def create():
+    created_status = False
     try:
         data = request.form.to_dict()
-        print(data)
+
         bookedDateTime = datetime.datetime.strptime(f"{data['select_date_value']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
         
         member_id = model.member.get_member_id_by_userId(data["userId"])
-        created_status = model.reserve.create(service_id=data["service_id"], 
+        
+        if member_id:
+            created_status = model.reserve.create(service_id=data["service_id"], 
                                     member_id=member_id, 
                                     bookedDateTime=bookedDateTime)
         if created_status:
             return {"success": True}, 201
         return {"success": False, "error":{"code": 200, "message":"Create Failed"}}, 200
-    except jwt.exceptions.PyJWTError:
-        return {"success": False, "error":{"code": 401, "message":"Unauthorized"}}, 401
     except Exception as e:
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
 

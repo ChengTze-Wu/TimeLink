@@ -44,6 +44,15 @@
             #selectTime {
                 font-size: 1.2rem;
             }
+
+            .service {
+                display: flex;
+                justify-content: space-evenly;
+            }
+
+            .service-image {
+                width: 130px;
+            }
         </style>
         <link
             href="https://cdn.jsdelivr.net/gh/marcellosurdi/DateTimePickerComponent/dist/css/date-time-picker-component.min.css"
@@ -63,10 +72,19 @@
                 const service = document.createElement("div");
                 const selectForm = document.createElement("form");
 
+                let imgUrl =
+                    "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
+                if (data.image) {
+                    imgUrl = data.image;
+                }
+
                 service.className = "service";
                 service.innerHTML = `
-                    <h2 class="service-name">${data.name}</h2>
-                    <h3 class="service-price">NT$ ${data.price}</h3>
+                    <div>
+                        <h2 class="service-name">${data.name}</h2>
+                        <h3 class="service-price">NT$ ${data.price}</h3>
+                    </div>
+                    <img class="service-image" src="${imgUrl}">
                 `;
                 selectForm.id = "selectForm";
                 selectForm.innerHTML = `

@@ -38,7 +38,8 @@ def get_all_by_service_id(service_id):
                         "price": data[2],
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
-                        "notAvailableTime": str(data[9])})
+                        "notAvailableTime": str(data[9]),
+                        "image": data[10]})
             
         return data_set
     except Exception as e:
@@ -98,7 +99,7 @@ def get_all_by_group_id(group_id):
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
                         "notAvailableTime": str(data[9]),
-                        "imgUrl": data[10]})
+                        "image": data[10]})
             
         return data_set
     except Exception as e:
@@ -126,7 +127,7 @@ def get_all_by_groupId(groupId):
                         "openTime": str(data[7]),
                         "closeTime": str(data[8]),
                         "notAvailableTime": str(data[9]),
-                        "imgUrl": data[10]})
+                        "image": data[10]})
             
         return data_set
     except Exception as e:

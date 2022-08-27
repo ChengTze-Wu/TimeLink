@@ -80,33 +80,6 @@ def create(service_id, member_id, bookedDateTime, status=None) -> bool:
         cnx.close()
         
 
-def get_reserve_by_member_id_and_group_id(member_id, group_id):
-    try:
-        cnx = db.get_db()
-        cursor = cnx.cursor()
-        
-        data = (member_id, group_id)
-        query = ("SELECT * FROM Reserve "
-                 "RIGHT JOIN Service "
-                 "ON Reserve.service_id = Service.id "
-                 "WHERE Reserve.member_id = %s "
-                 "AND Service.group_id = %s")
-       
-        cursor.execute(query, data)
-        result = cursor.fetchall()
-        datas = []
-        for data in result:
-            datas.append({"serviceName": data[7],
-                         "bookedDateTime": str(data[5])})
-            
-        return {"data": datas}
-    except Exception as e:
-        raise e
-    finally:
-        cursor.close()
-        cnx.close()
-        
-
 def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
     """
     ### Return Example ###

@@ -42,7 +42,7 @@ function renderGroup(name, image, id) {
     container.appendChild(group);
 }
 
-function renderServices(id, name, price, type, openTime, closeTime) {
+function renderServices(id, name, price, type, openTime, closeTime, image) {
     const container = document.getElementById("services_container");
     const service = document.createElement("tr");
     service.classList.add(
@@ -51,16 +51,26 @@ function renderServices(id, name, price, type, openTime, closeTime) {
         "hover:bg-gray-100",
         "text-center"
     );
+
+    let imgUrl =
+        "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
+    if (image) {
+        imgUrl = image;
+    }
+
     service.innerHTML = `
-        <td>${name}</td>
+        <td>
+            <img class="w-12 h-12 mx-auto object-contain" src="${imgUrl}">
+            <p class="text-sm">${name}</p>
+        </td>
         <td>${price}</td>
         <td>${type}</td>
         <td>${openTime}</td>
         <td>${closeTime}</td>
         <td>
-            <button data-id="${id}" class="delete_btn hover:text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <button data-id="${id}" data-name="${name}" class="delete_btn hover:text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
             </button>
         </td>`;
@@ -82,14 +92,14 @@ async function showServices(group_id) {
     document.getElementById("servicesLoader").classList.add("hidden");
     if (response.success) {
         response.data.forEach((service) => {
-            console.log(service);
             renderServices(
                 service.id,
                 service.name,
                 service.price,
                 service.type,
                 service.openTime,
-                service.closeTime
+                service.closeTime,
+                service.image
             );
         });
     } else {

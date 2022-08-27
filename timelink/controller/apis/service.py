@@ -80,6 +80,7 @@ def get_service(service_id):
         return {"success": False, "data": None}, 200
     except Exception as e:
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
+
     
 @bp.route("/services/<service_id>", methods=["DELETE"])
 def delete(service_id):

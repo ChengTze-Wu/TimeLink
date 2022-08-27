@@ -14,6 +14,8 @@ def upload_img_to_s3(imgfile, file_name=None) -> bool:
         if(imghdr.what(imgfile)):
             s3.upload_fileobj(imgfile, "wehelpimagetest", "timelink/"+file_name)
             return True
-    except ClientError as e:
         return False
-    return False
+    except ClientError:
+        return False
+    except Exception as e:
+        raise e

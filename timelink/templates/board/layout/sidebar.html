@@ -11,9 +11,9 @@
 
     <nav class="nav">
         <ul class="nav_items">
-            <li class="nav_item">
+            <li class="nav_item hover:text-primary-green">
                 <a
-                    class="p-3 pl-4 hover:opacity-75 flex gap-3"
+                    class="p-3 pl-4 flex gap-3"
                     href="{{ url_for('board.group') }}"
                 >
                     <svg
@@ -33,9 +33,9 @@
                     Line群組管理</a
                 >
             </li>
-            <li class="nav_item">
+            <li class="nav_item hover:text-primary-green">
                 <a
-                    class="p-3 pl-4 hover:opacity-75 flex gap-3"
+                    class="p-3 pl-4 flex gap-3"
                     href="{{ url_for('board.service') }}"
                 >
                     <svg
@@ -55,9 +55,9 @@
                     服務管理</a
                 >
             </li>
-            <li class="nav_item">
+            <li class="nav_item hover:text-primary-green">
                 <a
-                    class="p-3 pl-4 hover:opacity-75 flex gap-3"
+                    class="p-3 pl-4 flex gap-3"
                     href="{{ url_for('board.reserve') }}"
                 >
                     <svg
@@ -77,11 +77,6 @@
                     預約管理</a
                 >
             </li>
-            <!-- <li>
-                <a class="nav_item" href="{{ url_for('board.member') }}"
-                    >成員管理</a
-                >
-            </li> -->
         </ul>
     </nav>
 
