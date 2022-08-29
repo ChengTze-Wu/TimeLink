@@ -23,9 +23,10 @@ def login():
                 usertoken = {"id": dbData["id"], "username": dbData["username"], 
                              "exp":datetime.datetime.utcnow() + datetime.timedelta(hours=24)}
                 session["usertoken"] = jwt.encode(usertoken, SECRET_KEY, algorithm="HS256")
+                session.permanent = True
 
                 return {"success": True}, 201  # session created
-        return {'success': False, "error": {"code": 401, "message": "Login Failed"}}, 401
+        return {'success': False, "error": {"code": 400, "message": "Login Failed"}}, 400
     except Exception as e:
         return {'success': False, "error": {"code": 500, "message": str(e)}}, 500
     
@@ -53,7 +54,7 @@ def signup():
         created_status = model.user.create(username=username, password=hashed_password, name=name, email=email, phone=phone)
         if created_status:
             return {"success": True}, 201
-        return {"success": False, "error":{"code": 200, "message":"Create Failed"}}, 200
+        return {"success": False, "error":{"code": 400, "message":"Create Failed"}}, 400
     except Exception as e:
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
     

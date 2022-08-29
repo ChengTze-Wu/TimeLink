@@ -28,7 +28,7 @@ def create():
                                     bookedDateTime=bookedDateTime)
         if created_status:
             return {"success": True}, 201
-        return {"success": False, "error":{"code": 200, "message":"Create Failed"}}, 200
+        return {"success": False, "error":{"code": 400, "message":"Create Failed"}}, 400
     except Exception as e:
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
 

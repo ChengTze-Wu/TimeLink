@@ -36,7 +36,7 @@ def create():
             created_status = model.group.create(groupId=groupId, name=group_name, user_id=user_id)
             if created_status:
                 return {"success": True}, 201
-        return {"success": False, "error": {"code": 200, "message":"Create Failed"}}, 200
+        return {"success": False, "error": {"code": 400, "message":"Create Failed"}}, 400
     except jwt.exceptions.PyJWTError:
         return {"success": False, "error": {"code": 401, "message":"Unauthorized"}}, 401
     except Exception as e:
