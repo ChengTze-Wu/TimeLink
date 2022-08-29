@@ -25,17 +25,17 @@ function renderUsername(username) {
 function logout() {
     const logoutBtn = document.getElementById("logout_btn");
     logoutBtn.addEventListener("click", async () => {
-        const resp = await apiFetch.remove("auth");
-        if (resp["status"] === 200) {
+        const response = await apiFetch.remove("auth");
+        if (response.success) {
             window.location.href = "/";
         }
     });
 }
 
 async function getUserInfo() {
-    const resp = await apiFetch.get("user");
-    if (resp["status"] === 200) {
-        renderUsername(resp["data"]["username"]);
+    const response = await apiFetch.get("user");
+    if (response.success) {
+        renderUsername(response.data.username);
     }
 }
 

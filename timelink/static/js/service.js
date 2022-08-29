@@ -42,7 +42,7 @@ function renderGroup(name, image, id) {
     container.appendChild(group);
 }
 
-function renderServices(id, name, price, type, openTime, closeTime) {
+function renderServices(id, name, price, type, openTime, closeTime, image) {
     const container = document.getElementById("services_container");
     const service = document.createElement("tr");
     service.classList.add(
@@ -51,16 +51,26 @@ function renderServices(id, name, price, type, openTime, closeTime) {
         "hover:bg-gray-100",
         "text-center"
     );
+
+    let imgUrl =
+        "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
+    if (image) {
+        imgUrl = image;
+    }
+
     service.innerHTML = `
-        <td>${name}</td>
+        <td>
+            <img class="w-12 h-12 mx-auto object-contain" src="${imgUrl}">
+            <p class="text-sm">${name}</p>
+        </td>
         <td>${price}</td>
         <td>${type}</td>
         <td>${openTime}</td>
         <td>${closeTime}</td>
         <td>
-            <button data-id="${id}" class="delete_btn hover:text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <button data-id="${id}" data-name="${name}" class="delete_btn hover:text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
             </button>
         </td>`;
@@ -80,7 +90,7 @@ async function showServices(group_id) {
     const response = await apiFetch.get(`services?group_id=${group_id}`);
     // spinner end
     document.getElementById("servicesLoader").classList.add("hidden");
-    if (response.data.length > 0) {
+    if (response.success) {
         response.data.forEach((service) => {
             renderServices(
                 service.id,
@@ -88,7 +98,8 @@ async function showServices(group_id) {
                 service.price,
                 service.type,
                 service.openTime,
-                service.closeTime
+                service.closeTime,
+                service.image
             );
         });
     } else {
@@ -108,7 +119,7 @@ async function showGroups() {
     // spinner end
     document.getElementById("servicesLoader").classList.add("hidden");
     document.getElementById("groupsLoader").classList.add("hidden");
-    if (response.data.length > 0) {
+    if (response.success) {
         response.data.forEach((group) => {
             renderGroup(group.name, group.image, group.id);
         });
@@ -160,21 +171,17 @@ function createService() {
     serviceForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(serviceForm);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-
         const group = document
             .getElementById("groups_container")
             .querySelector("button[disabled]");
 
         if (group) {
-            data.group_id = group.getAttribute("data-id");
-            const response = await apiFetch.post("services", data);
-            if (response.status === 201) {
+            const group_id = group.getAttribute("data-id");
+            formData.append("group_id", group_id);
+            const response = await apiFetch.post("services", formData);
+            if (response.success) {
                 serviceForm.reset();
-                showServices(data.group_id);
+                showServices(group_id);
             } else {
                 alert("Something went wrong");
             }
@@ -191,12 +198,24 @@ function deleteService(group_id) {
         btn.addEventListener("click", async () => {
             const service_id = btn.getAttribute("data-id");
             const response = await apiFetch.remove(`services/${service_id}`);
-            if (response.status === 200) {
+            if (response.success) {
                 showServices(group_id);
             } else {
                 alert("刪除失敗");
             }
         });
+    });
+}
+
+function showInputImg() {
+    const input = document.getElementById("img_input");
+    input.addEventListener("change", () => {
+        const img = input.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(img);
+        reader.onload = (e) => {
+            document.getElementById("img_preview").src = e.target.result;
+        };
     });
 }
 
@@ -221,6 +240,7 @@ async function main() {
     await showGroups();
     clickGroup();
     createService();
+    showInputImg();
 }
 
 main();

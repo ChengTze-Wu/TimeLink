@@ -13,14 +13,14 @@ def create_app(test_config=None):
     db.init_app(app)
     
     with app.app_context():
-    # pages
         from . import controller
+        # pages
         app.register_blueprint(controller.home.bp)
         app.register_blueprint(controller.board.bp)
         app.register_blueprint(controller.liff.bp)
         # apis
         app.register_blueprint(controller.apis.group.bp)
-        app.register_blueprint(controller.apis.member.bp)
+        # app.register_blueprint(controller.apis.member.bp)
         app.register_blueprint(controller.apis.reserve.bp)
         app.register_blueprint(controller.apis.service.bp)
         app.register_blueprint(controller.apis.user.bp)

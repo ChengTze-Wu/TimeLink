@@ -86,18 +86,18 @@ function renderReserve(
 }
 // controller
 async function showGroups() {
-    const jsonData = await apiFetch.get("groups");
+    const response = await apiFetch.get("groups");
     document.getElementById("groupLoader").classList.add("hidden");
 
-    if (jsonData.data.length > 0) {
-        jsonData.data.forEach((group) => {
+    if (response.success) {
+        response.data.forEach((group) => {
             renderGroups(group.id, group.image, group.name);
         });
     } else {
         renderMessage(
             document.getElementById("groups_container"),
             "請先至'Line 群組管理'連結群組。",
-            "message text-gray-500"
+            "message text-gray-500 w-full h-full flex justify-center items-center"
         );
     }
 }
@@ -107,11 +107,11 @@ async function showReserves(group_id) {
     if (!requestStatus) {
         requestStatus = true;
         document.getElementById("reservesLoader").classList.remove("hidden");
-        const jsonData = await apiFetch.get(`reserves?group_id=${group_id}`);
+        const response = await apiFetch.get(`reserves?group_id=${group_id}`);
         requestStatus = false;
         document.getElementById("reservesLoader").classList.add("hidden");
-        if (jsonData.data) {
-            jsonData.data.forEach((reserve) => {
+        if (response.success) {
+            response.data.forEach((reserve) => {
                 renderReserve(
                     reserve.reserve_id,
                     reserve.reserve_bookedDateTime,
@@ -174,8 +174,8 @@ function clickTrash() {
         trashBtn.addEventListener("click", async () => {
             const reserve_id =
                 trashBtn.parentElement.parentElement.getAttribute("reserve_id");
-            const jsonData = await apiFetch.remove(`reserves/${reserve_id}`);
-            if (jsonData.status === 200) {
+            const response = await apiFetch.remove(`reserves/${reserve_id}`);
+            if (response.success) {
                 trashBtn.parentElement.parentElement.remove();
             }
         });

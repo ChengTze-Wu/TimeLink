@@ -3,6 +3,7 @@ from . import db
 import datetime
 import json
 import requests
+from mysql.connector import IntegrityError
 
 
 def get_image(groupId=None, userId=None): 
@@ -49,14 +50,16 @@ def get_available_time(service_id, booking_date, working_minutes=60):
                     bookedTime = str(data[5].time())
                     available_time.remove(bookedTime)
         
-        return {"data": {"available_time": available_time}}
+        if len(available_time) == 0:
+            return None
+        return {"available_time": available_time}
     except Exception as e:
         raise e
     finally:
         cursor.close()
         cnx.close()
         
-def create(service_id, member_id, bookedDateTime, status=None):
+def create(service_id, member_id, bookedDateTime, status=None) -> bool:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
@@ -67,34 +70,9 @@ def create(service_id, member_id, bookedDateTime, status=None):
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"ok": True}, 201
-    except Exception as e:
-        raise e
-    finally:
-        cursor.close()
-        cnx.close()
-        
-        
-def get_reserve_by_member_id_and_group_id(member_id, group_id):
-    try:
-        cnx = db.get_db()
-        cursor = cnx.cursor()
-        
-        data = (member_id, group_id)
-        query = ("SELECT * FROM Reserve "
-                 "RIGHT JOIN Service "
-                 "ON Reserve.service_id = Service.id "
-                 "WHERE Reserve.member_id = %s "
-                 "AND Service.group_id = %s")
-       
-        cursor.execute(query, data)
-        result = cursor.fetchall()
-        datas = []
-        for data in result:
-            datas.append({"serviceName": data[7],
-                         "bookedDateTime": str(data[5])})
-            
-        return {"data": datas}
+        return True
+    except IntegrityError:
+        return False
     except Exception as e:
         raise e
     finally:
@@ -138,7 +116,6 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
        
         cursor.execute(query, data)
         result = cursor.fetchall()
-        data = None
         
         if result:
             reserves = []
@@ -162,7 +139,7 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
                 
             return {"group_id": result[0][0], "group_name": result[0][2], "data": reserves}
         
-        return {"data": data}
+        return None
     except Exception as e:
         raise e
     finally:
@@ -180,7 +157,6 @@ def delete_by_id(reserve_id:int):
        
         cursor.execute(query, data)
         cnx.commit()
-        return True
     except Exception as e:
         raise e
     finally:

@@ -49,13 +49,11 @@ function linkGroup() {
     const linkForm = document.getElementById("link_form");
     linkForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const groupId = document.getElementById("groupId");
-        const resp = await apiFetch.post("groups", {
-            data: { groupId: groupId.value },
-        });
-        if (resp["status"] === 200) {
+        const formData = new FormData(linkForm);
+        const response = await apiFetch.post("groups", formData);
+        if (response.success) {
             window.location.reload();
-        } else if (resp["status"] === 400) {
+        } else {
             alert("連結失敗");
         }
         linkForm.reset();
@@ -64,11 +62,10 @@ function linkGroup() {
 
 async function showGroup() {
     document.getElementById("groupsLoader").classList.remove("hidden");
-    const resp = await apiFetch.get("groups");
+    const response = await apiFetch.get("groups");
     document.getElementById("groupsLoader").classList.add("hidden");
-    if (resp["status"] === 200) {
-        const groups = resp["data"];
-        groups.forEach((group) => {
+    if (response.success) {
+        response.data.forEach((group) => {
             renderGroup(
                 group.name,
                 group.image,

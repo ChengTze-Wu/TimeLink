@@ -2,6 +2,7 @@ from . import db
 from flask import current_app
 import json
 import requests
+from mysql.connector import IntegrityError
 
 
 def get_groupInfo(groupId=None): 
@@ -26,7 +27,7 @@ def get_groupInfo(groupId=None):
     except Exception:
         return None
 
-def create(groupId, name, user_id):
+def create(groupId, name, user_id) -> bool:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
@@ -35,14 +36,16 @@ def create(groupId, name, user_id):
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"data": True}
+        return True
+    except IntegrityError:
+        return False
     except Exception as e:
         raise e
     finally:
         cursor.close()
         cnx.close()
         
-def get_all_by_user(user_id):
+def get_all_by_user_id(user_id):
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
@@ -52,57 +55,19 @@ def get_all_by_user(user_id):
         cursor.execute(query, data)
         result = cursor.fetchall()
         
-        datas = []
+        data_set = []
         for data in result:
             groupInfo = get_groupInfo(data[1])
-            datas.append({"id": data[0],
+            data_set.append({"id": data[0],
                             "image": groupInfo["pictureUrl"],
                             "name": groupInfo["groupName"],
                             "memberCount": groupInfo["count"],
                             "createDate": data[3].strftime("%Y/%m/%d"),
                             "user_id": data[4]})
             
-        return datas
+        return data_set
     except Exception as e:
         raise e
     finally:
         cursor.close()
         cnx.close()
-        
-def get_all_groupId():
-    try:
-        cnx = db.get_db()
-        cursor = cnx.cursor()
-
-        query = ("select groupId from Line_Group")
-        cursor.execute(query)
-        result = cursor.fetchall()
-        
-        datas = []
-        for data in result:
-            datas.append({"groupId": data[0]})
-            
-        return {"data": datas}
-    except Exception as e:
-        raise e
-    finally:
-        cursor.close()
-        cnx.close()
-    
-def get_group_id_by_groupId(groupId):
-    try:
-        cnx = db.get_db()
-        cursor = cnx.cursor()
-
-        data = (groupId,)
-        query = ("select id from Line_Group where groupId = %s")
-        cursor.execute(query, data)
-        result = cursor.fetchone()
-            
-        return {"data": result[0]}
-    except Exception as e:
-        raise e
-    finally:
-        cursor.close()
-        cnx.close()
-        

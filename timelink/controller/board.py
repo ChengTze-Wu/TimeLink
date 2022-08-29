@@ -3,10 +3,10 @@ from timelink.util.login_validator import login_required
 
 bp = Blueprint('board', __name__)
 
-@bp.route("/board", methods=['GET'])
+@bp.route("/board/guide", methods=['GET'])
 @login_required
-def index():
-    return render_template('board/board.html')
+def guide():
+    return render_template('board/guide.html')
 
 @bp.route("/board/service", methods=['GET'])
 @login_required

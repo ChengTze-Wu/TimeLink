@@ -1,6 +1,7 @@
 from . import db
+from mysql.connector import IntegrityError
 
-def create(userId, name):
+def create(userId, name) -> bool:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
@@ -10,14 +11,16 @@ def create(userId, name):
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"ok": True}
+        return True
+    except IntegrityError:
+        return False
     except Exception as e:
         raise e
     finally:
         cursor.close()
         cnx.close()
         
-def get_member_id_by_userId(userId):
+def get_member_id_by_userId(userId) -> int:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
@@ -26,8 +29,8 @@ def get_member_id_by_userId(userId):
         query = ("SELECT id FROM Member WHERE userId = %s")
         cursor.execute(query, data)
         result = cursor.fetchone()
-            
-        return result[0]
+        member_id = result[0]
+        return member_id
     except Exception as e:
         raise e
     finally:

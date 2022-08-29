@@ -5,12 +5,9 @@ function signup() {
     signupForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(signupForm);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-        const response = await apiFetch.post("user", data);
-        if (response.status === 200) {
+
+        const response = await apiFetch.post("user", formData);
+        if (response.success) {
             window.location.href = "/";
         } else {
             alert("Signup failed");

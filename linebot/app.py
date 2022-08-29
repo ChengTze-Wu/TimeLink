@@ -86,7 +86,6 @@ def handle_member_join(event):
                     TextSendMessage("歡迎回來")
             )
         else:
-            print(str(e))
             line_bot_api.reply_message(
                     event.reply_token,
                     TextSendMessage("請稍候再試一次！")
