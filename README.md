@@ -37,7 +37,7 @@ The system is divided into two parts:
 
 ## EER diagram
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/EER.png" alt="Backend Architecture" >
+<img height="600px" src="https://d43czlgw2x7ve.cloudfront.net/timelink/EER.jpg">
 
 <br>
 
@@ -45,7 +45,7 @@ The system is divided into two parts:
 
 ### Backend Architecture Diagram
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/backend_new.png" alt="Backend Architecture" >
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/backend_new.png">
 
 -   Powered by <b>Flask</b>
 -   Following <b>Factory pattern</b> for using different configuration for different web app environments.
