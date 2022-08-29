@@ -45,7 +45,7 @@ The system is divided into two parts:
 
 ### Backend Architecture Diagram
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/backend_new.png">
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/backend_new2.png">
 
 -   Powered by <b>Flask</b>
 -   Following <b>Factory pattern</b> for using different configuration for different web app environments.
