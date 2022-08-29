@@ -15,28 +15,32 @@ def get_group_summary(groupId):
     try:
         resp = requests.get(url, headers=headers)
         if resp.status_code == 400:
-            return {"data": None}
-        return {"data": json.loads(resp.text)}
+            return None
+        return json.loads(resp.text)
     except Exception:
         return None
 
 @bp.route("/groups", methods=["POST"])
 def create():
     try:
-        data = request.get_json()
-        groupId = data["data"]["groupId"]
         usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
+        
+        data = request.form.to_dict()
+        groupId = data["groupId"]
 
         group_summary = get_group_summary(groupId)
 
-        if group_summary["data"]:
-            group_name = group_summary["data"]["groupName"]
-            resp = model.group.create(groupId=groupId, name=group_name, user_id=user_id)
-            return {"ok": True, "message": "Linking Successful."}, 200
-        return {"error": True, "message": "Linking failed."}, 400
+        if group_summary:
+            group_name = group_summary["groupName"]
+            created_status = model.group.create(groupId=groupId, name=group_name, user_id=user_id)
+            if created_status:
+                return {"success": True}, 201
+        return {"success": False, "error": {"code": 400, "message":"Create Failed"}}, 400
+    except jwt.exceptions.PyJWTError:
+        return {"success": False, "error": {"code": 401, "message":"Unauthorized"}}, 401
     except Exception as e:
-        return {'error': True, "message": "Server Error."}, 500
+        return {"success": False, "error": {"code": 500, "message": str(e)}}, 500
 
 @bp.route("/groups", methods=["GET"])
 def get():
@@ -44,8 +48,11 @@ def get():
         usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         user_id = usertoken["id"]
 
-        data = model.group.get_all_by_user(user_id=user_id)
-        
-        return {"data": data}, 200
+        dbData = model.group.get_all_by_user_id(user_id=user_id)
+        if dbData:
+            return {"success": True, "data": dbData}, 200
+        return {"success": False, "data": None}, 200
+    except jwt.exceptions.PyJWTError:
+        return {"success": False, "error": {"code": 401, "message":"Unauthorized"}}, 401
     except Exception as e:
-        return {'error': True, "message": "Server Error."}, 500
+        return {"success": False, "error": {"code": 500, "message": str(e)}}, 500

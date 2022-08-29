@@ -60,18 +60,31 @@
         </div>
 
         <!-- Add Service -->
-        <div class="card p-8 basis-4/5">
-            <form class="flex flex-col gap-8" id="service_form">
+        <div class="card basis-4/5 overflow-auto">
+            <form class="flex flex-col gap-2" id="service_form">
                 <h2>服務新增</h2>
                 <input
-                    placeholder="服務名稱"
+                    placeholder="服務名稱*"
                     class="input"
                     type="text"
                     name="name"
                     required
                 />
+                <div class="input h-24 flex justify-between">
+                    <input
+                        id="img_input"
+                        type="file"
+                        name="imageFile"
+                        accept="image/*"
+                    />
+                    <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg"
+                        id="img_preview"
+                        class="h-20"
+                    />
+                </div>
                 <input
-                    placeholder="價格"
+                    placeholder="價格*"
                     class="input"
                     type="number"
                     min="0"
@@ -86,7 +99,7 @@
                 />
                 <div class="flex gap-4">
                     <input
-                        placeholder="開始時間"
+                        placeholder="開始時間*"
                         class="input"
                         type="datetime"
                         id="openTime"
@@ -94,7 +107,7 @@
                         required
                     />
                     <input
-                        placeholder="結束時間"
+                        placeholder="結束時間*"
                         class="input"
                         type="datetime"
                         id="closeTime"
@@ -102,11 +115,11 @@
                         required
                     />
                 </div>
-                <button class="btn-card" type="submit">新增</button>
+                <button class="btn-card mt-2" type="submit">新增</button>
             </form>
         </div>
     </div>
-    <div class="card h-full w-1/2 relative">
+    <div class="card h-full w-1/2 relative overflow-auto">
         <table class="w-full h-fit border-collapse bg-whitetext-sm shadow-sm">
             <thead class="w-full bg-secondary-gray">
                 <tr class="text-white font-semibold">

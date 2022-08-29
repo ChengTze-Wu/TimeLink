@@ -3,8 +3,14 @@ import * as apiFetch from "./module/apiFetch.js";
 function showLogin() {
     const loginCard = document.getElementById("login_card");
     const loginBtn = document.getElementById("login_btn");
-    loginBtn.addEventListener("click", () => {
-        loginCard.classList.toggle("invisible");
+    loginBtn.addEventListener("click", async () => {
+        // if already logged in, redirect to board page
+        const response = await apiFetch.get("user");
+        if (response.success) {
+            window.location.href = "/board/guide";
+        } else {
+            loginCard.classList.toggle("invisible");
+        }
     });
 }
 
@@ -21,13 +27,9 @@ function login() {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(loginForm);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-        const response = await apiFetch.post("auth", data);
-        if (response.status === 200) {
-            window.location.href = "/board";
+        const response = await apiFetch.post("auth", formData);
+        if (response.success) {
+            window.location.href = "/board/guide";
         } else {
             alert("Login failed");
         }

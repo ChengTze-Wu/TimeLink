@@ -1,31 +1,31 @@
 # TimeLink
 
-TimeLine is the bridge between studios and customers.
+TimeLine is a communication bridge between studios and customers.
 
-Customers can view the services provided by the studio in the Line group through the TimeLink LINE Bot, and the studio can also manage the affairs in the Line group through the TimeLink management system.
+Customers can view or reserve a service provided by the studio in the Line group through the TimeLink LINE Bot, and the studio can also manage the affairs in the Line group through the TimeLink management system. The system can manage the bot in multiple groups, and each bot can have different service information.
 
-The system can manage robots in multiple groups, and each robot can have different service information. The system is divided into two parts:
+The system is divided into two parts:
 
 -   <h3>TimeLink LINE Bot</h3>
 
-    <img style="margin: 20px" src="./rm_static/demo_bot.gif" alt="TimeLink Web" width="300">
-    <img style="margin: 20px" src="./rm_static/booking.gif" alt="TimeLink Web" width="300">
+    <img style="margin: 20px" src="./.github/check.gif" alt="TimeLink Web" width="300">
+    <img style="margin: 20px" src="./.github/booking.gif" alt="TimeLink Web" width="300">
 
 -   <h3>TimeLink Management System</h3>
 
-      <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/group.png" width="800">
+    <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/group_new.png" width="800">
 
-      <br>
+    <br>
 
-      <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/service.png" width="800">
+    <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/service_new.png" width="800">
 
-      <br>
+    <br>
 
-      <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/reserve.png" width="800">
+    <img src="https://d43czlgw2x7ve.cloudfront.net/timelink/reserve_new.png" width="800">
 
 <br>
 
-## Management System Link
+## Management System Site
 
 [TimeLink](https://timelink.cc)
 
@@ -35,20 +35,33 @@ The system can manage robots in multiple groups, and each robot can have differe
 
 <br>
 
+## EER diagram
+
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/EER.png" alt="Backend Architecture" >
+
+<br>
+
 ## Technique
 
 ### Backend Architecture Diagram
 
-<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/Backend_Architecture.png" alt="Backend Architecture" >
+<img src="https://d43czlgw2x7ve.cloudfront.net/timelink/backend_new.png" alt="Backend Architecture" >
 
 -   Powered by <b>Flask</b>
 -   Following <b>Factory pattern</b> for using different configuration for different web app environments.
 -   Following the <b>MVC pattern</b>, the website is divided into three parts:
-    -   Model: the data layer, containing the database connection and operations.
-    -   View: the presentation layer, containing the HTML templates and static files.
-    -   Controller: the business logic layer, containing the api calls and the business logic.
+    -   Model: business logic and data access
+    -   View: page and api response
+    -   Controller: routing and integrate the model and view
+-   Following <b>RESTful API</b> design pattern to provide a simple and clean API for the website.
+-   Using <b>JWT</b> for authentication and authorization.
 -   Using <b>Docker</b> for containerization, <b>Docker Compose</b> for deployment.
 -   Using <b>Gunicorn</b> for Web Server Gateway Interface, <b>Nginx</b> for reverse proxy and SSL certificate.
--   Using <b>AWS RDS</b> (MySQL) for database, <b>EC2</b> for server.
+-   Using <b>AWS EC2</b> for server, <b>RDS</b> (MySQL) for database, <b>S3</b> for storing image files and <b>CloudFront</b> for CDN.
 -   Support <b>SSL</b> for HTTPS.
--   Using <b>Line Messaging API</b> on LINE Bot Server.
+-   Using <b>Line Messaging API, SDK</b> on LINE Bot Server.
+
+### Frontend
+
+-   CSS Framework: <b>TailwindCSS</b>
+-   Using <b>LINE LIFF</b> for LINE app.

@@ -12,50 +12,51 @@ SECRET_KEY = current_app.config['SECRET_KEY']
 @bp.route("/auth", methods=["POST"])
 def login():
     try:
-        request_json = request.get_json()
-        username = request_json["username"]
-        password = request_json["password"]
-        resp = model.user.auth(username)
-        if resp["data"]:
-            hashed_password = resp["data"]["password"]
+        data = request.form.to_dict()
+        username = data["username"]
+        password = data["password"]
+        dbData = model.user.auth(username)
+        if dbData:
+            hashed_password = dbData["password"]
             if check_password_hash(hashed_password, password):
                
-                usertoken = {"id":resp["data"]["id"], "username":resp["data"]["username"], 
+                usertoken = {"id": dbData["id"], "username": dbData["username"], 
                              "exp":datetime.datetime.utcnow() + datetime.timedelta(hours=24)}
                 session["usertoken"] = jwt.encode(usertoken, SECRET_KEY, algorithm="HS256")
+                session.permanent = True
 
-                return {"ok": True, "message": "Login Successful."}, 200
-        return {'error': True, "message": "Login failed."}, 400
+                return {"success": True}, 201  # session created
+        return {'success': False, "error": {"code": 400, "message": "Login Failed"}}, 400
     except Exception as e:
-        return {'error': True, "message": "Server Error."}, 500
+        return {'success': False, "error": {"code": 500, "message": str(e)}}, 500
     
 @bp.route('/auth', methods=["DELETE"])
 def logout():
     try:
         session.pop('usertoken', None)
-        return {"ok": True, "message": "Logout Successful."}, 200
+        return {"success": True}, 200
     except Exception as e:
-        return {'error': True, "message": "Server Error."}, 500
+        return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
 
 
 @bp.route("/user", methods=["POST"])
 def signup():
     try:
-        request_json = request.get_json()
-        username = request_json["username"]
-        password = request_json["password"]
-        name = request_json["name"]
-        email = request_json["email"]
-        phone = request_json["phone"]
+        data = request.form.to_dict()
+        username = data["username"]
+        password = data["password"]
+        name = data["name"]
+        email = data["email"]
+        phone = data["phone"]
         
         hashed_password = generate_password_hash(password)
         
-        resp = model.user.create(username=username, password=hashed_password, name=name, email=email, phone=phone)
-        if resp["data"]:
-            return {"ok": True, "message": "Signup Successful."}, 200
-        return {"error": True, "message": "Signup failed."}, 400
+        created_status = model.user.create(username=username, password=hashed_password, name=name, email=email, phone=phone)
+        if created_status:
+            return {"success": True}, 201
+        return {"success": False, "error":{"code": 400, "message":"Create Failed"}}, 400
     except Exception as e:
-        return  {'error': True, "message": "Server Error."}, 500
+        return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
     
 
 @bp.route("/user", methods=["GET"])
@@ -64,8 +65,8 @@ def get():
         usertoken = jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
         username = usertoken["username"]
         user_id = usertoken["id"]
-        
-       
-        return {"data": {"username": username, "user_id": user_id}}, 200
+        return {"success": True ,"data": {"username": username, "user_id": user_id}}, 200
+    except jwt.exceptions.PyJWTError:
+        return {"success": False, "error":{"code": 401, "message":"Unauthorized"}}, 401
     except Exception as e:
-        return  {'error': True, "message": "Server Error."}, 500
+        return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
