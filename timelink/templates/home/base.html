@@ -133,6 +133,9 @@
             </div>
         </footer>
         <!-- script -->
+        <script type="text/javascript">
+            const csrf_token = "{{ csrf_token() }}";
+        </script>
         <script
             type="module"
             src="{{ url_for('static', filename='js/module/apiFetch.js') }}"
