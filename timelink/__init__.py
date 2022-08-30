@@ -1,4 +1,7 @@
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect()
 
 def create_app(test_config=None):
     
@@ -8,6 +11,8 @@ def create_app(test_config=None):
         app.config.from_pyfile('timelink_config.py', silent=True)
     else:
         app.config.from_mapping(test_config)
+        
+    csrf.init_app(app)
         
     from timelink.model import db
     db.init_app(app)

@@ -180,6 +180,9 @@
                     const response = await fetch(`/api/reserves`, {
                         method: "POST",
                         body: formData,
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token() }}",
+                        },
                     });
                     const responseJson = await response.json();
                     if (responseJson.success) {

@@ -954,6 +954,10 @@ h2 {
   width: 3rem;
 }
 
+.w-64 {
+  width: 16rem;
+}
+
 .flex-none {
   flex: none;
 }
