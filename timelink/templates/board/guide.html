@@ -4,34 +4,33 @@
 <!-- main -->
 {% block main %}
 
-<div class="px-8">
+<div class="card h-full overflow-y-auto">
     <h1>Time<span style="color: #44ad53">Link</span> Guideline</h1>
     <h3>三步驟啟用 TimeLink Bot</h3>
-</div>
 
-<div class="px-8 flex w-full justify-around">
-    <article class="my-4 w-full">
-        <h3>STEP 1</h3>
-        <p class="text-lg">Line 掃描 QRCODE 加入 TimeLink 好友。</p>
-        <br />
-        <h3>STEP 2</h3>
-        <p class="text-lg">將 TimeLink 邀請進開設的群組內，並跟從指示。</p>
-        <br />
-        <h3>STEP 3</h3>
-        <p class="text-lg">
-            至 Line 群組管理，輸入 Group ID 註冊群組，以開通後台功能。
-        </p>
-    </article>
-    <div class="w-full">
-        <img
-            class="w-40 mx-auto mb-4"
-            src="https://d43czlgw2x7ve.cloudfront.net/timelink/timelink_qr.png"
-        />
-        <img
-            class="w-60 mx-auto"
-            src="https://d43czlgw2x7ve.cloudfront.net/timelink/linebot_init.gif"
-        />
+    <div class="px-8 flex w-full justify-around">
+        <article class="my-4 w-full">
+            <h3>STEP 1</h3>
+            <p class="text-lg">Line 掃描 QRCODE 加入 TimeLink 好友。</p>
+            <img
+                class="w-40"
+                src="https://d43czlgw2x7ve.cloudfront.net/timelink/timelink_qr.png"
+            />
+            <br />
+            <h3>STEP 2</h3>
+            <p class="text-lg">將 TimeLink 邀請進開設的群組內，並跟從指示。</p>
+            <br />
+            <h3>STEP 3</h3>
+            <p class="text-lg">
+                至 Line 群組管理，輸入 Group ID 註冊群組，以開通後台功能。
+            </p>
+        </article>
+        <div class="my-4 w-full">
+            <img
+                class="w-72 mx-auto"
+                src="https://d43czlgw2x7ve.cloudfront.net/timelink/linebot_init.gif"
+            />
+        </div>
     </div>
 </div>
-
 {% endblock %}
