@@ -23,7 +23,7 @@ services:
         ports:
             - "8000:8000"
         working_dir: /usr/src
-        command: gunicorn -c ./timelink/gunicorn.conf.py 'timelink:create_app() -D'
+        command: gunicorn -c ./timelink/gunicorn.conf.py 'timelink:create_app()'
 
     timelink_bot:
         image: chengtze/timelink_bot
