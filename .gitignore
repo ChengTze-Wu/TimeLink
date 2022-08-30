@@ -1,5 +1,5 @@
 .env
-*.log
+log/
 venv/
 timelink.cc/
 instance/
