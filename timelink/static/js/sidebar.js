@@ -2,14 +2,14 @@ import * as apiFetch from "./module/apiFetch.js";
 
 // view
 function navHint() {
-    const locationHref = window.location.href;
+    const locationPath = window.location.pathname;
     const nav_items = document.querySelectorAll(".nav_item");
     nav_items.forEach((item) => {
         const itemATag = item.querySelector("a");
         // highlight current page
-        if (itemATag.href === locationHref) {
+        if (itemATag.pathname === locationPath) {
             item.classList.add("text-primary-green", "bg-secondary-gray");
-            // can't link to the same page
+            // can't link t the same page
             itemATag.removeAttribute("href");
             itemATag.classList.remove("hover:opacity-75");
         }

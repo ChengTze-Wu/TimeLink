@@ -33,6 +33,21 @@ def create():
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
 
 
+@bp.route("/reserves/<int:reserve_id>" , methods=["PUT"])
+def update(reserve_id):
+    updated_status = False
+    try:
+        data = request.form.to_dict()
+
+        bookedDateTime = datetime.datetime.strptime(f"{data['booking_date']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
+        updated_status = model.reserve.update(reserve_id=reserve_id, bookedDateTime=bookedDateTime)
+        if updated_status:
+            return {"success": True, "data": bookedDateTime.strftime("%Y/%m/%d %H:%M")}, 200
+        return {"success": False, "error":{"code": 400, "message":"Update Failed"}}, 400
+    except Exception as e:
+        return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
+    
+
 @bp.route("/reserves", methods=["GET"])
 def get():
     dbData = None

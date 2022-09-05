@@ -63,6 +63,17 @@ def create(service_id, member_id, bookedDateTime, status=None) -> bool:
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
+        # check if the time is available
+        check_query = ("SELECT * FROM Reserve "
+                       "WHERE service_id = %s and bookedDateTime = %s")
+        check_data = (service_id, bookedDateTime)
+        
+        cursor.execute(check_query, check_data)
+        result = cursor.fetchone()
+        
+        if result:
+            return False
+        
         query = ("insert into Reserve "
                  "(service_id, member_id, bookedDateTime, status) "
                  "values (%s, %s, %s, %s)")
@@ -71,8 +82,26 @@ def create(service_id, member_id, bookedDateTime, status=None) -> bool:
         cursor.execute(query, data)
         cnx.commit()
         return True
-    except IntegrityError:
-        return False
+    except Exception as e:
+       raise e
+    finally:
+        cursor.close()
+        cnx.close()
+        
+        
+def update(reserve_id, bookedDateTime) -> bool:
+    try:
+        cnx = db.get_db()
+        cursor = cnx.cursor()
+        
+        query = ("UPDATE Reserve "
+                 "SET bookedDateTime = %s "
+                 "WHERE id = %s")
+        data = (bookedDateTime, reserve_id)
+        
+        cursor.execute(query, data)
+        cnx.commit()
+        return True
     except Exception as e:
         raise e
     finally:
