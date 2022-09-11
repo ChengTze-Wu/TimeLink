@@ -188,8 +188,11 @@
                     if (responseJson.success) {
                         alert("預約成功");
                         liff.closeWindow();
+                    } else if (responseJson.error.code === 400) {
+                        alert("預約失敗，此時段已有人預約。");
                     } else {
-                        alert("預約失敗");
+                        alert("伺服器錯誤，請稍後再試一次。");
+                        liff.closeWindow();
                     }
                 });
             }

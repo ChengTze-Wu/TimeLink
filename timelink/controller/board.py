@@ -14,9 +14,12 @@ def service():
     return render_template('board/service.html')
 
 @bp.route("/board/reserve", methods=['GET'])
+@bp.route("/board/reserve/<int:reserve_id>", methods=['GET'])
 @login_required
-def reserve():
-    return render_template('board/reserve.html')
+def reserve(reserve_id=None):
+    if reserve_id:
+        return render_template('board/reserve.html', reserve_id=reserve_id)
+    return render_template('board/reserves.html')
 
 @bp.route("/board/group", methods=['GET'])
 @login_required
