@@ -5,6 +5,8 @@ import datetime
 from timelink import model
 import jwt
 
+from timelink.model import db
+
 
 bp = Blueprint('reserve', __name__, url_prefix='/api')
 
@@ -33,10 +35,32 @@ def create():
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
 
 
+@bp.route("/reserves/<int:reserve_id>" , methods=["PUT"])
+def update(reserve_id):
+    updated_status = False
+    try:
+        data = request.form.to_dict()
+
+        bookedDateTime = datetime.datetime.strptime(f"{data['booking_date']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
+        updated_status = model.reserve.update(reserve_id=reserve_id, bookedDateTime=bookedDateTime)
+        if updated_status:
+            return {"success": True, "data": bookedDateTime.strftime("%Y/%m/%d %H:%M")}, 200
+        return {"success": False, "error":{"code": 400, "message":"Update Failed"}}, 400
+    except Exception as e:
+        return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
+    
+
 @bp.route("/reserves", methods=["GET"])
-def get():
+@bp.route("/reserves/<int:reserve_id>", methods=["GET"])
+def get(reserve_id=None):
     dbData = None
     try:
+        if reserve_id:
+            dbData = model.reserve.get_reserve_by_id(reserve_id=reserve_id)
+            if dbData:
+                return {"success": True , "reserve_id": dbData["reserve_id"] ,"data": dbData}, 200
+            return {"success": False, "data": None}, 200
+        
         query_string = request.args.to_dict()
         
         if "service_id" in query_string and "booking_date" in query_string:
@@ -57,12 +81,13 @@ def get():
         return {"success": False, "error":{"code": 401, "message":"Unauthorized"}}, 401
     except Exception as e:
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
+
     
-@bp.route("/reserves/<int:id>", methods=["DELETE"])
-def delete(id):
+@bp.route("/reserves/<int:reserve_id>", methods=["DELETE"])
+def delete(reserve_id):
     try:
         jwt.decode(session.get('usertoken'), SECRET_KEY, algorithms=["HS256"])
-        model.reserve.delete_by_id(reserve_id=id)
+        model.reserve.delete_by_id(reserve_id=reserve_id)
         return {"success": True}, 200
     except jwt.exceptions.PyJWTError:
         return {"success": False, "error":{"code": 401, "message":"Unauthorized"}}, 401

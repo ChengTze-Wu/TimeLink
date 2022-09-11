@@ -196,12 +196,17 @@ function deleteService(group_id) {
     const deleteBtns = document.querySelectorAll(".delete_btn");
     deleteBtns.forEach((btn) => {
         btn.addEventListener("click", async () => {
-            const service_id = btn.getAttribute("data-id");
-            const response = await apiFetch.remove(`services/${service_id}`);
-            if (response.success) {
-                showServices(group_id);
-            } else {
-                alert("刪除失敗");
+            const confirmMessage = confirm("確認刪除此服務?");
+            if (confirmMessage) {
+                const service_id = btn.getAttribute("data-id");
+                const response = await apiFetch.remove(
+                    `services/${service_id}`
+                );
+                if (response.success) {
+                    showServices(group_id);
+                } else {
+                    alert("刪除失敗");
+                }
             }
         });
     });

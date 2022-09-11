@@ -18,6 +18,7 @@ services:
         image: chengtze/timelink_web
         volumes:
             - ./instance:/usr/src/instance
+            - ./logs:/usr/src/logs
         environment:
             - TZ="Asia/Taipei"
         ports:
