@@ -3,11 +3,17 @@ import * as apiFetch from "./module/apiFetch.js";
 // view
 function navHint() {
     const locationPath = window.location.pathname;
+    let objectPath = locationPath.split("/");
+    // if last path is number, remove it
+    if (!isNaN(objectPath[objectPath.length - 1])) {
+        objectPath.pop();
+    }
+    objectPath = objectPath.join("/");
     const nav_items = document.querySelectorAll(".nav_item");
     nav_items.forEach((item) => {
         const itemATag = item.querySelector("a");
         // highlight current page
-        if (itemATag.pathname === locationPath) {
+        if (itemATag.pathname === objectPath) {
             item.classList.add("text-primary-green", "bg-secondary-gray");
             // can't link t the same page
             itemATag.removeAttribute("href");

@@ -5,7 +5,78 @@
 <!-- main -->
 {% block main %}
 
-<div class="card w-full h-full"></div>
+<div class="card w-[500px] h-full mx-auto space-y-6">
+    <div class="flex gap-6 relative">
+        <div>
+            <img
+                id="service_image"
+                class="w-40 h-40 object-cover"
+                src="https://via.placeholder.com/160"
+                alt="service image"
+            />
+
+            <p class="text-lg text-center" id="service_name">服務名稱</p>
+        </div>
+        <div class="flex flex-col gap-2">
+            <p>
+                預約者:
+                <img
+                    id="member_image"
+                    class="w-8 h-8 object-cover rounded-full inline-block"
+                    src="https://via.placeholder.com/32"
+                    alt="member image"
+                />
+                <span id="member_name">姓名</span>
+            </p>
+            <p>
+                預約時段:
+                <span class="font-bold" id="reserve_bookedDateTime"></span>
+            </p>
+            <p>價格: <span id="service_price"></span></p>
+            <p>上次修改: <span id="reserve_createDateTime"></span></p>
+        </div>
+        <a href="{{ url_for('board.reserve') }}">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.2"
+                stroke="currentColor"
+                class="w-8 h-8 absolute right-0 hover:text-primary-green"
+                id="close"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+        </a>
+    </div>
+    <hr />
+    <form class="space-y-2" id="update_form">
+        <h3 class="text-2xl">修改預約日期</h3>
+        <input type="date" id="booking_date" name="booking_date" required />
+        <br />
+        <select id="booking_time" name="booking_time" required>
+            <option>請先選擇日期</option>
+        </select>
+        <input
+            class="btn-card hover:cursor-pointer hover:bg-yellow-500 hover:border-yellow-500"
+            type="submit"
+            value="修改"
+        />
+    </form>
+    <hr />
+    <form class="space-y-4" id="delete_form">
+        <h3 class="text-2xl">刪除預約</h3>
+        <input
+            class="btn-card hover:cursor-pointer hover:bg-red-500 hover:border-red-500"
+            type="submit"
+            value="刪除"
+        />
+    </form>
+</div>
 
 {% endblock %}
 
