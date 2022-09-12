@@ -144,28 +144,29 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
                  "FROM (((Reserve INNER JOIN Service ON Reserve.service_id = Service.id) "
                  "INNER JOIN Member ON Reserve.member_id = Member.id) " 
                  "INNER JOIN Line_Group ON Service.group_id = Line_Group.id) "
-                 "WHERE Service.user_id = %s and Service.group_id = %s ")
+                 "WHERE Service.user_id = %s and Service.group_id = %s "
+                 "ORDER BY Reserve.bookedDateTime DESC")
        
         cursor.execute(query, data)
         result = cursor.fetchall()
         
         if result:
             reserves = []
-            member_exist = []
-            member_image = None
+            members = {} 
+            '''
+            {1:{'member_image': 'http://image.example/1', 'member_name': 'name1'}, 
+            2:{'member_image': 'http://image.example/2', 'member_name': 'name2'}}
+            '''
             for data in result:
-                
-                if data[3] not in member_exist:
-                    # reduce number of requests of getting member image
+                # reduce frequency of requests of getting member profile
+                if data[3] not in members.keys():
                     profile = get_profile(groupId=data[1], userId=data[4])
-                    member_image = profile["img_url"]
-                    member_name = profile["member_name"]
-                    member_exist.append(data[3])
+                    members[data[3]] = {"member_image": profile["img_url"], "member_name": profile["member_name"]}
                 
                 reserves.append({"reserve_id": data[8],
                                 "member_id": data[3],
-                                "member_image": member_image,
-                                "member_name": member_name,
+                                "member_image": members[data[3]]["member_image"],
+                                "member_name": members[data[3]]["member_name"],
                                 "service_id": data[6],
                                 "service_name": data[7],
                                 "reserve_createDateTme": data[9].strftime("%Y/%m/%d %H:%M:%S"),
