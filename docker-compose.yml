@@ -10,8 +10,6 @@ services:
         volumes:
             - ./certificate.crt:/etc/ssl/certificate.crt
             - ./private.key:/etc/ssl/private.key
-        ports:
-            - "3000:3000"
         command: gunicorn -w 2 -b :3000 app:app
 
     timelink_web:
@@ -21,8 +19,6 @@ services:
             - ./logs:/usr/src/logs
         environment:
             - TZ="Asia/Taipei"
-        ports:
-            - "8000:8000"
         working_dir: /usr/src
         command: gunicorn -c ./timelink/gunicorn.conf.py 'timelink:create_app()'
 
@@ -32,8 +28,6 @@ services:
             - ./.env
         environment:
             - TZ="Asia/Taipei"
-        ports:
-            - "5000:5000"
         command: gunicorn -w 2 -b :5000 app:timelink_bot
 
     nginx:
