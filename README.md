@@ -60,6 +60,7 @@ The system is divided into two parts:
 -   Using <b>AWS EC2</b> for server, <b>RDS</b> (MySQL) for database, <b>S3</b> for storing image files and <b>CloudFront</b> for CDN.
 -   Support <b>SSL</b> for HTTPS.
 -   Using <b>Line Messaging API, SDK</b> on LINE Bot Server.
+-   Using <b>Socket.IO</b> for real-time communication in Booking System.
 
 ### Frontend
 
