@@ -59,6 +59,7 @@ def get_all_by_user_id(user_id):
         for data in result:
             groupInfo = get_groupInfo(data[1])
             data_set.append({"id": data[0],
+                            "groupId": data[1],
                             "image": groupInfo["pictureUrl"],
                             "name": groupInfo["groupName"],
                             "memberCount": groupInfo["count"],

@@ -75,7 +75,14 @@
             charset="utf-8"
             src="https://static.line-scdn.net/liff/edge/2/sdk.js"
         ></script>
+        <script
+            src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+            integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+            crossorigin="anonymous"
+        ></script>
         <script>
+            const socket = io();
+
             function renderServiceDate(data) {
                 const container = document.getElementById("container");
                 const service = document.createElement("div");
@@ -170,13 +177,14 @@
                 });
             }
 
-            function makeReserve(service_id, userId) {
+            function makeReserve(service_id, userId, groupId) {
                 const selectForm = document.getElementById("selectForm");
                 selectForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
                     const formData = new FormData(selectForm);
                     formData.append("userId", userId);
                     formData.append("service_id", service_id);
+                    formData.append("groupId", groupId);
                     const response = await fetch(`/api/reserves`, {
                         method: "POST",
                         body: formData,
@@ -186,6 +194,7 @@
                     });
                     const responseJson = await response.json();
                     if (responseJson.success) {
+                        socket.emit("reserve_server", responseJson);
                         alert("預約成功");
                         liff.closeWindow();
                     } else if (responseJson.error.code === 400) {
@@ -203,8 +212,20 @@
                 .then(async () => {
                     const context = liff.getContext();
                     const service_id = location.pathname.split("/")[3];
+                    socket.on("connect", () => {
+                        socket.emit("join", {
+                            groupId: context.groupId,
+                            userId: context.userId,
+                        });
+                    });
+                    socket.on("disconnect", () => {
+                        socket.emit("leave", {
+                            groupId: context.groupId,
+                            userId: context.userId,
+                        });
+                    });
                     await createService(service_id);
-                    makeReserve(service_id, context.userId);
+                    makeReserve(service_id, context.userId, context.groupId);
                     cancel();
                 })
                 .catch((err) => {

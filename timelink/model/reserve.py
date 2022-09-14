@@ -84,6 +84,7 @@ def create(service_id, member_id, bookedDateTime, status=None) -> bool:
         
         cursor.execute(query, data)
         cnx.commit()
+        
         return True
     except Exception as e:
        raise e
@@ -149,7 +150,6 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
        
         cursor.execute(query, data)
         result = cursor.fetchall()
-        
         if result:
             reserves = []
             members = {} 
@@ -160,7 +160,7 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
             for data in result:
                 # reduce frequency of requests of getting member profile
                 if data[3] not in members.keys():
-                    profile = get_profile(groupId=data[1], userId=data[4])
+                    profile = get_profile(userId=data[4])
                     members[data[3]] = {"member_image": profile["img_url"], "member_name": profile["member_name"]}
                 
                 reserves.append({"reserve_id": data[8],
@@ -169,7 +169,7 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
                                 "member_name": members[data[3]]["member_name"],
                                 "service_id": data[6],
                                 "service_name": data[7],
-                                "reserve_createDateTme": data[9].strftime("%Y/%m/%d %H:%M:%S"),
+                                "reserve_createDateTime": data[9].strftime("%Y/%m/%d %H:%M:%S"),
                                 "reserve_bookedDateTime": data[10].strftime("%Y/%m/%d %H:00")})
                 
             return {"group_id": result[0][0], "group_name": result[0][2], "data": reserves}
@@ -212,6 +212,36 @@ def get_reserve_by_id(reserve_id:int):
         cursor.close()
         cnx.close()
         
+
+def get_reserve_by_create(service_id, member_id, bookedDateTime):
+    try:
+        cnx = db.get_db()
+        cursor = cnx.cursor()
+        
+        data = (service_id, member_id, bookedDateTime)
+        query = ("SELECT * "
+                 "FROM ((Reserve INNER JOIN Service ON Reserve.service_id = Service.id) "
+                 "INNER JOIN Member ON Reserve.member_id = Member.id) " 
+                 "WHERE Reserve.service_id = %s and Reserve.member_id = %s and Reserve.bookedDateTime = %s ")
+        
+        cursor.execute(query, data)
+        result = cursor.fetchone()
+        
+        if result:
+            profile = get_profile(userId=result[18])
+            member_name = profile["member_name"]
+            member_image = profile["img_url"]
+            return {"reserve_id": result[0], "reserve_createDateTime": result[3].strftime("%Y/%m/%d %H:%M:%S"),
+                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:00"),
+                    "service_id": result[6], "service_name": result[7], "service_price": result[8], 
+                    "service_image": result[16], "member_id": result[17], "member_name": member_name, "member_image":member_image}
+        
+        return None
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+        cnx.close()
         
 
 def delete_by_id(reserve_id:int):
