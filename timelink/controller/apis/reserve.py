@@ -2,26 +2,44 @@ from flask import (
     Blueprint, request, session, current_app
 )
 import datetime
-from timelink import model
+from timelink import model, socketio
 import jwt
-
-from timelink.model import db
+from flask_socketio import emit, join_room, leave_room
 
 
 bp = Blueprint('reserve', __name__, url_prefix='/api')
 
-
 SECRET_KEY = current_app.config['SECRET_KEY']
 
+@socketio.on('join')
+def on_join(json):
+    room = json['groupId']
+    userId = json['userId']
+    join_room(room)
+    # emit("reserve_client", 
+    #     {"success": True, "data":{"userId": userId, "message": f"Entered Room: {room}"}}, 
+    #     to=room)
+
+@socketio.on("reserve_server")
+def handle_reserve_event(json):
+    room = json["data"]["groupId"]
+    emit("reserve_client", json["data"], to=room)
+
+@socketio.on('leave')
+def on_leave(json):
+    room = json['groupId']
+    userId = json['userId']
+    leave_room(room)
+    # emit("reserve_client", 
+    #     {"success": False, "data":{"userId": userId, "message": f"Entered Room: {room}"}}, 
+    #     to=room)
 
 @bp.route("/reserves" , methods=["POST"])
 def create():
     created_status = False
     try:
         data = request.form.to_dict()
-
         bookedDateTime = datetime.datetime.strptime(f"{data['select_date_value']} {data['booking_time']}", "%Y-%m-%d %H:%M:%S")
-        
         member_id = model.member.get_member_id_by_userId(data["userId"])
         
         if member_id:
@@ -29,7 +47,11 @@ def create():
                                     member_id=member_id, 
                                     bookedDateTime=bookedDateTime)
         if created_status:
-            return {"success": True}, 201
+            dbData = model.reserve.get_reserve_by_create(service_id=data["service_id"], 
+                                    member_id=member_id, 
+                                    bookedDateTime=bookedDateTime)
+            dbData["groupId"] = data["groupId"]
+            return {"success": True, "data": dbData}, 201
         return {"success": False, "error":{"code": 400, "message":"Create Failed"}}, 400
     except Exception as e:
         return {"success": False, "error":{"code": 500, "message": str(e)}}, 500
