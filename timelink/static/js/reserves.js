@@ -1,6 +1,7 @@
 import * as apiFetch from "./module/apiFetch.js";
 // var
 let requestStatus = false;
+const socket = io();
 // model
 // view
 function renderMessage(node, message, className) {
@@ -17,13 +18,14 @@ function removeMessage(node) {
     }
 }
 
-function renderGroups(id, img, name) {
+function renderGroups(id, groupId, img, name) {
     const container = document.getElementById("groups_container");
     const group = document.createElement("button");
     const groupImg = document.createElement("img");
     const groupName = document.createElement("p");
 
     group.setAttribute("group_id", id);
+    group.setAttribute("groupId", groupId);
     group.className =
         "group shrink-0 hover:cursor-pointer hover:text-primary-green";
     groupImg.src = img;
@@ -43,7 +45,8 @@ function renderReserve(
     member_image,
     member_name,
     service_id,
-    service_name
+    service_name,
+    new_data = false
 ) {
     const container = document.getElementById("reserves_container");
     const reserveTr = document.createElement("tr");
@@ -51,7 +54,7 @@ function renderReserve(
     const memberImg = document.createElement("img");
     const serviceTd = document.createElement("td");
     const bookedDateTimeTd = document.createElement("td");
-    const createDateTmeTd = document.createElement("td");
+    const createDateTimeTd = document.createElement("td");
 
     reserveTr.setAttribute("reserve_id", reserve_id);
     memberTd.setAttribute("member_id", member_id);
@@ -62,19 +65,30 @@ function renderReserve(
     memberImg.className = "w-10 h-10 inline-block rounded-full mx-1";
     serviceTd.className = "border border-slate-300 p-1";
     bookedDateTimeTd.className = "border border-slate-300 p-1";
-    createDateTmeTd.className = "border border-slate-300 p-1";
+    createDateTimeTd.className = "border border-slate-300 p-1 relative";
 
     memberImg.src = member_image;
     memberTd.appendChild(memberImg);
     memberTd.appendChild(document.createTextNode(member_name));
     serviceTd.textContent = service_name;
     bookedDateTimeTd.textContent = reserve_bookedDateTime;
-    createDateTmeTd.textContent = reserve_createDateTme;
+    createDateTimeTd.appendChild(
+        document.createTextNode(reserve_createDateTme)
+    );
+
+    if (new_data) {
+        const newHint = document.createElement("img");
+        newHint.src =
+            "https://d43czlgw2x7ve.cloudfront.net/timelink/new_tag2.png";
+        newHint.className =
+            "w-9 h-9 inline-block mx-2 absolute right-0 top-1/2 transform -translate-y-1/2";
+        createDateTimeTd.appendChild(newHint);
+    }
 
     reserveTr.appendChild(memberTd);
     reserveTr.appendChild(serviceTd);
     reserveTr.appendChild(bookedDateTimeTd);
-    reserveTr.appendChild(createDateTmeTd);
+    reserveTr.appendChild(createDateTimeTd);
     container.appendChild(reserveTr);
 }
 // controller
@@ -84,7 +98,7 @@ async function showGroups() {
 
     if (response.success) {
         response.data.forEach((group) => {
-            renderGroups(group.id, group.image, group.name);
+            renderGroups(group.id, group.groupId, group.image, group.name);
         });
     } else {
         renderMessage(
@@ -95,7 +109,7 @@ async function showGroups() {
     }
 }
 
-async function showReserves(group_id) {
+async function showReserves(group_id, groupId) {
     removeMessage(document.getElementById("reservesCard"));
     if (!requestStatus) {
         requestStatus = true;
@@ -108,7 +122,7 @@ async function showReserves(group_id) {
                 renderReserve(
                     reserve.reserve_id,
                     reserve.reserve_bookedDateTime,
-                    reserve.reserve_createDateTme,
+                    reserve.reserve_createDateTime,
                     reserve.member_id,
                     reserve.member_image,
                     reserve.member_name,
@@ -123,6 +137,10 @@ async function showReserves(group_id) {
                 "message text-gray-500 text-lg absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
             );
         }
+        socket.emit("join", {
+            groupId: groupId,
+            userId: "admin",
+        });
     }
 }
 
@@ -133,7 +151,9 @@ function clickGroup() {
     groups.forEach((group) => {
         group.addEventListener("click", async () => {
             const group_id = group.getAttribute("group_id");
-            if (last_click !== group_id && last_click !== null) {
+            const groupId = group.getAttribute("groupId");
+
+            if (last_click !== group && last_click !== null) {
                 last_click
                     .querySelector("p")
                     .classList.remove("text-primary-green");
@@ -154,8 +174,14 @@ function clickGroup() {
             group.toggleAttribute("disabled");
             group.classList.remove("hover:cursor-pointer");
             reserves.innerHTML = "";
+            if (last_click) {
+                socket.emit("leave", {
+                    groupId: last_click.getAttribute("groupId"),
+                    userId: "admin",
+                });
+            }
             last_click = group;
-            await showReserves(group_id);
+            await showReserves(group_id, groupId);
             clickReserve();
         });
     });
@@ -184,6 +210,19 @@ async function main() {
     await showGroups();
     clickGroup();
     init();
+    socket.on("reserve_client", (socket_data) => {
+        renderReserve(
+            socket_data.reserve_id,
+            socket_data.reserve_bookedDateTime,
+            socket_data.reserve_createDateTime,
+            socket_data.member_id,
+            socket_data.member_image,
+            socket_data.member_name,
+            socket_data.service_id,
+            socket_data.service_name,
+            true
+        );
+    });
 }
 
 main();

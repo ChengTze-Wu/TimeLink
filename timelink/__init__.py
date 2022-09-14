@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from flask_socketio import SocketIO
 
 csrf = CSRFProtect()
+socketio = SocketIO(cors_allowed_origins='*')
 
 def create_app(test_config=None):
     
@@ -12,10 +14,10 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
         
-    csrf.init_app(app)
-        
     from timelink.model import db
+    csrf.init_app(app)
     db.init_app(app)
+    socketio.init_app(app)
     
     with app.app_context():
         from . import controller
