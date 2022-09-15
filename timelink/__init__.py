@@ -5,7 +5,7 @@ from flask_socketio import SocketIO
 csrf = CSRFProtect()
 socketio = SocketIO(cors_allowed_origins=["https://timelink.cc", 
                                           "https://www.timelink.cc",
-                                          "http://localhost:8000"])
+                                          "http://127.0.0.1:8000"])
 
 def create_app(test_config=None):
     
