@@ -61,8 +61,13 @@
                 liffId: "1657198810-v359xpYa",
             })
                 .then(() => {
-                    const context = liff.getContext();
-                    createServices(context.groupId);
+                    if (liff.isLoggedIn()) {
+                        const context = liff.getContext();
+                        createServices(context.groupId);
+                    } else {
+                        const container = document.getElementById("container");
+                        container.textContent = "請使用手機 LINE APP 瀏覽。";
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
