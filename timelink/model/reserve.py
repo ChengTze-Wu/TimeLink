@@ -170,7 +170,7 @@ def get_reserve_by_user_id_and_group_id(user_id:int, group_id:int) -> dict:
                                 "service_id": data[6],
                                 "service_name": data[7],
                                 "reserve_createDateTime": data[9].strftime("%Y/%m/%d %H:%M:%S"),
-                                "reserve_bookedDateTime": data[10].strftime("%Y/%m/%d %H:00")})
+                                "reserve_bookedDateTime": data[10].strftime("%Y/%m/%d %H:%M")})
                 
             return {"group_id": result[0][0], "group_name": result[0][2], "data": reserves}
         
@@ -201,7 +201,7 @@ def get_reserve_by_id(reserve_id:int):
             member_name = profile["member_name"]
             member_image = profile["img_url"]
             return {"reserve_id": result[0], "reserve_createDateTime": result[3].strftime("%Y/%m/%d %H:%M:%S"),
-                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:00"),
+                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:%M"),
                     "service_id": result[6], "service_name": result[7], "service_price": result[8], 
                     "service_image": result[16], "member_name": member_name, "member_image":member_image}
         
@@ -232,7 +232,7 @@ def get_reserve_by_create(service_id, member_id, bookedDateTime):
             member_name = profile["member_name"]
             member_image = profile["img_url"]
             return {"reserve_id": result[0], "reserve_createDateTime": result[3].strftime("%Y/%m/%d %H:%M:%S"),
-                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:00"),
+                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:%M"),
                     "service_id": result[6], "service_name": result[7], "service_price": result[8], 
                     "service_image": result[16], "member_id": result[17], "member_name": member_name, "member_image":member_image}
         

@@ -1,131 +1,54 @@
 {% extends "home/base.html" %}
 <!-- banner -->
 {% block banner %}
-<div class="banner w-full">
+<div class="banner w-full relative">
     <img
-        class="opacity-75 object-cover w-full h-[432px]"
+        class="opacity-80 blur-sm object-cover w-full md:h-[432px] h-[332px]"
         src="https://d43czlgw2x7ve.cloudfront.net/timelink/mobile.jpg"
     />
+    <div class="banner-text absolute lg:top-18 lg:mx-36 top-8 mx-10">
+        <h1 class="text-6xl font-bold text-white">TimeLink</h1>
+        <h1 class="text-3xl font-bold text-white">與顧客聯繫沒有時間限制，</h1>
+        <h1 class="text-3xl font-bold text-white">
+            你的 Line 群組，可以做得更多。
+        </h1>
+        <a
+            href="/signup"
+            class="btn text-lg border-2 hover:bg-primary-green hover:text-white w-fit h-12 sm:mt-8 mt-2"
+            >立即註冊</a
+        >
+    </div>
 </div>
 {% endblock %}
 
 <!-- main -->
 {% block main %}
-<div id="features">
-    <div
-        class="grid lg:grid-cols-3 lg:grid-rows-2 sm:grid-cols-2 sm:grid-rows-3 gap-4"
-    >
-        <div class="card relative">
-            <h2>簡單易用</h2>
-            <p>只需三步驟，即可完成 Line BOT 與群組連結。</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-40 w-40 opacity-30 absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                />
-            </svg>
-        </div>
-        <div class="card relative">
-            <h2>介面簡約</h2>
-            <p>後台管理介面簡約，只需要一個選單即可管理所有功能。</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-40 w-40 opacity-30 absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                />
-            </svg>
-        </div>
-        <div class="card relative">
-            <h2>頻繁更新</h2>
-            <p>提供新的功能，提高管理者體驗。</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-40 w-40 opacity-30 absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
-                />
-            </svg>
-        </div>
-        <div class="card relative">
-            <h2>群組管理</h2>
-            <p>可以自行連結群組，並查看群組資訊。</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-40 w-40 opacity-30 absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-            </svg>
-        </div>
-        <div class="card relative">
-            <h2>服務管理</h2>
-            <p>可以自行新增 / 刪除服務，並查看服務資訊。</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-40 w-40 opacity-30 absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1"
-            >
-                <path
-                    d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"
-                />
-            </svg>
-        </div>
-        <div class="card relative">
-            <h2>預約管理</h2>
-            <p>可以自行刪除預約，並查看預約資訊。</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-40 w-40 opacity-30 absolute top-1/2 right-1/2 translate-y-[-50%] translate-x-[50%]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="1"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-            </svg>
-        </div>
+<div id="features" class="grid lg:grid-cols-3 sm:grid-cols-2 sm:gap-4 gap-0">
+    <div class="card sm:rounded-xl rounded-b-none h-fit relative">
+        <h2>簡單易用</h2>
+        <p>只需三步驟，你的群組即可啟用 TimeLink 機器人。</p>
+    </div>
+    <div class="card sm:p-6 py-0 sm:rounded-xl rounded-none h-fit relative">
+        <h2>全天服務</h2>
+        <p>24 小時不間斷，群組中機器人隨時都能服務顧客。</p>
+    </div>
+    <div class="card sm:rounded-xl rounded-t-none h-fit relative">
+        <h2>介面簡約</h2>
+        <p>管理介面簡約，群組與顧客資訊一目瞭然。</p>
+    </div>
+</div>
+<div class="card p-0 h-fit w-full mt-8 sm:flex items-center overflow-hidden">
+    <div class="md:w-1/4 text-secondary-blue md:p-8 p-4">
+        <h1 class="md:text-3xl text-2xl">即時接收預約資訊</h1>
+        <p class="lg:block hidden">
+            您可以透過後台管理介面，即時接收來自 Line 群組內顧客的預約資訊。
+        </p>
+    </div>
+    <div class="md:w-3/4">
+        <img
+            class="w-full"
+            src="https://d43czlgw2x7ve.cloudfront.net/timelink/reserve_realtime.gif"
+        />
     </div>
 </div>
 {% endblock %}
