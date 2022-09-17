@@ -1,15 +1,48 @@
-<div class="basis-1/5 bg-secondary-blue text-white relative">
+<div class="lg:basis-1/5 bg-secondary-blue text-white lg:relative lg:h-screen">
     <div
-        class="flex justify-center items-center border-b-2 border-solid border-primary-white"
+        class="flex p-4 lg:justify-center justify-between items-center border-b-2 border-solid border-primary-white"
     >
         <a
-            class="text-center p-3 text-3xl hover:opacity-75"
+            class="text-center text-3xl hover:opacity-75"
             href="{{ url_for('home.index') }}"
             >Time<span style="color: #44ad53">Link</span></a
         >
+        <!-- menu hamburger -->
+        <button class="lg:hidden focus:outline-none" id="menu_toggle">
+            <svg
+                id="menu"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-8 h-8"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+            </svg>
+            <svg
+                id="menu_close"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-8 h-8 hidden"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+        </button>
     </div>
 
-    <nav class="nav">
+    <nav id="nav" class="nav lg:block hidden">
         <ul class="nav_items">
             <li class="nav_item hover:text-primary-green">
                 <a
@@ -103,7 +136,8 @@
     </nav>
 
     <div
-        class="absolute bottom-0 flex justify-between w-full p-4 py-4 border-t-2 border-solid border-primary-white"
+        id="user_menu"
+        class="justify-between w-full p-4 py-4 border-t-2 border-solid border-primary-white lg:flex lg:absolute lg:bottom-0 hidden"
     >
         <div class="flex items-center gap-1">
             <svg

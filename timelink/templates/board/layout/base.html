@@ -10,12 +10,14 @@
 
         <title>{% block title %}{% endblock %}TimeLink</title>
     </head>
-    <body class="overflow-hidden font-sans">
-        <div class="flex bg-primary-white h-screen">
+    <body class="font-sans bg-primary-white">
+        <div class="lg:flex h-full">
             <!-- area-l -->
             {% include'board/layout/sidebar.html' %}
             <!-- area-r -->
-            <main class="basis-4/5 px-8 py-16 overflow-y-auto relative">
+            <main
+                class="lg:basis-4/5 lg:px-8 px-2 lg:py-16 py-2 overflow-y-auto relative"
+            >
                 <!-- main  -->
                 {% block main %}{% endblock %}
             </main>

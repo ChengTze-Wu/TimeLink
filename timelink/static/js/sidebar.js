@@ -45,10 +45,34 @@ async function getUserInfo() {
     }
 }
 
+function clickMenuToggle() {
+    const menuToggle = document.getElementById("menu_toggle");
+    const menu = document.getElementById("menu");
+    const menuClose = document.getElementById("menu_close");
+    const nav = document.getElementById("nav");
+    const userMenu = document.getElementById("user_menu");
+    menuToggle.addEventListener("click", () => {
+        if (menu.classList.contains("hidden")) {
+            menu.classList.remove("hidden");
+            menuClose.classList.add("hidden");
+            nav.classList.add("hidden");
+            userMenu.classList.add("hidden");
+            userMenu.classList.remove("flex");
+        } else {
+            menu.classList.add("hidden");
+            menuClose.classList.remove("hidden");
+            nav.classList.remove("hidden");
+            userMenu.classList.remove("hidden");
+            userMenu.classList.add("flex");
+        }
+    });
+}
+
 function main() {
     navHint();
     logout();
     getUserInfo();
+    clickMenuToggle();
 }
 
 main();
