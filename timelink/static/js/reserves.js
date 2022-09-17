@@ -77,12 +77,6 @@ function renderReserve(
     );
 
     if (new_data) {
-        const newHint = document.createElement("img");
-        newHint.src =
-            "https://d43czlgw2x7ve.cloudfront.net/timelink/new_tag2.png";
-        newHint.className =
-            "w-9 h-9 inline-block mx-2 absolute right-0 top-1/2 transform -translate-y-1/2";
-        createDateTimeTd.appendChild(newHint);
         reserveTr.classList.remove("cursor-pointer");
         reserveTr.classList.add("bg-gray-100");
     }
