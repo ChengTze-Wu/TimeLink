@@ -66,3 +66,4 @@ The system is divided into two parts:
 
 -   CSS Framework: <b>TailwindCSS</b>
 -   Using <b>LINE LIFF</b> for LINE app.
+-   Support <b>RWD</b> for mobile devices.
