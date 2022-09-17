@@ -746,10 +746,6 @@ h2 {
   top: 1rem;
 }
 
-.top-8 {
-  top: 2rem;
-}
-
 .bottom-0 {
   bottom: 0px;
 }
@@ -789,9 +785,9 @@ h2 {
   margin-bottom: 2rem;
 }
 
-.mx-10 {
-  margin-left: 2.5rem;
-  margin-right: 2.5rem;
+.mx-6 {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 .my-2 {
@@ -1338,8 +1334,8 @@ h2 {
   line-height: 1.5rem;
 }
 
-.text-6xl {
-  font-size: 3.75rem;
+.text-5xl {
+  font-size: 3rem;
   line-height: 1;
 }
 
@@ -1521,9 +1517,24 @@ h2 {
     padding-left: 2rem;
     padding-right: 2rem;
   }
+
+  .sm\:text-6xl {
+    font-size: 3.75rem;
+    line-height: 1;
+  }
+
+  .sm\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
 }
 
 @media (min-width: 768px) {
+  .md\:mx-36 {
+    margin-left: 9rem;
+    margin-right: 9rem;
+  }
+
   .md\:h-\[432px\] {
     height: 432px;
   }
@@ -1551,11 +1562,6 @@ h2 {
 }
 
 @media (min-width: 1024px) {
-  .lg\:mx-36 {
-    margin-left: 9rem;
-    margin-right: 9rem;
-  }
-
   .lg\:block {
     display: block;
   }
