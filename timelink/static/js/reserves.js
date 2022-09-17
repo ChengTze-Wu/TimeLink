@@ -62,7 +62,7 @@ function renderReserve(
 
     reserveTr.className = "hover:bg-gray-100 cursor-pointer";
     memberTd.className = "border border-slate-300 p-1";
-    memberImg.className = "w-10 h-10 inline-block rounded-full mx-1";
+    memberImg.className = "w-10 h-10 sm:inline-block rounded-full mx-1";
     serviceTd.className = "border border-slate-300 p-1";
     bookedDateTimeTd.className = "border border-slate-300 p-1";
     createDateTimeTd.className = "border border-slate-300 p-1 relative";
