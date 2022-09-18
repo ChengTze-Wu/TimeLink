@@ -23,12 +23,13 @@ def create(userId, name):
         
         cursor.execute(query, data)
         cnx.commit()
-        return {"ok": True}
+        
+        return True
     except Exception as e:
+        if e.errno == 1062:
+            return "Already exists"
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()
         
@@ -41,12 +42,11 @@ def get_member_id_by_userId(userId):
         query = ("SELECT id FROM Member WHERE userId = %s")
         cursor.execute(query, data)
         result = cursor.fetchone()
-            
-        return result[0]
+        if result:
+            return result[0]
+        return None
     except Exception as e:
         raise e
     finally:
-        if cnx.in_transaction:
-            cnx.rollback()
         cursor.close()
         cnx.close()

@@ -730,6 +730,14 @@ h2 {
   right: 0px;
 }
 
+.right-\[-1px\] {
+  right: -1px;
+}
+
+.top-0 {
+  top: 0px;
+}
+
 .top-\[72px\] {
   top: 72px;
 }
@@ -748,14 +756,6 @@ h2 {
 
 .top-1 {
   top: 0.25rem;
-}
-
-.top-2 {
-  top: 0.5rem;
-}
-
-.top-0 {
-  top: 0px;
 }
 
 .z-20 {
@@ -802,11 +802,6 @@ h2 {
 .mx-1 {
   margin-left: 0.25rem;
   margin-right: 0.25rem;
-}
-
-.mx-2 {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
 }
 
 .mb-2 {
@@ -875,24 +870,12 @@ h2 {
   height: 7rem;
 }
 
-.h-\[554px\] {
-  height: 554px;
-}
-
-.h-\[508px\] {
-  height: 508px;
+.h-\[500px\] {
+  height: 500px;
 }
 
 .h-24 {
   height: 6rem;
-}
-
-.h-20 {
-  height: 5rem;
-}
-
-.h-16 {
-  height: 4rem;
 }
 
 .h-6 {
@@ -923,16 +906,16 @@ h2 {
   height: 15rem;
 }
 
-.h-9 {
-  height: 2.25rem;
-}
-
 .h-5 {
   height: 1.25rem;
 }
 
-.min-h-\[636px\] {
-  min-height: 636px;
+.h-16 {
+  height: 4rem;
+}
+
+.h-\[70px\] {
+  height: 70px;
 }
 
 .w-full {
@@ -983,10 +966,6 @@ h2 {
 
 .w-12 {
   width: 3rem;
-}
-
-.w-9 {
-  width: 2.25rem;
 }
 
 .w-5 {
@@ -1263,11 +1242,6 @@ h2 {
   padding: 0.75rem;
 }
 
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1283,9 +1257,24 @@ h2 {
   padding-bottom: 0px;
 }
 
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 .pl-4 {
@@ -1466,10 +1455,6 @@ h2 {
 }
 
 @media (min-width: 640px) {
-  .sm\:top-1\/2 {
-    top: 50%;
-  }
-
   .sm\:my-0 {
     margin-top: 0px;
     margin-bottom: 0px;
@@ -1489,15 +1474,6 @@ h2 {
 
   .sm\:w-72 {
     width: 18rem;
-  }
-
-  .sm\:-translate-y-1\/2 {
-    --tw-translate-y: -50%;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-  }
-
-  .sm\:transform {
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
   .sm\:grid-cols-2 {
@@ -1601,6 +1577,10 @@ h2 {
     display: none;
   }
 
+  .lg\:h-auto {
+    height: auto;
+  }
+
   .lg\:h-full {
     height: 100%;
   }
@@ -1611,6 +1591,10 @@ h2 {
 
   .lg\:w-1\/2 {
     width: 50%;
+  }
+
+  .lg\:grow {
+    flex-grow: 1;
   }
 
   .lg\:basis-4\/5 {
