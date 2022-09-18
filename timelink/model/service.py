@@ -29,7 +29,7 @@ def get_service_by_id(service_id):
         data = (service_id,)
         query = ("SELECT id, name, price, openTime, "
                  "closeTime, notAvailableTime, imgUrl "
-                 "FROM Service WHERE id = %s")
+                 "FROM Service WHERE isDeleted = 0 AND id = %s")
        
         cursor.execute(query, data)
         result = cursor.fetchone()
@@ -57,7 +57,7 @@ def get_all_by_user_id(user_id):
         
         data = (user_id,)
         query = ("select Service.id, Service.name, Service.type, Service.price, Line_Group.name from Service "
-                 "INNER JOIN Line_Group ON Service.group_id = Line_Group.id where Service.user_id = %s")
+                 "INNER JOIN Line_Group ON Service.group_id = Line_Group.id where Service.isDeleted = 0 AND Service.user_id = %s")
     
         cursor.execute(query, data)
         result = cursor.fetchall()
@@ -89,7 +89,7 @@ def get_all_by_group_id(group_id):
         data = (group_id,)
         query = ("select id, name, price, type, "
                  "openTime, closeTime, notAvailableTime, imgUrl "
-                 "from Service where group_id = %s")
+                 "from Service where isDeleted = 0 AND group_id = %s")
     
         cursor.execute(query, data)
         result = cursor.fetchall()
@@ -120,7 +120,7 @@ def get_all_by_groupId(groupId):
         data = (groupId,)
         query = ("SELECT id, name, price, "
                  "openTime, closeTime, notAvailableTime, imgUrl "
-                 "FROM Service WHERE group_id in "
+                 "FROM Service WHERE isDeleted = 0 AND group_id in "
                  "(SELECT id FROM Line_Group WHERE groupId = %s)")
        
         cursor.execute(query, data)
@@ -142,13 +142,14 @@ def get_all_by_groupId(groupId):
         cursor.close()
         cnx.close()
 
-def delete(service_id):
+# logical deletion
+def logical_delete(service_id):
     try:
         cnx = db.get_db()
         cursor = cnx.cursor()
         
         data = (service_id,)
-        query = ("DELETE FROM Service WHERE id = %s;")
+        query = ("update Service set isDeleted = 1 where id = %s")
         
         cursor.execute(query, data)
         cnx.commit()

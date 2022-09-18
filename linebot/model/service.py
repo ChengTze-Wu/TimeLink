@@ -21,7 +21,7 @@ def get_all_by_group_id(group_id):
         
         data = (group_id,)
         query = ("SELECT id, name, price, openTime, closeTime, notAvailableTime "
-                 "FROM Service WHERE group_id = %s")
+                 "FROM Service WHERE isDeleted = 0 AND group_id = %s")
        
         cursor.execute(query, data)
         result = cursor.fetchall()
