@@ -51,7 +51,8 @@ def get_all_by_user_id(user_id):
         cursor = cnx.cursor()
         
         data = (user_id,)
-        query = ("select * from Line_Group where user_id = %s")
+        query = ("select id, groupId, createDatetime, user_id "
+                 "from Line_Group where user_id = %s")
         cursor.execute(query, data)
         result = cursor.fetchall()
         
@@ -63,8 +64,8 @@ def get_all_by_user_id(user_id):
                             "image": groupInfo["pictureUrl"],
                             "name": groupInfo["groupName"],
                             "memberCount": groupInfo["count"],
-                            "createDate": data[3].strftime("%Y/%m/%d"),
-                            "user_id": data[4]})
+                            "createDate": data[2].strftime("%Y/%m/%d"),
+                            "user_id": data[3]})
             
         return data_set
     except Exception as e:
