@@ -14,11 +14,7 @@ SECRET_KEY = current_app.config['SECRET_KEY']
 @socketio.on('join')
 def on_join(json):
     room = json['groupId']
-    userId = json['userId']
     join_room(room)
-    # emit("reserve_client", 
-    #     {"success": True, "data":{"userId": userId, "message": f"Entered Room: {room}"}}, 
-    #     to=room)
 
 @socketio.on("reserve_server")
 def handle_reserve_event(json):
@@ -28,11 +24,8 @@ def handle_reserve_event(json):
 @socketio.on('leave')
 def on_leave(json):
     room = json['groupId']
-    userId = json['userId']
     leave_room(room)
-    # emit("reserve_client", 
-    #     {"success": False, "data":{"userId": userId, "message": f"Entered Room: {room}"}}, 
-    #     to=room)
+    
 
 @bp.route("/reserves" , methods=["POST"])
 def create():

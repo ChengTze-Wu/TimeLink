@@ -74,8 +74,9 @@ def get_services():
 @bp.route("/services/<service_id>", methods=["GET"])
 def get_service(service_id):
     try:
-        dbData = model.service.get_all_by_service_id(service_id=service_id)
+        dbData = model.service.get_service_by_id(service_id=service_id)
         if dbData:
+            print(dbData)
             return {"success": True, "data": dbData}, 200
         return {"success": False, "data": None}, 200
     except Exception as e:

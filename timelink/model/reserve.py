@@ -30,8 +30,8 @@ def get_available_time(service_id, booking_date, working_minutes=60):
         cursor = cnx.cursor()
         
         data = (service_id, )
-        query = ("SELECT * FROM Reserve "
-                 "RIGHT JOIN Service "
+        query = ("SELECT Reserve.bookedDateTime, Service.openTime, Service.closeTime "
+                 "FROM Reserve RIGHT JOIN Service "
                  "ON Reserve.service_id = Service.id "
                  "WHERE Service.id = %s")
        
@@ -39,8 +39,8 @@ def get_available_time(service_id, booking_date, working_minutes=60):
         result = cursor.fetchall()
         # time control
         # get operation time
-        openTimeDelta = result[0][13]
-        closeTimeDelta = result[0][14]
+        openTimeDelta = result[0][1]
+        closeTimeDelta = result[0][2]
         timeRange = (closeTimeDelta - openTimeDelta)//datetime.timedelta(minutes=working_minutes)
         available_time = []
         
@@ -48,9 +48,9 @@ def get_available_time(service_id, booking_date, working_minutes=60):
             available_time.append(str((datetime.datetime.min + openTimeDelta + datetime.timedelta(minutes=frag*working_minutes)).time()))
         
         for data in result:
-            if data[5]:
-                if str(data[5].date()) == booking_date:
-                    bookedTime = str(data[5].time())
+            if data[0]:
+                if str(data[0].date()) == booking_date:
+                    bookedTime = str(data[0].time())
                     available_time.remove(bookedTime)
         
         if len(available_time) == 0:
@@ -67,7 +67,7 @@ def create(service_id, member_id, bookedDateTime, status=None) -> bool:
         cnx = db.get_db()
         cursor = cnx.cursor()
         # check if the time is available
-        check_query = ("SELECT * FROM Reserve "
+        check_query = ("SELECT id FROM Reserve "
                        "WHERE service_id = %s and bookedDateTime = %s")
         check_data = (service_id, bookedDateTime)
         
@@ -187,8 +187,9 @@ def get_reserve_by_id(reserve_id:int):
         cnx = db.get_db()
         cursor = cnx.cursor()
         
-        data = (reserve_id, )
-        query = ("SELECT * "
+        data = (reserve_id,)
+        query = ("SELECT Reserve.id, Reserve.createDateTime, Reserve.bookedDateTime, "
+                 "Service.id, Service.name, Service.price, Service.imgUrl, Member.userId "
                  "FROM ((Reserve INNER JOIN Service ON Reserve.service_id = Service.id) "
                  "INNER JOIN Member ON Reserve.member_id = Member.id) " 
                  "WHERE Reserve.id = %s ")
@@ -197,13 +198,13 @@ def get_reserve_by_id(reserve_id:int):
         result = cursor.fetchone()
         
         if result:
-            profile = get_profile(userId=result[18])
+            profile = get_profile(userId=result[7])
             member_name = profile["member_name"]
             member_image = profile["img_url"]
-            return {"reserve_id": result[0], "reserve_createDateTime": result[3].strftime("%Y/%m/%d %H:%M:%S"),
-                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:%M"),
-                    "service_id": result[6], "service_name": result[7], "service_price": result[8], 
-                    "service_image": result[16], "member_name": member_name, "member_image":member_image}
+            return {"reserve_id": result[0], "reserve_createDateTime": result[1].strftime("%Y/%m/%d %H:%M:%S"),
+                    "reserve_bookedDateTime": result[2].strftime("%Y/%m/%d %H:%M"),
+                    "service_id": result[3], "service_name": result[4], "service_price": result[5], 
+                    "service_image": result[6], "member_name": member_name, "member_image":member_image}
         
         return None
     except Exception as e:
@@ -219,7 +220,9 @@ def get_reserve_by_create(service_id, member_id, bookedDateTime):
         cursor = cnx.cursor()
         
         data = (service_id, member_id, bookedDateTime)
-        query = ("SELECT * "
+        query = ("SELECT Reserve.id, Reserve.createDateTime, Reserve.bookedDateTime, "
+                 "Service.id, Service.name, Service.price, Service.imgUrl, "
+                 "Member.id, Member.userId "
                  "FROM ((Reserve INNER JOIN Service ON Reserve.service_id = Service.id) "
                  "INNER JOIN Member ON Reserve.member_id = Member.id) " 
                  "WHERE Reserve.service_id = %s and Reserve.member_id = %s and Reserve.bookedDateTime = %s ")
@@ -228,13 +231,13 @@ def get_reserve_by_create(service_id, member_id, bookedDateTime):
         result = cursor.fetchone()
         
         if result:
-            profile = get_profile(userId=result[18])
+            profile = get_profile(userId=result[8])
             member_name = profile["member_name"]
             member_image = profile["img_url"]
-            return {"reserve_id": result[0], "reserve_createDateTime": result[3].strftime("%Y/%m/%d %H:%M:%S"),
-                    "reserve_bookedDateTime": result[5].strftime("%Y/%m/%d %H:%M"),
-                    "service_id": result[6], "service_name": result[7], "service_price": result[8], 
-                    "service_image": result[16], "member_id": result[17], "member_name": member_name, "member_image":member_image}
+            return {"reserve_id": result[0], "reserve_createDateTime": result[1].strftime("%Y/%m/%d %H:%M:%S"),
+                    "reserve_bookedDateTime": result[2].strftime("%Y/%m/%d %H:%M"),
+                    "service_id": result[3], "service_name": result[4], "service_price": result[5], 
+                    "service_image": result[6], "member_id": result[7], "member_name": member_name, "member_image":member_image}
         
         return None
     except Exception as e:
