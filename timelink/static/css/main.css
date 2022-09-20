@@ -804,6 +804,11 @@ h2 {
   margin-right: 0.25rem;
 }
 
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -878,6 +883,10 @@ h2 {
   height: 6rem;
 }
 
+.h-\[70px\] {
+  height: 70px;
+}
+
 .h-6 {
   height: 1.5rem;
 }
@@ -908,14 +917,6 @@ h2 {
 
 .h-5 {
   height: 1.25rem;
-}
-
-.h-16 {
-  height: 4rem;
-}
-
-.h-\[70px\] {
-  height: 70px;
 }
 
 .w-full {
@@ -1265,16 +1266,6 @@ h2 {
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
-}
-
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
 }
 
 .pl-4 {
