@@ -14,11 +14,18 @@
         <h1 class="sm:text-3xl text-2xl font-bold text-white">
             你的 Line 群組，可以做得更多。
         </h1>
-        <a
-            href="/signup"
-            class="btn text-lg border-2 hover:bg-primary-green hover:text-white w-fit h-12 sm:mt-8 mt-2"
-            >立即註冊</a
-        >
+        <div class="flex sm:gap-4 gap-2">
+            <a
+                href="/signup"
+                class="btn text-lg border-2 bg-primary-green border-primary-green hover:text-white hover:border-white w-fit h-12 sm:mt-8 mt-2"
+                >商家註冊</a
+            >
+            <a
+                href="#experience"
+                class="btn text-lg bg-secondary-blue border-secondary-blue hover:border-white hover:text-white border-2 w-fit h-12 sm:mt-8 mt-2"
+                >顧客體驗</a
+            >
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -55,6 +62,42 @@
         />
     </div>
 </div>
-{% endblock %}
-<!-- page script -->
-{% block script %} {% endblock %}
+<div
+    id="experience"
+    class="card p-8 h-fit w-full sm:mt-8 mt-2 text-secondary-blue"
+>
+    <h1 class="md:text-3xl text-2xl">成為顧客，體驗預約服務。</h1>
+    <div
+        class="grid xl:grid-cols-5 xl:grid-rows-1 md:grid-cols-3 md:grid-rows-2 grid-cols-1 items-center md:justify-items-start justify-items-center"
+    >
+        <div class="justify-self-start">
+            <p class="font-bold">STEP 1</p>
+            <p>與 TimeLink 機器人成為好友</p>
+        </div>
+        <img
+            class="w-48 h-48 xl:col-span-1 md:col-span-2"
+            src="https://d43czlgw2x7ve.cloudfront.net/timelink/timelink_qr.png"
+        />
+        <div class="justify-self-start">
+            <p class="font-bold">STEP 2</p>
+            <p>任選加入體驗群組</p>
+        </div>
+        <div class="w-fit h-fit">
+            <img
+                class="w-48 h-48"
+                src="https://d43czlgw2x7ve.cloudfront.net/timelink/line_group_123.jpeg"
+            />
+            <p class="font-light text-center">123攝影</p>
+        </div>
+        <div class="w-fit h-fit">
+            <img
+                class="w-48 h-48"
+                src="https://d43czlgw2x7ve.cloudfront.net/timelink/line_group_demo.jpeg"
+            />
+            <p class="font-light text-center">demo</p>
+        </div>
+    </div>
+    {% endblock %}
+    <!-- page script -->
+    {% block script %} {% endblock %}
+</div>
