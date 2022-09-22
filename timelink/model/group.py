@@ -59,13 +59,14 @@ def get_all_by_user_id(user_id):
         data_set = []
         for data in result:
             groupInfo = get_groupInfo(data[1])
-            data_set.append({"id": data[0],
-                            "groupId": data[1],
-                            "image": groupInfo["pictureUrl"],
-                            "name": groupInfo["groupName"],
-                            "memberCount": groupInfo["count"],
-                            "createDate": data[2].strftime("%Y/%m/%d"),
-                            "user_id": data[3]})
+            if groupInfo:
+                data_set.append({"id": data[0],
+                                "groupId": data[1],
+                                "image": groupInfo["pictureUrl"],
+                                "name": groupInfo["groupName"],
+                                "memberCount": groupInfo["count"],
+                                "createDate": data[2].strftime("%Y/%m/%d"),
+                                "user_id": data[3]})
             
         return data_set
     except Exception as e:

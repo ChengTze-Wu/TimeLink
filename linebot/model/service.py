@@ -20,7 +20,7 @@ def get_all_by_group_id(group_id):
         cursor = cnx.cursor()
         
         data = (group_id,)
-        query = ("SELECT id, name, price, openTime, closeTime, notAvailableTime "
+        query = ("SELECT id, name, price, openTime, closeTime, imgUrl "
                  "FROM Service WHERE isDeleted = 0 AND group_id = %s")
        
         cursor.execute(query, data)
@@ -34,7 +34,7 @@ def get_all_by_group_id(group_id):
                             "price": data[2],
                             "openTime": str(data[3]),
                             "closeTime": str(data[4]),
-                            "notAvailableTime": str(data[5])})
+                            "image": data[5]})
 
         return {"data": data_set}
     except Exception as e:

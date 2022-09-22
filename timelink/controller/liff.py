@@ -6,6 +6,6 @@ bp = Blueprint('liff', __name__, url_prefix='/liff')
 def liff_services():
     return render_template('liff/services.html')
 
-@bp.route("/service/<service_id>", methods=['GET'])
+@bp.route("/services/<service_id>", methods=['GET'])
 def liff_service(service_id):
     return render_template("liff/service.html")
