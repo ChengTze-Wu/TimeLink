@@ -1,3 +1,4 @@
+from genericpath import exists
 import os
 from select import select
 import mysql.connector
@@ -36,15 +37,20 @@ def create(memberId=None, groupId=None, member_id=None, group_id=None):
                 group_id = groupId_result[0]
         
         if member_id and group_id:
+            # Check if member_id and group_id already exist in Manage
+            check_data = (member_id, group_id)
+            check_query = ("SELECT id FROM Manage WHERE member_id = %s AND group_id = %s")
+            cursor.execute(check_query, check_data)
+            exists_result = cursor.fetchone()
+            if exists_result:
+                return "Already exists"
             Manage_data = (member_id, group_id)
-            Manage_query = ("INSERT IGNORE INTO Manage (member_id, group_id) VALUES (%s, %s)")
+            Manage_query = ("INSERT INTO Manage (member_id, group_id) VALUES (%s, %s)")
             cursor.execute(Manage_query, Manage_data)
             cnx.commit()
             return True
         return False
     except Exception as e:
-        if e.errno == 1062:
-            return "Already exists"
         raise e
     finally:
         cursor.close()

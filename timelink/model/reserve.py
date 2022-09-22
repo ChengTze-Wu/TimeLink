@@ -3,7 +3,6 @@ from . import db
 import datetime
 import json
 import requests
-from mysql.connector import IntegrityError
 
 
 def get_profile(groupId=None, userId=None): 

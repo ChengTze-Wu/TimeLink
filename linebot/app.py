@@ -10,11 +10,14 @@ from linebot import (
     LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
-    InvalidSignatureError, LineBotApiError
+    InvalidSignatureError
 )
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
-    JoinEvent, MemberJoinedEvent, FollowEvent
+    JoinEvent, MemberJoinedEvent, FollowEvent,
+    ButtonsTemplate, TemplateSendMessage,
+    MessageAction, URIAction, CarouselColumn,
+    CarouselTemplate
 )
 
 timelink_bot = Flask(__name__)
@@ -125,30 +128,32 @@ def message_text(event):
             )
         else:
             if not member_id:
-                model.manage.create(member_id=member_id, group_id=group_id)
                 line_bot_api.reply_message(
                     event.reply_token,
                     TextSendMessage("請先點選 TimeLink 頭像加入好友！")
                 )
                 return
+            model.manage.create(member_id=member_id, group_id=group_id)
             # ️feature
             if "服務" in event.message.text:
-                # get user name
-                profile = line_bot_api.get_profile(userId)
-                user_name = profile.display_name
                 # get group services
                 services = model.service.get_all_by_group_id(group_id)
-                service_msg = ""
                 if services["data"]:
+                    carousel_columns = []
                     for service in services["data"]:
-                        service_msg += f"\n{service['name']} | {service['price']}元"
+                        carousel_columns.append(
+                            CarouselColumn(text=f'${service["price"]}',title=service["name"], thumbnail_image_url=service["image"], actions=[
+                                URIAction(label='點此預約', uri=f'https://liff.line.me/1657198810-v359xpYa/{service["id"]}')
+                            ], image_size="contain"),
+                        )
+                    carousel_template = CarouselTemplate(columns=carousel_columns)
+                    template_message = TemplateSendMessage(
+                        alt_text='查看現有服務', template=carousel_template)
+                    line_bot_api.reply_message(event.reply_token, template_message)
                 else:
-                    service_msg = "\n此群組目前尚無服務"
-                
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(f"{user_name}，為您查看服務列表：{service_msg}")
-                )
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage("此群組目前尚無服務。"))
             elif "記錄" in event.message.text:
                 # get user name
                 profile = line_bot_api.get_profile(userId)
@@ -167,17 +172,23 @@ def message_text(event):
                     TextSendMessage(f"{user_name}，為您查看預約記錄：{reserve_record}")
                 )
             elif "預約" in event.message.text:
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage("https://liff.line.me/1657198810-v359xpYa")
-                )
+                buttons_template = ButtonsTemplate(
+                    text='TimeLink 預約系統', actions=[
+                        URIAction(label='點此進入', uri='https://liff.line.me/1657198810-v359xpYa'),
+                    ])
+                template_message = TemplateSendMessage(
+                    alt_text='TimeLink 預約系統', template=buttons_template)
+                line_bot_api.reply_message(event.reply_token, template_message)
             else:
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage("查看服務列表 請輸入： tl 服務\n"
-                                    "預約服務 請輸入： tl 預約\n"
-                                    "查詢預約記錄 請輸入： tl 記錄")
-                )
+                buttons_template = ButtonsTemplate(
+                    text='TimeLink 功能表', actions=[
+                        MessageAction(label='查看現有服務', text='tl服務'),
+                        MessageAction(label='查看預約記錄', text='tl記錄'),
+                        MessageAction(label='預約服務', text='tl預約'),
+                    ])
+                template_message = TemplateSendMessage(
+                    alt_text='TimeLink 功能表', template=buttons_template)
+                line_bot_api.reply_message(event.reply_token, template_message)
                 
 if __name__ == "__main__":
     timelink_bot.run(port=3000, debug=True)
