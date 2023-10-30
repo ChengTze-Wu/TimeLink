@@ -1,5 +1,5 @@
 from flask import Blueprint, request, session, current_app
-from timelink import model
+from web import model
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime

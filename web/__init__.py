@@ -16,7 +16,7 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
         
-    from timelink.model import db
+    from web.model import db
     csrf.init_app(app)
     db.init_app(app)
     socketio.init_app(app)

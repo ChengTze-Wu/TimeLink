@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from timelink.util.login_validator import login_required
+from web.util.login_validator import login_required
 
 bp = Blueprint('board', __name__)
 

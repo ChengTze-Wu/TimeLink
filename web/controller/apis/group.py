@@ -1,7 +1,7 @@
 import requests
 from flask import Blueprint, session, request, current_app
 import jwt
-from timelink import model
+from web import model
 import json
 
 bp = Blueprint('group', __name__, url_prefix='/api')

@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import session, redirect, url_for, current_app
 import jwt
-from timelink import model
+from web import model
 
 SECRET_KEY = current_app.config['SECRET_KEY']
 

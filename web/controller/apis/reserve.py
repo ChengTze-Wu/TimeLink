@@ -2,7 +2,7 @@ from flask import (
     Blueprint, request, session, current_app
 )
 import datetime
-from timelink import model, socketio
+from web import model, socketio
 import jwt
 from flask_socketio import emit, join_room, leave_room
 

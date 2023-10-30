@@ -1,6 +1,6 @@
 from flask import Blueprint, request, session, current_app
-from timelink import model
-from timelink.util.uploader import upload_img_to_s3
+from web import model
+from web.util.uploader import upload_img_to_s3
 import jwt
 
 
