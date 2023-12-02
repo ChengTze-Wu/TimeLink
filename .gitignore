@@ -4,6 +4,7 @@
 .venv/
 timelink.cc/
 instance/
+configs
 
 *.sh
 
@@ -15,9 +16,12 @@ htmlcov/
 .DS_Store
 __pycache__/
 *.pyc
+.vscode
 
 note.sql
 
 node_modules/
 package-lock.json
 package.json
+
+alembic.ini
