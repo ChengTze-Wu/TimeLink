@@ -3,8 +3,8 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import select
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import NotFound, Conflict, Unauthorized, Forbidden
-from web_app.db.connect import Session
-from web_app.db.models import User
+from web_api.db.connect import Session
+from web_api.db.models import User
 from typing import List, Tuple
 import jwt
 import datetime

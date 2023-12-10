@@ -1,5 +1,5 @@
 from flask import Request, session, redirect, url_for, current_app
-from web_app.db.models import User
+from web_api.db.models import User
 from functools import wraps
 import re
 import jwt

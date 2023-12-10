@@ -1,4 +1,4 @@
-from web_app.db.models import BaseModel
+from web_api.db.models import BaseModel
 from typing import List, Tuple
 
 class RESTfulResponse():

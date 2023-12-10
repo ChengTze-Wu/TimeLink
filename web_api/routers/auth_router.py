@@ -1,6 +1,6 @@
 from flask import Blueprint, request, abort, make_response
-from web_app.api.services import account_service
-from web_app.utils.validators import RequestValidator, PasswordValidator
+from web_api.services import account_service
+from web_api.utils.validators import RequestValidator, PasswordValidator
 
 
 bp = Blueprint("auth_router", __name__)

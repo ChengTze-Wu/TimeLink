@@ -37,8 +37,8 @@ def create_app(test_config=None):
         pass
 
     with app.app_context():
-        from web_app.api.routers import user_router, auth_router
-        from web_app.utils import error_handlers
+        from web_api.routers import user_router, auth_router
+        from web_api.utils import error_handlers
 
         app.register_error_handler(400, error_handlers.handle_400_error)
         app.register_error_handler(401, error_handlers.handle_401_error)
