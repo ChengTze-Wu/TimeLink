@@ -154,19 +154,19 @@ def login(username: str, password: str) -> str:
             if not user.is_active:
                 raise Forbidden(f"User `{username}` is not active")
 
-        JWT_SECRET_KEY = current_app.config.get("JWT_SECRET_KEY", "test")
-        JWT_ACCESS_TOKEN_EXPIRE_HOURS = current_app.config.get(
-            "JWT_ACCESS_TOKEN_EXPIRE_HOURS", 24
-        )
-        jwt_payload = {
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            "exp": datetime.datetime.now(tz=datetime.timezone.utc)
-            + datetime.timedelta(hours=JWT_ACCESS_TOKEN_EXPIRE_HOURS),
-        }
+            JWT_SECRET_KEY = current_app.config.get("JWT_SECRET_KEY", "test")
+            JWT_ACCESS_TOKEN_EXPIRE_HOURS = current_app.config.get(
+                "JWT_ACCESS_TOKEN_EXPIRE_HOURS", 24
+            )
+            jwt_payload = {
+                "username": user.username,
+                "name": user.name,
+                "email": user.email,
+                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                + datetime.timedelta(hours=JWT_ACCESS_TOKEN_EXPIRE_HOURS),
+            }
 
-        jwt_token = jwt.encode(payload=jwt_payload, key=JWT_SECRET_KEY, algorithm="HS256")
+            jwt_token = jwt.encode(payload=jwt_payload, key=JWT_SECRET_KEY, algorithm="HS256")
 
         return jwt_token
     except NotFound as e:
