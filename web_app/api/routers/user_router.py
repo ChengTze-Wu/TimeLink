@@ -4,7 +4,7 @@ from web_app.utils.response_handlers import RESTfulResponse
 from web_app.api.services import account_service
 
 
-bp = Blueprint("users", __name__)
+bp = Blueprint("user_router", __name__)
 
 
 @bp.route("", methods=["POST"])
