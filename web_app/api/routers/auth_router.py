@@ -1,7 +1,6 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, abort, make_response
 from web_app.api.services import account_service
 from web_app.utils.validators import RequestValidator, PasswordValidator
-from web_app.api.views.response_view import RESTfulResponse
 
 
 bp = Blueprint("auth_router", __name__)
@@ -9,7 +8,27 @@ bp = Blueprint("auth_router", __name__)
 
 @bp.route("/", methods=["GET"])
 def login():
-    pass
+    request_validator = RequestValidator(request)
+    request_validator.config(
+        request_type="form",
+        required_fields=["username", "password"],
+        field_types={"username": str, "password": str},
+        field_max_lengths={"username": 100, "password": 100},
+        field_validators={"password": PasswordValidator},
+    )
+    is_valid = request_validator.check()
+    if not is_valid:
+        abort(400, request_validator.message)
+    
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    jwt_token = account_service.login(username, password)
+
+    response = make_response()
+    response.set_cookie("jwt_token", jwt_token)
+
+    return response
 
 
 @bp.route("/", methods=["DELETE"])
