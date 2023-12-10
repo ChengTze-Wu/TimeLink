@@ -101,13 +101,6 @@ def get_one(username: str) -> User:
 
 
 def get_all_available_by_pagination(page: int=1, per_page: int=10, with_total_items: bool=False) -> List[User] | Tuple[List[User], int]:
-    '''
-    :param page: page number
-    :param per_page: number of users per page
-    :param with_total_items: return total users count or not
-
-    :return: list of users or tuple of list of users and total users count
-    '''
     try:
         with Session() as session:
             users = session.scalars(select(User).filter(User.is_deleted == False).offset((page - 1) * per_page).limit(per_page)).all()
@@ -131,17 +124,13 @@ def get_all_by_pagination(page: int=1, per_page: int=10) -> List[User]:
 def login(username: str, password: str):
     try:
         with Session() as session:
-            user = session.scalars(select(User).filter(User.username == username)).first()
-            if user is None:
-                raise NotFound(f"User `{username}` not found")
+            user = session.scalars(select(User).filter(User.username == username and User.is_deleted == False)).first()
+            if user is None or not check_password_hash(user.password, password):
+                raise Unauthorized(f"Invalid username or password")
             if not user.is_active:
-                raise Unauthorized(f"User `{username}` is not active")
-            if user.is_deleted:
-                raise Forbidden(f"User `{username}` is deleted")
-            if not check_password_hash(user.password, password):
-                raise Unauthorized("Wrong password")
+                raise Forbidden(f"User `{username}` is not active")
+            # return JWT token
         return user
-
     except NotFound as e:
         abort(404, e.description)
     except Unauthorized as e:
