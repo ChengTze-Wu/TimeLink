@@ -5,7 +5,7 @@ from web_app import create_app
 def app():
     app = create_app({
         'TESTING': True,
-        'DATABASE': 'postgresql+psycopg2://tltester:passw0rd123@localhost:55432/2023-timelink-test',
+        'DATABASE': 'postgresql+psycopg2://tltester:passw0rd123@127.0.0.1:55432/2023-timelink-test',
     })
 
     # other setup can go here
