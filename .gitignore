@@ -21,7 +21,5 @@ __pycache__/
 note.sql
 
 node_modules/
-package-lock.json
-package.json
 
 alembic.ini
