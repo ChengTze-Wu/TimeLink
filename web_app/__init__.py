@@ -37,7 +37,7 @@ def create_app(test_config=None):
         pass
 
     with app.app_context():
-        from web_app.api.controllers import user_controller, auth_controller
+        from web_app.api import routers
         from web_app.utils import error_handlers
 
         app.register_error_handler(400, error_handlers.handle_400_error)
@@ -48,6 +48,6 @@ def create_app(test_config=None):
         app.register_error_handler(409, error_handlers.handle_409_error)
         app.register_error_handler(500, error_handlers.handle_500_error)
 
-        app.register_blueprint(user_controller.bp, url_prefix='/api/users')
-        app.register_blueprint(auth_controller.bp, url_prefix='/api/auth')
+        app.register_blueprint(routers.user_router.bp, url_prefix='/api/users')
+        app.register_blueprint(routers.auth_router.bp, url_prefix='/api/auth')
     return app
