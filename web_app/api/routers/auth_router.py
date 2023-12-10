@@ -26,11 +26,12 @@ def login():
     jwt_token = account_service.login(username, password)
 
     response = make_response()
-    response.set_cookie("jwt_token", jwt_token)
-
+    response.set_cookie("usertoken", jwt_token, httponly=True, samesite="Strict", secure=True)
     return response
 
 
 @bp.route("/", methods=["DELETE"])
 def logout():
-    pass
+    response = make_response()
+    response.set_cookie("usertoken", "", httponly=True, samesite="Strict", secure=True)
+    return response
