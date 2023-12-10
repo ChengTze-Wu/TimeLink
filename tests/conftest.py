@@ -1,5 +1,5 @@
 import pytest
-from web_app import create_app
+from web_api import create_app
 
 @pytest.fixture
 def app():
@@ -10,14 +10,14 @@ def app():
 
     # other setup can go here
     with app.app_context():
-        from web_app.db.exec import init_db
+        from web_api.db.exec import init_db
         init_db()
     
     yield app
 
     # clean up / reset resources here
     with app.app_context():
-        from web_app.db.exec import drop_db
+        from web_api.db.exec import drop_db
         drop_db()
 
 
