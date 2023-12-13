@@ -1,6 +1,6 @@
 from flask import abort, current_app
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import NotFound, Conflict, Unauthorized, Forbidden
 from web_api.db.connect import Session
@@ -107,21 +107,29 @@ def get_one(username: str) -> User:
 
 
 def get_all_available_by_pagination(
-    page: int = 1, per_page: int = 10, with_total_items: bool = False
+    page: int = 1, per_page: int = 10, query: str = None, with_total_items: bool = False
 ) -> List[User] | Tuple[List[User], int]:
     try:
         with Session() as session:
-            users = session.scalars(
-                select(User)
-                .filter(User.is_deleted == False)
-                .offset((page - 1) * per_page)
-                .limit(per_page)
-            ).all()
-            if with_total_items:
-                total_items = len(
-                    session.scalars(select(User).filter(User.is_deleted == False)).all()
+            base_query = select(User).filter(User.is_deleted == False)
+
+            if query:
+                search_filter = or_(
+                    User.email.ilike(f'%{query}%'),
+                    User.username.ilike(f'%{query}%'),
+                    User.name.ilike(f'%{query}%'),
+                    User.phone.ilike(f'%{query}%')
                 )
+                base_query = base_query.filter(search_filter)
+
+            users = session.scalars(
+                base_query.offset((page - 1) * per_page).limit(per_page)
+            ).all()
+
+            if with_total_items:
+                total_items = len(session.scalars(base_query).all())
                 return users, total_items
+
             return users
     except Exception as e:
         abort(500, e)

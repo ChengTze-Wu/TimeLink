@@ -94,7 +94,8 @@ def get_one(username):
 def get_all():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    users, total_available_users = account_service.get_all_available_by_pagination(page=page, per_page=per_page, with_total_items=True)
+    query = request.args.get("query", None, type=str)
+    users, total_available_users = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, with_total_items=True)
     return RESTfulResponse(
                 users, 
                 hide_fields=["password", "is_deleted", "is_active"], 
