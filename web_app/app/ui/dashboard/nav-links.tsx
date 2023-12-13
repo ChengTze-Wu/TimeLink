@@ -5,7 +5,6 @@ import {
   UserGroupIcon,
   HomeIcon,
   ClockIcon,
-  ArchiveBoxIcon,
   ViewColumnsIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
