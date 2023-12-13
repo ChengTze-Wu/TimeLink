@@ -98,6 +98,6 @@ def get_all():
     users, total_available_users = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, with_total_items=True)
     return RESTfulResponse(
                 users, 
-                hide_fields=["password", "is_deleted", "is_active"], 
+                hide_fields=["password", "is_deleted"], 
                 pagination=(page, per_page, total_available_users)
             ).to_dict()

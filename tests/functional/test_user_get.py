@@ -169,6 +169,7 @@ class TestGetAllUserApi:
             "created_at",
             "updated_at",
             "line_user_id",
+            "is_active",
         }
         assert response.json['pagination'] == {
             'current_page': 1,
@@ -192,6 +193,7 @@ class TestGetAllUserApi:
             "created_at",
             "updated_at",
             "line_user_id",
+            "is_active",
         }
         assert response.json['pagination'] == {
             'current_page': 1,
