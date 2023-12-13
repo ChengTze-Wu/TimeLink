@@ -95,7 +95,8 @@ def get_all():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
     query = request.args.get("query", None, type=str)
-    users, total_available_users = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, with_total_items=True)
+    status = request.args.get("status", 1, type=int)
+    users, total_available_users = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
     return RESTfulResponse(
                 users, 
                 hide_fields=["password", "is_deleted"], 
