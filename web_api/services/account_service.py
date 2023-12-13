@@ -107,14 +107,16 @@ def get_one(username: str) -> User:
 
 
 def get_all_available_by_pagination(
-    page: int = 1, per_page: int = 10, query: str = None, status: int=1, with_total_items: bool = False
+    page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = False
 ) -> List[User] | Tuple[List[User], int]:
     try:
         with Session() as session:
-            base_query = select(User).filter(User.is_deleted == False)
-
+            base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.asc())
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)
+
+            if status == 1:
+                base_query = base_query.filter(User.is_active == True)
 
             if query:
                 search_filter = or_(
