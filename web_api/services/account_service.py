@@ -111,7 +111,7 @@ def get_all_available_by_pagination(
 ) -> List[User] | Tuple[List[User], int]:
     try:
         with Session() as session:
-            base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.asc())
+            base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)
 
