@@ -8,6 +8,7 @@ export async function get(apiEndpoint: string) {
     const res = await fetch(apiEndpoint, {
       method: "GET",
       headers: {
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
     });
