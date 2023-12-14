@@ -10,7 +10,9 @@ export default function DashboardLayout({
       <nav className="w-full flex-none md:w-64">
         <SideNav username="" />
       </nav>
-      <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
+      <div className="flex-grow p-6 md:overflow-y-auto md:p-10 md:pb-16 md:mb-2">
+        {children}
+      </div>
     </section>
   );
 }
