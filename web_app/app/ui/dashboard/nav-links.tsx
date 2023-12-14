@@ -3,24 +3,27 @@
 import {
   UserIcon,
   UserGroupIcon,
-  HomeIcon,
-  ClockIcon,
-  ViewColumnsIcon,
+  RectangleGroupIcon,
+  ShieldCheckIcon,
+  SquaresPlusIcon,
+  TableCellsIcon,
+  CalendarDaysIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 const links = [
-  { name: "儀表板", href: "/dashboard", icon: HomeIcon },
+  { name: "儀表板", href: "/dashboard", icon: RectangleGroupIcon },
   { name: "群組", href: "/dashboard/groups", icon: UserGroupIcon },
   {
     name: "服務",
     href: "/dashboard/services",
-    icon: ViewColumnsIcon,
+    icon: SquaresPlusIcon,
   },
-  { name: "預約", href: "/dashboard/bookings", icon: ClockIcon },
+  { name: "預約", href: "/dashboard/bookings", icon: CalendarDaysIcon },
   { name: "帳號", href: "/dashboard/accounts", icon: UserIcon },
+  // { name: "系統紀錄", href: "/dashboard/records", icon: TableCellsIcon },
 ];
 
 export default function NavLinks() {
