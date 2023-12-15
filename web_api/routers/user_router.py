@@ -43,9 +43,9 @@ def register():
     return RESTfulResponse(user, hide_fields=["password"]).to_dict(), 201
 
 
-@bp.route("/<username>", methods=["DELETE"])
-def delete(username):
-    user = account_service.logical_delete(username)
+@bp.route("/<uuid>", methods=["DELETE"])
+def delete(uuid):
+    user = account_service.logical_delete(uuid)
     return RESTfulResponse(user, hide_fields=["password"]).to_dict()
 
 

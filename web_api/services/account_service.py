@@ -69,14 +69,14 @@ def update_one(user_data: dict, username: str) -> User:
         abort(500, e)
 
 
-def logical_delete(username: str) -> User:
+def logical_delete(uuid: str) -> User:
     try:
         with Session() as session:
-            user = session.query(User).filter_by(username=username).first()
+            user = session.query(User).filter_by(id=uuid).first()
             if user is None:
-                raise NotFound(f"User `{username}` not found")
+                raise NotFound(f"User not found")
             if user.is_deleted:
-                raise Conflict(f"User `{username}` already deleted")
+                raise Conflict(f"User `{user.username}` already deleted")
             user.is_deleted = True
             session.commit()
             session.refresh(user)
