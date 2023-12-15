@@ -24,7 +24,7 @@ def register():
         },
         field_max_lengths={
             "email": 100,
-            "username": 100,
+            "username": 50,
             "password": 100,
             "name": 50,
             "phone": 50,
@@ -65,7 +65,7 @@ def update(username):
         },
         field_max_lengths={
             "email": 100,
-            "username": 100,
+            "username": 50,
             "password": 100,
             "name": 50,
             "phone": 50,
