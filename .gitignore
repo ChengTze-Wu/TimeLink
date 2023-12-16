@@ -23,3 +23,5 @@ note.sql
 node_modules/
 
 alembic.ini
+# React Component Preview
+previewConfig.json

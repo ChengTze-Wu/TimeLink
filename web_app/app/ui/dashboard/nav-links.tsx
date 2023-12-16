@@ -4,9 +4,7 @@ import {
   UserIcon,
   UserGroupIcon,
   RectangleGroupIcon,
-  ShieldCheckIcon,
   SquaresPlusIcon,
-  TableCellsIcon,
   CalendarDaysIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
@@ -22,8 +20,7 @@ const links = [
     icon: SquaresPlusIcon,
   },
   { name: "預約", href: "/dashboard/bookings", icon: CalendarDaysIcon },
-  { name: "帳號", href: "/dashboard/accounts", icon: UserIcon },
-  // { name: "系統紀錄", href: "/dashboard/records", icon: TableCellsIcon },
+  { name: "系統帳號", href: "/dashboard/accounts", icon: UserIcon },
 ];
 
 export default function NavLinks() {
