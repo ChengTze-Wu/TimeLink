@@ -3,6 +3,7 @@ import pytest
 @pytest.fixture
 def setup_exist_user(client):
     client.post("/api/users", json={
+        "id": "3b27d130-9a97-4752-8690-d4d551120a83",
         "email": "testuser@email.com",
         "username": "testuser",
         "password": "Testuser.123",
@@ -10,6 +11,7 @@ def setup_exist_user(client):
         "phone": "0912345678",
     })
     client.post("/api/users", json={
+        "id": "3b27d130-9a97-4752-8690-d4d551120a84",
         "email": "testuser1@email.com",
         "username": "testuser1",
         "password": "Testuser.123",
@@ -24,7 +26,7 @@ def setup_exist_user(client):
 def assert_status_code_and_error_message(
     client,  json_data, expected_status_code, expected_message
 ):
-    response = client.put("/api/users/testuser", json=json_data)
+    response = client.put("/api/users/3b27d130-9a97-4752-8690-d4d551120a83", json=json_data)
     assert response.status_code == expected_status_code
     assert expected_message in response.json["message"]
 
@@ -104,13 +106,13 @@ class TestUpdateUserApi:
             client,
             {"name": "Test User 2"},
             404,
-            f"User `testuser` not found",
+            f"User not found",
         )
 
 
     @pytest.mark.usefixtures("setup_exist_user")
     def test_one(self, client):
-        response = client.put("/api/users/testuser", json={"name": "Test User 2"})
+        response = client.put("/api/users/3b27d130-9a97-4752-8690-d4d551120a83", json={"name": "Test User 2"})
         assert response.status_code == 200
         assert set(response.json.keys()) == {
             "id",

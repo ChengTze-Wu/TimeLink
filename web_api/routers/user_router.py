@@ -14,6 +14,7 @@ def register():
         request_type="json",
         required_fields=["email", "username", "password", "name"],
         field_types={
+            "id": str,
             "email": str,
             "username": str,
             "password": str,

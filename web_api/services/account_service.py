@@ -13,6 +13,7 @@ import datetime
 def create_one(user_data: dict) -> User:
     try:
         user = User(
+            id=user_data.get("id"),
             email=user_data.get("email"),
             username=user_data.get("username"),
             password=generate_password_hash(user_data.get("password")),
