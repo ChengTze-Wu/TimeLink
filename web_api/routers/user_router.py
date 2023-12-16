@@ -49,8 +49,8 @@ def delete(uuid):
     return RESTfulResponse(user, hide_fields=["password"]).to_dict()
 
 
-@bp.route("/<username>", methods=["PUT"])
-def update(username):
+@bp.route("/<uuid>", methods=["PUT"])
+def update(uuid):
     request_validator = RequestValidator(request)
     request_validator.config(
         request_type="json",
@@ -80,7 +80,7 @@ def update(username):
         abort(400, request_validator.message)
 
     user_json_data = request.get_json()
-    user = account_service.update_one(user_json_data, username)
+    user = account_service.update_one(user_json_data, uuid)
     return RESTfulResponse(user, hide_fields=["password"]).to_dict()
 
 

@@ -37,14 +37,14 @@ def create_one(user_data: dict) -> User:
         abort(500, e)
 
 
-def update_one(user_data: dict, username: str) -> User:
+def update_one(user_data: dict, uuid: str ) -> User:
     try:
         with Session() as session:
             user = session.scalars(
-                select(User).filter(User.username == username)
+                select(User).filter(User.id == uuid)
             ).first()
             if user is None:
-                raise NotFound(f"User `{username}` not found")
+                raise NotFound(f"User not found")
 
             for field, value in user_data.items():
                 if hasattr(user, field):
