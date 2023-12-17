@@ -86,9 +86,9 @@ def logical_delete(uuid: str) -> User:
         abort(409, e.description)
     except NotFound as e:
         abort(404, e.description)
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         abort(500, e)
-    except Exception:
+    except Exception as e:
         abort(500, e)
 
 
