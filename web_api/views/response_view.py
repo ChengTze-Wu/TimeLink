@@ -1,12 +1,69 @@
+'''
+Author: Cheng-Tze Wu
+Date: 2023-12-18
+Contact: chengtzewu@gmail.com
+'''
+
 from typing import Tuple, Optional
 
 
 class RESTfulResponse:
+    '''
+    RESTfulResponse is a class that handles the serialization of data
+    to be returned to the client.
+
+    Attributes:
+        data (dict | list): data to be serialized
+        hide_fields (list): list of fields to be hidden
+        pagination (tuple): pagination data (page, per_page, total_items)
+
+    Methods:
+        to_serializable: return serialized data
+
+
+    Basic Example:
+        >>> from web_api.views.response_view import RESTfulResponse
+        >>> result_data = {
+                "name": "John Doe",
+                "age": 30,
+                "email": "john@email.com",
+            }
+        >>> restful_response = RESTfulResponse(
+                data=result_data, 
+                hide_fields=["age"])
+        >>> restful_response.to_serializable()
+        {"name": "John Doe", "email": "john@email.com"}
+
+    Example with pagination:
+        >>> from web_api.views.response_view import RESTfulResponse
+        >>> restful_response = RESTfulResponse(
+                data = dataset,
+                hide_fields=["age"],
+                pagination=(1, 10, 100),
+            )
+        >>> restful_response.to_serializable()
+        {
+            "data": [
+                {
+                    "name": "John Doe",
+                    "email": "john@email.com"
+                }, ...
+            ],
+            "pagination": {
+                "current_page": 1,
+                "next_page": 2,
+                "current_page_items": 10,
+                "total_pages": 10,
+                "total_items": 100,
+            },
+        }
+    '''
+
     def __init__(
         self,
         data: Optional[dict | list] = None,
         hide_fields: Optional[list] = None,
-        pagination: Optional[Tuple[int, int, int]] = None, # (page, per_page, total_items)
+        pagination: Optional[Tuple[int, int, int]] = None,
     ):
         if data and not isinstance(data, (dict, list)):
             raise TypeError("data type must be dict, list")
