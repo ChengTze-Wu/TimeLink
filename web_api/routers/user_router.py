@@ -40,14 +40,14 @@ def register():
         abort(400, request_validator.message)
 
     user_json_data = request.get_json()
-    user = account_service.create_one(user_json_data)
-    return RESTfulResponse(user, hide_fields=["password"]).to_serializable(), 201
+    created_user_data = account_service.create_one(user_json_data)
+    return RESTfulResponse(created_user_data, hide_fields=["password"]).to_serializable(), 201
 
 
 @bp.route("/<uuid>", methods=["DELETE"])
 def delete(uuid):
-    user = account_service.logical_delete(uuid)
-    return RESTfulResponse(user, hide_fields=["password"]).to_serializable()
+    deleted_user_data = account_service.logical_delete(uuid)
+    return RESTfulResponse(deleted_user_data, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("/<uuid>", methods=["PUT"])
@@ -81,14 +81,14 @@ def update(uuid):
         abort(400, request_validator.message)
 
     user_json_data = request.get_json()
-    user = account_service.update_one(user_json_data, uuid)
-    return RESTfulResponse(user, hide_fields=["password"]).to_serializable()
+    updated_user_data = account_service.update_one(user_json_data, uuid)
+    return RESTfulResponse(updated_user_data, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("/<username>", methods=["GET"])
 def get_one(username):
-    user = account_service.get_one(username)
-    return RESTfulResponse(user, hide_fields=["password"]).to_serializable()
+    user_data = account_service.get_one(username)
+    return RESTfulResponse(user_data, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("", methods=["GET"])
@@ -97,9 +97,9 @@ def get_all():
     per_page = request.args.get("per_page", 10, type=int)
     query = request.args.get("query", None, type=str)
     status = request.args.get("status", None, type=int)
-    users, total_available_users = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
+    user_dataset, total_items_count = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
     return RESTfulResponse(
-                users, 
+                user_dataset, 
                 hide_fields=["password", "is_deleted"], 
-                pagination=(page, per_page, total_available_users)
+                pagination=(page, per_page, total_items_count)
             ).to_serializable()
