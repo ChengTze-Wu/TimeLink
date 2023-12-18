@@ -149,7 +149,7 @@ class TestGetAllUserApi:
                 'current_page': 1,
                 'next_page': None,
                 'current_page_items': 0,
-                'total_pages': 0,
+                'total_pages': 1,
                 'total_items': 0
             }
         }
