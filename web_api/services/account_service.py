@@ -10,7 +10,7 @@ import jwt
 import datetime
 
 
-def create_one(user_data: dict) -> User:
+def create_one(user_data: dict) -> dict:
     try:
         user = User(
             id=user_data.get("id"),
@@ -26,7 +26,7 @@ def create_one(user_data: dict) -> User:
             session.add(user)
             session.commit()
             session.refresh(user)
-            return user
+            return user.to_dict()
     except SQLAlchemyError as e:
         if isinstance(e, IntegrityError):
             if "Key (email)" in str(e.orig):
@@ -38,7 +38,7 @@ def create_one(user_data: dict) -> User:
         abort(500, e)
 
 
-def update_one(user_data: dict, uuid: str ) -> User:
+def update_one(user_data: dict, uuid: str ) -> dict:
     try:
         with Session() as session:
             user = session.scalars(
@@ -56,7 +56,7 @@ def update_one(user_data: dict, uuid: str ) -> User:
 
             session.commit()
             session.refresh(user)
-            return user
+            return user.to_dict()
     except NotFound as e:
         abort(404, e.description)
     except SQLAlchemyError as e:
@@ -70,7 +70,7 @@ def update_one(user_data: dict, uuid: str ) -> User:
         abort(500, e)
 
 
-def logical_delete(uuid: str) -> User:
+def logical_delete(uuid: str) -> dict:
     try:
         with Session() as session:
             user = session.query(User).filter_by(id=uuid).first()
@@ -81,7 +81,7 @@ def logical_delete(uuid: str) -> User:
             user.is_deleted = True
             session.commit()
             session.refresh(user)
-            return user
+            return user.to_dict()
     except Conflict as e:
         abort(409, e.description)
     except NotFound as e:
@@ -92,7 +92,7 @@ def logical_delete(uuid: str) -> User:
         abort(500, e)
 
 
-def get_one(username: str) -> User:
+def get_one(username: str) -> dict:
     try:
         with Session() as session:
             user = session.scalars(
@@ -100,7 +100,7 @@ def get_one(username: str) -> User:
             ).first()
             if user is None:
                 raise NotFound(f"User `{username}` not found")
-            return user
+            return user.to_dict()
     except NotFound as e:
         abort(404, e.description)
     except Exception as e:
@@ -109,7 +109,7 @@ def get_one(username: str) -> User:
 
 def get_all_available_by_pagination(
     page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = False
-) -> List[User] | Tuple[List[User], int]:
+) -> List[dict] | Tuple[List[dict], int]:
     try:
         with Session() as session:
             base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())
@@ -132,11 +132,13 @@ def get_all_available_by_pagination(
                 base_query.offset((page - 1) * per_page).limit(per_page)
             ).all()
 
+            users_in_dict = [user.to_dict() for user in users]
+
             if with_total_items:
                 total_items = len(session.scalars(base_query).all())
-                return users, total_items
+                return users_in_dict, total_items
 
-            return users
+            return users_in_dict
     except Exception as e:
         abort(500, e)
 
@@ -147,7 +149,7 @@ def get_all_by_pagination(page: int = 1, per_page: int = 10) -> List[User]:
             users = session.scalars(
                 select(User).offset((page - 1) * per_page).limit(per_page)
             ).all()
-            return users
+            return [user.to_dict() for user in users]
     except Exception as e:
         abort(500, e)
 

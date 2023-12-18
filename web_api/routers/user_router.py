@@ -41,13 +41,13 @@ def register():
 
     user_json_data = request.get_json()
     user = account_service.create_one(user_json_data)
-    return RESTfulResponse(user, hide_fields=["password"]).to_dict(), 201
+    return RESTfulResponse(user, hide_fields=["password"]).to_serializable(), 201
 
 
 @bp.route("/<uuid>", methods=["DELETE"])
 def delete(uuid):
     user = account_service.logical_delete(uuid)
-    return RESTfulResponse(user, hide_fields=["password"]).to_dict()
+    return RESTfulResponse(user, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("/<uuid>", methods=["PUT"])
@@ -82,13 +82,13 @@ def update(uuid):
 
     user_json_data = request.get_json()
     user = account_service.update_one(user_json_data, uuid)
-    return RESTfulResponse(user, hide_fields=["password"]).to_dict()
+    return RESTfulResponse(user, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("/<username>", methods=["GET"])
 def get_one(username):
     user = account_service.get_one(username)
-    return RESTfulResponse(user, hide_fields=["password"]).to_dict()
+    return RESTfulResponse(user, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("", methods=["GET"])
@@ -102,4 +102,4 @@ def get_all():
                 users, 
                 hide_fields=["password", "is_deleted"], 
                 pagination=(page, per_page, total_available_users)
-            ).to_dict()
+            ).to_serializable()
