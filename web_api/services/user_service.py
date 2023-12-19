@@ -105,7 +105,7 @@ def get_one_by_id(user_id: str) -> dict:
 
 
 def get_all_available_by_filter(
-    page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = True
+    page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = False
 ) -> List[dict] | Tuple[List[dict], int]:
     try:
         with Session() as session:

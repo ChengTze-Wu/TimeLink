@@ -88,5 +88,5 @@ def get_all_endpoint():
     per_page = request.args.get("per_page", 10, type=int)
     query = request.args.get("query", None, type=str)
     status = request.args.get("status", None, type=int)
-    service_dataset, total_items_count = service_service.get_all_available_by_filter(page=page, per_page=per_page, query=query, status=status)
+    service_dataset, total_items_count = service_service.get_all_available_by_filter(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
     return RESTfulResponse(service_dataset, pagination=(page, per_page, total_items_count)).to_serializable()
