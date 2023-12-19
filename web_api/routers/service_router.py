@@ -8,7 +8,7 @@ bp = Blueprint("service_router", __name__)
 
 
 @bp.route("", methods=["POST"])
-def create():
+def create_endpoint():
     request_validator = RequestValidator(request)
     request_validator.config(
         request_type="json",
@@ -22,15 +22,15 @@ def create():
             "close_time": int,
             "start_date": str,
             "end_date": str,
-            "unavailable_datetime": str,
             "is_active": bool,
+            "unavailable_periods": list,
         },
         field_max_lengths={
             "name": 100,
             "image": 100,
             "start_date": 100,
             "end_date": 100,
-            "unavailable_datetime": 100,
+            "unavailable_periods": 100,
         },
     )
     is_valid = request_validator.check()
@@ -38,20 +38,18 @@ def create():
         abort(400, request_validator.message)
 
     service_json_data = request.get_json()
-    service = service_service.create_one(service_json_data)
-    return RESTfulResponse(service).to_dict(), 201
-
-
+    created_service_data = service_service.create_one(service_json_data)
+    return RESTfulResponse(created_service_data).to_serializable(), 201
 
 
 @bp.route("/<service_id>", methods=["DELETE"])
-def delete(service_id):
-    service = service_service.logical_delete(service_id)
-    return RESTfulResponse(service).to_dict()
+def delete_endpoint(service_id):
+    deleted_service_data = service_service.logical_delete_by_id(service_id)
+    return RESTfulResponse(deleted_service_data).to_serializable()
 
 
 @bp.route("/<service_id>", methods=["PUT"])
-def update(service_id):
+def update_endpoint(service_id):
     request_validator = RequestValidator(request)
     request_validator.config(
         request_type="json",
@@ -64,7 +62,7 @@ def update(service_id):
             "close_time": int,
             "start_date": str,
             "end_date": str,
-            "unavailable_datetime": str,
+            "unavailable_periods": list,
             "is_active": bool,
         },
         field_max_lengths={
@@ -72,7 +70,7 @@ def update(service_id):
             "image": 100,
             "start_date": 100,
             "end_date": 100,
-            "unavailable_datetime": 100,
+            "unavailable_periods": 100,
         },
     )
     is_valid = request_validator.check()
@@ -80,32 +78,15 @@ def update(service_id):
         abort(400, request_validator.message)
 
     service_json_data = request.get_json()
-    service = service_service.update_one(service_id, service_json_data)
-    return RESTfulResponse(service).to_dict()
-
-
-@bp.route("/<service_id>", methods=["GET"])
-def get_one(service_id):
-    service = service_service.get_one(service_id)
-    return RESTfulResponse(service).to_dict()
-
+    updated_service_data = service_service.update_one_by_id(service_id, service_json_data)
+    return RESTfulResponse(updated_service_data).to_serializable()
 
 
 @bp.route("", methods=["GET"])
-def get_all():
-    services = service_service.get_all()
-    return RESTfulResponse(services).to_dict()
-
-
-@bp.route("/<service_id>/groups", methods=["GET"])
-def get_groups(service_id):
-    groups = service_service.get_groups(service_id)
-    return RESTfulResponse(groups).to_dict()
-
-
-@bp.route("/<service_id>/users", methods=["GET"])
-def get_users(service_id):
-    users = service_service.get_users(service_id)
-    return RESTfulResponse(users).to_dict()
-
-
+def get_all_endpoint():
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+    query = request.args.get("query", None, type=str)
+    status = request.args.get("status", None, type=int)
+    service_dataset, total_items_count = service_service.get_all_available_by_filter(page=page, per_page=per_page, query=query, status=status)
+    return RESTfulResponse(service_dataset, pagination=(page, per_page, total_items_count)).to_serializable()
