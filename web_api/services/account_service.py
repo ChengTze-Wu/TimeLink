@@ -38,11 +38,11 @@ def create_one(user_data: dict) -> dict:
         abort(500, e)
 
 
-def update_one(user_data: dict, uuid: str ) -> dict:
+def update_one_by_id(user_data: dict, user_id: str) -> dict:
     try:
         with Session() as session:
             user = session.scalars(
-                select(User).filter(User.id == uuid)
+                select(User).filter(User.id == user_id)
             ).first()
             if user is None:
                 raise NotFound(f"User not found")
@@ -65,15 +65,14 @@ def update_one(user_data: dict, uuid: str ) -> dict:
                 abort(409, f"Email `{user_data['email']}` already exists")
             if "Key (username)" in str(e.orig):
                 abort(409, f"Username `{user_data['username']}` already exists")
-        abort(500, e)
     except Exception as e:
         abort(500, e)
 
 
-def logical_delete(uuid: str) -> dict:
+def logical_delete_by_id(user_id: str) -> dict:
     try:
         with Session() as session:
-            user = session.query(User).filter_by(id=uuid).first()
+            user = session.query(User).filter(User.id == user_id).first()
             if user is None:
                 raise NotFound(f"User not found")
             if user.is_deleted:
@@ -86,20 +85,18 @@ def logical_delete(uuid: str) -> dict:
         abort(409, e.description)
     except NotFound as e:
         abort(404, e.description)
-    except SQLAlchemyError as e:
-        abort(500, e)
     except Exception as e:
         abort(500, e)
 
 
-def get_one(username: str) -> dict:
+def get_one_by_id(user_id: str) -> dict:
     try:
         with Session() as session:
             user = session.scalars(
-                select(User).filter(User.username == username)
+                select(User).filter(User.id == user_id)
             ).first()
             if user is None:
-                raise NotFound(f"User `{username}` not found")
+                raise NotFound(f"User not found")
             return user.to_dict()
     except NotFound as e:
         abort(404, e.description)
@@ -107,8 +104,8 @@ def get_one(username: str) -> dict:
         abort(500, e)
 
 
-def get_all_available_by_pagination(
-    page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = False
+def get_all_available_by_filter(
+    page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = True
 ) -> List[dict] | Tuple[List[dict], int]:
     try:
         with Session() as session:
@@ -119,7 +116,7 @@ def get_all_available_by_pagination(
             if status == 1:
                 base_query = base_query.filter(User.is_active == True)
 
-            if query:
+            if query is not None:
                 search_filter = or_(
                     User.email.ilike(f'%{query}%'),
                     User.username.ilike(f'%{query}%'),
@@ -131,25 +128,13 @@ def get_all_available_by_pagination(
             users = session.scalars(
                 base_query.offset((page - 1) * per_page).limit(per_page)
             ).all()
+            list_dict_users = [user.to_dict() for user in users]
 
-            users_in_dict = [user.to_dict() for user in users]
-
-            if with_total_items:
+            if with_total_items is True:
                 total_items = len(session.scalars(base_query).all())
-                return users_in_dict, total_items
+                return list_dict_users, total_items
 
-            return users_in_dict
-    except Exception as e:
-        abort(500, e)
-
-
-def get_all_by_pagination(page: int = 1, per_page: int = 10) -> List[User]:
-    try:
-        with Session() as session:
-            users = session.scalars(
-                select(User).offset((page - 1) * per_page).limit(per_page)
-            ).all()
-            return [user.to_dict() for user in users]
+            return list_dict_users
     except Exception as e:
         abort(500, e)
 

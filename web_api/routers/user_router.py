@@ -8,7 +8,7 @@ bp = Blueprint("user_router", __name__)
 
 
 @bp.route("", methods=["POST"])
-def register():
+def register_endpoint():
     request_validator = RequestValidator(request)
     request_validator.config(
         request_type="json",
@@ -44,14 +44,14 @@ def register():
     return RESTfulResponse(created_user_data, hide_fields=["password"]).to_serializable(), 201
 
 
-@bp.route("/<uuid>", methods=["DELETE"])
-def delete(uuid):
-    deleted_user_data = account_service.logical_delete(uuid)
+@bp.route("/<user_id>", methods=["DELETE"])
+def delete_endpoint(user_id):
+    deleted_user_data = account_service.logical_delete_by_id(user_id)
     return RESTfulResponse(deleted_user_data, hide_fields=["password"]).to_serializable()
 
 
-@bp.route("/<uuid>", methods=["PUT"])
-def update(uuid):
+@bp.route("/<user_id>", methods=["PUT"])
+def update_endpoint(user_id):
     request_validator = RequestValidator(request)
     request_validator.config(
         request_type="json",
@@ -81,23 +81,23 @@ def update(uuid):
         abort(400, request_validator.message)
 
     user_json_data = request.get_json()
-    updated_user_data = account_service.update_one(user_json_data, uuid)
+    updated_user_data = account_service.update_one_by_id(user_json_data, user_id)
     return RESTfulResponse(updated_user_data, hide_fields=["password"]).to_serializable()
 
 
-@bp.route("/<username>", methods=["GET"])
-def get_one(username):
-    user_data = account_service.get_one(username)
+@bp.route("/<user_id>", methods=["GET"])
+def get_one_endpoint(user_id):
+    user_data = account_service.get_one_by_id(user_id)
     return RESTfulResponse(user_data, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("", methods=["GET"])
-def get_all():
+def get_all_endpoint():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
     query = request.args.get("query", None, type=str)
     status = request.args.get("status", None, type=int)
-    user_dataset, total_items_count = account_service.get_all_available_by_pagination(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
+    user_dataset, total_items_count = account_service.get_all_available_by_filter(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
     return RESTfulResponse(
                 user_dataset, 
                 hide_fields=["password", "is_deleted"], 
