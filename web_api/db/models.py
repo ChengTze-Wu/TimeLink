@@ -80,6 +80,17 @@ class CommonColumns:
     )
 
 
+class UnavailablePeriod(BaseModel, CommonColumns):
+    __tablename__ = "unavailable_period"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('service.id'))
+    start_datetime: Mapped[datetime.datetime]  # 不可預約時間段的開始
+    end_datetime: Mapped[datetime.datetime]    # 不可預約時間段的結束
+
+    service: Mapped["Service"] = relationship("Service", back_populates="unavailable_periods")
+
+
 class Service(BaseModel, CommonColumns):
     __tablename__ = "service"
 
@@ -87,12 +98,15 @@ class Service(BaseModel, CommonColumns):
     name: Mapped[str] = mapped_column(Text)
     price: Mapped[Optional[float]]
     image: Mapped[Optional[str]] = mapped_column(Text)
-    period_time: Mapped[Optional[int]]
-    open_time: Mapped[Optional[datetime.time]]
-    close_time: Mapped[Optional[datetime.time]]
-    start_date: Mapped[Optional[datetime.date]]
-    end_date: Mapped[Optional[datetime.date]]
-    unavailable_datetime: Mapped[Optional[datetime.datetime]]
+    period_time: Mapped[Optional[int]]  # 作業時間(分鐘)
+    open_time: Mapped[Optional[datetime.time]]  # 每日開始時間
+    close_time: Mapped[Optional[datetime.time]] # 每日結束時間
+    start_date: Mapped[Optional[datetime.date]] # 開始日期
+    end_date: Mapped[Optional[datetime.date]]   # 結束日期
+    
+    unavailable_periods: Mapped[List["UnavailablePeriod"]] = relationship(
+        "UnavailablePeriod", back_populates="service"
+    )
 
     users: Mapped[List["User"]] = relationship(
         secondary=service_user, back_populates="services"
@@ -101,6 +115,24 @@ class Service(BaseModel, CommonColumns):
     groups: Mapped[List["Group"]] = relationship(
         secondary=group_service, back_populates="services"
     )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "price": self.price,
+            "image": self.image,
+            "period_time": self.period_time,
+            "open_time": self.open_time,
+            "close_time": self.close_time,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "unavailable_datetime": self.unavailable_datetime,
+            "is_active": self.is_active,
+            "is_deleted": self.is_deleted,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
 
 
 class User(BaseModel, CommonColumns):
@@ -156,3 +188,14 @@ class Group(BaseModel, CommonColumns):
     services: Mapped[List[Service]] = relationship(
         secondary=group_service, back_populates="groups"
     )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "line_group_id": self.line_group_id,
+            "is_active": self.is_active,
+            "is_deleted": self.is_deleted,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
