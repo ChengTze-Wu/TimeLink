@@ -37,7 +37,7 @@ def create_app(test_config=None):
         pass
 
     with app.app_context():
-        from web_api.routers import user_router, auth_router
+        from web_api.routers import user_router, auth_router, service_router, group_router
         from web_api.utils import error_handlers
 
         app.register_error_handler(400, error_handlers.handle_400_error)
@@ -50,4 +50,6 @@ def create_app(test_config=None):
 
         app.register_blueprint(user_router.bp, url_prefix='/api/users')
         app.register_blueprint(auth_router.bp, url_prefix='/api/auth')
+        app.register_blueprint(service_router.bp, url_prefix='/api/services')
+        app.register_blueprint(group_router.bp, url_prefix='/api/groups')
     return app
