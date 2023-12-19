@@ -3,6 +3,7 @@ import pytest
 @pytest.fixture
 def setup_exist_user(client):
     client.post("/api/users", json={
+        "id": "88f73f9b-2402-4a5a-837f-4d151dbd554f",
         "email": "testuser@email.com",
         "username": "testuser",
         "password": "Testuser.123",
@@ -10,6 +11,7 @@ def setup_exist_user(client):
         "phone": "0912345678",
     })
     client.post("/api/users", json={
+        "id": "88f73f9b-2402-4a5a-837f-4d151dbd553f",
         "email": "testuser1@email.com",
         "username": "testuser1",
         "password": "Testuser.123",
@@ -17,6 +19,7 @@ def setup_exist_user(client):
         "phone": "0912345678",
     })
     client.post("/api/users", json={
+        "id": "88f73f9b-2402-4a5a-837f-4d151dbd552f",
         "email": "testuser2@email.com",
         "username": "testuser2",
         "password": "Testuser.123",
@@ -25,6 +28,7 @@ def setup_exist_user(client):
         "is_active": False,
     })
     client.post("/api/users", json={
+        "id": "88f73f9b-2402-4a5a-837f-4d151dbd551f",
         "email": "testuser3@email.com",
         "username": "testuser3",
         "password": "Testuser.123",
@@ -33,6 +37,7 @@ def setup_exist_user(client):
         "is_deleted": True,
     })
     client.post("/api/users", json={
+        "id": "88f73f9b-2402-4a5a-837f-4d151dbd550f",
         "email": "testuser4@email.com",
         "username": "testuser4",
         "password": "Testuser.123",
@@ -42,17 +47,17 @@ def setup_exist_user(client):
         "is_deleted": True,
     })
     yield
-    client.delete("/api/users/testuser")
-    client.delete("/api/users/testuser1")
-    client.delete("/api/users/testuser2")
-    client.delete("/api/users/testuser3")
-    client.delete("/api/users/testuser4")
+    client.delete("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd554f")
+    client.delete("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd553f")
+    client.delete("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd552f")
+    client.delete("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd551f")
+    client.delete("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd550f")
 
 
 def assert_status_code_and_error_message(
     client, expected_status_code, expected_message
 ):
-    response = client.get("/api/users/testuser")
+    response = client.get("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd554f")
     assert response.status_code == expected_status_code
     assert expected_message in response.json["message"]
 
@@ -62,12 +67,12 @@ class TestGetOneUserApi:
         assert_status_code_and_error_message(
             client,
             404,
-            f"User `testuser` not found",
+            f"User not found",
         )
 
     @pytest.mark.usefixtures("setup_exist_user")
     def test_one(self, client):
-        response = client.get("/api/users/testuser")
+        response = client.get("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd554f")
         assert response.status_code == 200
         assert set(response.json.keys()) == {
             "id",
@@ -85,7 +90,7 @@ class TestGetOneUserApi:
 
     @pytest.mark.usefixtures("setup_exist_user")
     def test_deleted_user(self, client):
-        response = client.get("/api/users/testuser3")
+        response = client.get("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd551f")
         assert response.status_code == 200
         assert set(response.json.keys()) == {
             "id",
@@ -103,7 +108,7 @@ class TestGetOneUserApi:
     
     @pytest.mark.usefixtures("setup_exist_user")
     def test_disabled_user(self, client):
-        response = client.get("/api/users/testuser2")
+        response = client.get("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd552f")
         assert response.status_code == 200
         assert set(response.json.keys()) == {
             "id",
@@ -121,7 +126,7 @@ class TestGetOneUserApi:
 
     @pytest.mark.usefixtures("setup_exist_user")
     def test_deleted_and_disabled_user(self, client):
-        response = client.get("/api/users/testuser4")
+        response = client.get("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd550f")
         assert response.status_code == 200
         assert set(response.json.keys()) == {
             "id",
