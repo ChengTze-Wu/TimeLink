@@ -90,6 +90,17 @@ class UnavailablePeriod(BaseModel, CommonColumns):
 
     service: Mapped["Service"] = relationship("Service", back_populates="unavailable_periods")
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "start_datetime": self.start_datetime,
+            "end_datetime": self.end_datetime,
+            "is_active": self.is_active,
+            "is_deleted": self.is_deleted,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
+
 
 class Service(BaseModel, CommonColumns):
     __tablename__ = "service"
@@ -127,11 +138,11 @@ class Service(BaseModel, CommonColumns):
             "close_time": self.close_time,
             "start_date": self.start_date,
             "end_date": self.end_date,
-            "unavailable_datetime": self.unavailable_datetime,
             "is_active": self.is_active,
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
+            "unavailable_periods": [ unavailable_period.to_dict() for unavailable_period in self.unavailable_periods ],
         }
 
 
