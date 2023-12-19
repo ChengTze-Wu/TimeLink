@@ -1,7 +1,7 @@
 from flask import Blueprint, request, abort
 from web_api.utils.validators import RequestValidator, EmailValidator, PasswordValidator
 from web_api.views.response_view import RESTfulResponse
-from web_api.services import account_service
+from web_api.services import user_service
 
 
 bp = Blueprint("user_router", __name__)
@@ -40,13 +40,13 @@ def register_endpoint():
         abort(400, request_validator.message)
 
     user_json_data = request.get_json()
-    created_user_data = account_service.create_one(user_json_data)
+    created_user_data = user_service.create_one(user_json_data)
     return RESTfulResponse(created_user_data, hide_fields=["password"]).to_serializable(), 201
 
 
 @bp.route("/<user_id>", methods=["DELETE"])
 def delete_endpoint(user_id):
-    deleted_user_data = account_service.logical_delete_by_id(user_id)
+    deleted_user_data = user_service.logical_delete_by_id(user_id)
     return RESTfulResponse(deleted_user_data, hide_fields=["password"]).to_serializable()
 
 
@@ -81,13 +81,13 @@ def update_endpoint(user_id):
         abort(400, request_validator.message)
 
     user_json_data = request.get_json()
-    updated_user_data = account_service.update_one_by_id(user_json_data, user_id)
+    updated_user_data = user_service.update_one_by_id(user_json_data, user_id)
     return RESTfulResponse(updated_user_data, hide_fields=["password"]).to_serializable()
 
 
 @bp.route("/<user_id>", methods=["GET"])
 def get_one_endpoint(user_id):
-    user_data = account_service.get_one_by_id(user_id)
+    user_data = user_service.get_one_by_id(user_id)
     return RESTfulResponse(user_data, hide_fields=["password"]).to_serializable()
 
 
@@ -97,7 +97,7 @@ def get_all_endpoint():
     per_page = request.args.get("per_page", 10, type=int)
     query = request.args.get("query", None, type=str)
     status = request.args.get("status", None, type=int)
-    user_dataset, total_items_count = account_service.get_all_available_by_filter(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
+    user_dataset, total_items_count = user_service.get_all_available_by_filter(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
     return RESTfulResponse(
                 user_dataset, 
                 hide_fields=["password", "is_deleted"], 
