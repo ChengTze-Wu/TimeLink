@@ -19,8 +19,8 @@ def setup_exist_user(client):
         "phone": "0912345678",
     })
     yield
-    client.delete("/api/users/testuser")
-    client.delete("/api/users/testuser1")
+    client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a83")
+    client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a84")
 
 
 def assert_status_code_and_error_message(
@@ -28,7 +28,8 @@ def assert_status_code_and_error_message(
 ):
     response = client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a83")
     assert response.status_code == expected_status_code
-    assert expected_message in response.json["message"]
+    response_messages = " ".join(response.json["message"])
+    assert expected_message in response_messages
 
 
 class TestDeleteUserApi:

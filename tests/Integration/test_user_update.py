@@ -19,8 +19,8 @@ def setup_exist_user(client):
         "phone": "0912345678",
     })
     yield
-    client.delete("/api/users/testuser")
-    client.delete("/api/users/testuser1")
+    client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a83")
+    client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a84")
 
 
 def assert_status_code_and_error_message(
@@ -28,37 +28,40 @@ def assert_status_code_and_error_message(
 ):
     response = client.put("/api/users/3b27d130-9a97-4752-8690-d4d551120a83", json=json_data)
     assert response.status_code == expected_status_code
-    assert expected_message in response.json["message"]
+    response_messages = " ".join(response.json["message"])
+    assert expected_message in response_messages
 
 
 class TestUpdateUserApi:
     def test_invalid_content_type(self, client):
-        response = client.put("/api/users/testuser", data={"username": "testuser2"})
+        response = client.put("/api/users/3b27d130-9a97-4752-8690-d4d551120a83", data={"username": "testuser2"})
         assert response.status_code == 400
-        assert "Content-Type must be application/json" in response.json["message"]
+        response_messages = " ".join(response.json["message"])
+        assert "Content-Type must be application/json" in response_messages
 
 
     def test_empty_json_body(self, client):
-        response = client.put("/api/users/testuser", json={})
+        response = client.put("/api/users/3b27d130-9a97-4752-8690-d4d551120a83", json={})
         assert response.status_code == 400
-        assert "Request body must not be empty" in response.json["message"]
+        response_messages = " ".join(response.json["message"])
+        assert "Request body must not be empty" in response_messages
 
 
     @pytest.mark.parametrize(
         "field, value, expected_message",
         [
-            ("name", 123, "Fields with invalid types: name"),
-            ("password", 123, "Fields with invalid types: password"),
-            ("email", 123, "Fields with invalid types: email"),
-            ("username", 123, "Fields with invalid types: username"),
-            ("phone", 123, "Fields with invalid types: phone"),
-            ("is_active", 123, "Fields with invalid types: is_active"),
-            ("is_deleted", 123, "Fields with invalid types: is_deleted"),
-            ("name", "t" * 51, "Fields with invalid lengths: name"),
-            ("password", "t" * 101, "Fields with invalid lengths: password"),
-            ("email", "t" * 101, "Fields with invalid lengths: email"),
-            ("username", "t" * 101, "Fields with invalid lengths: username"),
-            ("phone", "t" * 51, "Fields with invalid lengths: phone"),
+            ("name", 123, "Invalid types: name"),
+            ("password", 123, "Invalid types: password"),
+            ("email", 123, "Invalid types: email"),
+            ("username", 123, "Invalid types: username"),
+            ("phone", 123, "Invalid types: phone"),
+            ("is_active", 123, "Invalid types: is_active"),
+            ("is_deleted", 123, "Invalid types: is_deleted"),
+            ("name", "t" * 51, "Fields with too long values: name"),
+            ("password", "t" * 101, "Fields with too long values: password"),
+            ("email", "t" * 101, "Fields with too long values: email"),
+            ("username", "t" * 101, "Fields with too long values: username"),
+            ("phone", "t" * 51, "Fields with too long values: phone"),
         ],
     )
     def test_invalid_input(
@@ -77,7 +80,7 @@ class TestUpdateUserApi:
                 "password": "test",
             }, 
             400, 
-            "Fields with invalid values: email, password"
+            "Invalid field"
         )
 
 

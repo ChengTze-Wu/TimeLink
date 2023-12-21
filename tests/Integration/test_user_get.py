@@ -59,7 +59,8 @@ def assert_status_code_and_error_message(
 ):
     response = client.get("/api/users/88f73f9b-2402-4a5a-837f-4d151dbd554f")
     assert response.status_code == expected_status_code
-    assert expected_message in response.json["message"]
+    response_messages = " ".join(response.json["message"])
+    assert expected_message in response_messages
 
 
 class TestGetOneUserApi:

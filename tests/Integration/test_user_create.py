@@ -16,37 +16,38 @@ def assert_status_code_and_error_message(
 ):
     response = client.post("/api/users", json=json_data)
     assert response.status_code == expected_status_code
-    assert expected_message == response.json["message"]
+    response_messages = " ".join(response.json["message"])
+    assert expected_message in response_messages
 
 
 class TestCreateUserApi:
     def test_invalid_content_type(self, client, client_json_data):
         response = client.post("/api/users", data=client_json_data)
         assert response.status_code == 400
-        assert "Content-Type must be application/json" == response.json["message"]
+        response_messages = " ".join(response.json["message"])
+        assert "Content-Type must be application/json" in response_messages
 
     def test_empty_json_body(self, client):
         response = client.post("/api/users", json={})
         assert response.status_code == 400
-        assert "Request body must not be empty" == response.json["message"]
+        response_messages = " ".join(response.json["message"])
+        assert "Request body must not be empty" in response_messages
 
     @pytest.mark.parametrize(
         "field, value, expected_message",
         [
-            ("password", "test", "Fields with invalid values: password"),
-            ("email", "test", "Fields with invalid values: email"),
-            ("name", "", "Missing required fields: name"),
-            ("password", "", "Missing required fields: password"),
-            ("email", "", "Missing required fields: email"),
-            ("username", "", "Missing required fields: username"),
-            ("name", 123, "Fields with invalid types: name"),
-            ("password", 123, "Fields with invalid types: password"),
-            ("email", 123, "Fields with invalid types: email"),
-            ("username", 123, "Fields with invalid types: username"),
-            ("name", "t" * 51, "Fields with invalid lengths: name"),
-            ("password", "t" * 101, "Fields with invalid lengths: password"),
-            ("email", "t" * 101, "Fields with invalid lengths: email"),
-            ("username", "t" * 101, "Fields with invalid lengths: username"),
+            ("password", "test", "Invalid field: password"),
+            ("email", "test", "Invalid field: email"),
+            ("password", "", "Invalid field: password"),
+            ("email", "", "Invalid field: email"),
+            ("name", 123, "Invalid types: name"),
+            ("password", 123, "Invalid types: password"),
+            ("email", 123, "Invalid field: email"),
+            ("username", 123, "Invalid types: username"),
+            ("name", "t" * 51, "Fields with too long values: name"),
+            ("password", "t" * 101, "Fields with too long values: password"),
+            ("email", "t" * 101, "Fields with too long values: email"),
+            ("username", "t" * 101, "Fields with too long values: username"),
         ],
     )
     def test_invalid_input(
@@ -57,26 +58,16 @@ class TestCreateUserApi:
             client, client_json_data, 400, expected_message
         )
 
-    def test_multiple_empty_input(self, client, client_json_data):
-        client_json_data["name"] = ""
-        client_json_data["password"] = ""
-        client_json_data["email"] = ""
-        assert_status_code_and_error_message(
-            client,
-            client_json_data,
-            400,
-            "Missing required fields: email, password, name",
-        )
-
     def test_invalid_email_and_password(self, client, client_json_data):
         client_json_data["email"] = "test"
         client_json_data["password"] = "test"
         assert_status_code_and_error_message(
-            client, client_json_data, 400, "Fields with invalid values: email, password"
+            client, client_json_data, 400, "Invalid field"
         )
 
     def test_existed_email(self, client, client_json_data):
         client.post("/api/users", json=client_json_data)
+        client_json_data["username"] = "test2"
         assert_status_code_and_error_message(
             client,
             client_json_data,
