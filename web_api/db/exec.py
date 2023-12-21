@@ -1,5 +1,7 @@
-from web_api.db.connect import engine
+from web_api.db.connect import get_engine
 from web_api.db.models import BaseModel
+
+engine = get_engine()
 
 def init_db():
     """Initialize the database by creating all tables."""
