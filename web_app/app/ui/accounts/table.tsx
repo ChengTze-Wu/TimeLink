@@ -58,7 +58,7 @@ export default async function AccountsTable({
             </td>
             <td className="md:flex gap-4 items-center h-full">
               <Link
-                href={`/dashboard/accounts/${user.username}/edit`}
+                href={`/dashboard/accounts/${user.id}/edit`}
                 className="rounded-md border p-2 hover:bg-gray-100"
               >
                 <PencilIcon className="w-5  text-gray-500" />
