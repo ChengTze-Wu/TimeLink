@@ -5,6 +5,7 @@ from web_api.db.connect import Session
 from web_api.db.models import Service, UnavailablePeriod
 from werkzeug.exceptions import NotFound, Conflict
 
+
 def create_one(service_data: dict) -> dict:
     try:
         unavailable_periods_dataset = service_data.get("unavailable_periods", [])
@@ -14,7 +15,8 @@ def create_one(service_data: dict) -> dict:
                 start_datetime=service_data.get("start_datetime"),
                 end_datetime=service_data.get("end_datetime"),
             )
-            for unavailable_period_data in unavailable_periods_dataset if unavailable_period_data
+            for unavailable_period_data in unavailable_periods_dataset
+            if unavailable_period_data
         ]
 
         service = Service(
@@ -27,7 +29,7 @@ def create_one(service_data: dict) -> dict:
             start_date=service_data.get("start_date"),
             end_date=service_data.get("end_date"),
             is_active=service_data.get("is_active"),
-            unavailable_periods=unavailable_periods
+            unavailable_periods=unavailable_periods,
         )
 
         with Session() as session:
@@ -35,10 +37,9 @@ def create_one(service_data: dict) -> dict:
             session.commit()
             session.refresh(service)
             return service.to_dict()
-        
+
     except Exception as e:
         abort(500, e)
-
 
 
 def logical_delete_by_id(service_id: str) -> dict:
@@ -75,10 +76,19 @@ def get_one_by_id(service_id: str) -> dict:
         return service.to_dict()
 
 
-
-def get_all_available_by_filter(page: int = 1, per_page: int = 10, query: str = None, status: int = None, with_total_items: bool = True) -> List[dict] | Tuple[List[dict], int]:
+def get_all_available_by_filter(
+    page: int = 1,
+    per_page: int = 10,
+    query: str = None,
+    status: int = None,
+    with_total_items: bool = True,
+) -> List[dict] | Tuple[List[dict], int]:
     with Session() as session:
-        base_query = session.query(Service).filter(Service.is_deleted == False).order_by(Service.created_at.desc())
+        base_query = (
+            session.query(Service)
+            .filter(Service.is_deleted == False)
+            .order_by(Service.created_at.desc())
+        )
 
         if status == 0:
             base_query = base_query.filter(Service.is_active == False)
@@ -88,12 +98,14 @@ def get_all_available_by_filter(page: int = 1, per_page: int = 10, query: str = 
 
         if query is not None:
             search_filter = or_(
-                Service.name.ilike(f'%{query}%'),
-                Service.price.ilike(f'%{query}%'),
+                Service.name.ilike(f"%{query}%"),
+                Service.price.ilike(f"%{query}%"),
             )
             base_query = base_query.filter(search_filter)
 
-        services = session.scalars(base_query.offset((page - 1) * per_page).limit(per_page)).all()
+        services = session.scalars(
+            base_query.offset((page - 1) * per_page).limit(per_page)
+        ).all()
         list_dict_services = [service.to_dict() for service in services]
 
         if with_total_items is True:
