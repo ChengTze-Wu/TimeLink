@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import select, or_
 from werkzeug.exceptions import NotFound, Conflict
-from web_api.db.connect import Session
+from web_api.db.connect import get_session
 from web_api.db.models import User
 
 
@@ -13,7 +13,7 @@ class UserRepository:
         try:
             error_datails = []
             new_user = User(**new_user_data)
-            with Session() as session:
+            with get_session() as session:
                 session.add(new_user)
                 session.commit()
                 session.refresh(new_user)
@@ -34,7 +34,7 @@ class UserRepository:
     ):
         error_datails = []
         try:
-            with Session() as session:
+            with get_session() as session:
                 user = session.query(User).filter(User.id == user_id).first()
                 if user is None:
                     raise NotFound("User not found")
@@ -60,7 +60,7 @@ class UserRepository:
         self,
         user_id: str
     ):
-        with Session() as session:
+        with get_session() as session:
             user = session.query(User).filter(User.id == user_id).first()
             if user is None:
                 raise NotFound(f"User not found")
@@ -75,7 +75,7 @@ class UserRepository:
         self,
         user_id: str
     ):
-        with Session() as session:
+        with get_session() as session:
             user = session.query(User).filter(User.id == user_id).first()
             if user is None:
                 raise NotFound("User not found")
@@ -87,7 +87,7 @@ class UserRepository:
         query: str = None,
         status: int = None
     ):
-        with Session() as session:
+        with get_session() as session:
             base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)
@@ -114,7 +114,7 @@ class UserRepository:
         query: str = None,
         status: int = None
     ):
-        with Session() as session:
+        with get_session() as session:
             base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)

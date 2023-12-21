@@ -21,20 +21,20 @@ class UserService:
         }
         return self.repository.create_new_user(new_user_data)
 
-    def update(self, user_id: str, user_data: dict) -> dict:
-        user_data = {
-            "email": user_data.get("email"),
-            "username": user_data.get("username"),
-            "password": generate_password_hash(user_data.get("password"))
-            if user_data.get("password")
+    def update(self, user_id: str, user_json_data: dict) -> dict:
+        update_user_data = {
+            "email": user_json_data.get("email"),
+            "username": user_json_data.get("username"),
+            "password": generate_password_hash(user_json_data.get("password"))
+            if user_json_data.get("password")
             else None,
-            "name": user_data.get("name"),
-            "line_user_id": user_data.get("line_user_id"),
-            "phone": user_data.get("phone"),
-            "is_active": user_data.get("is_active"),
-            "is_deleted": user_data.get("is_deleted"),
+            "name": user_json_data.get("name"),
+            "line_user_id": user_json_data.get("line_user_id"),
+            "phone": user_json_data.get("phone"),
+            "is_active": user_json_data.get("is_active"),
+            "is_deleted": user_json_data.get("is_deleted"),
         }
-        return self.repository.update_user_by_id(user_id, user_data)
+        return self.repository.update_user_by_id(user_id, update_user_data)
 
     def delete(self, user_id: str) -> dict:
         return self.repository.logical_delete_user_by_id(user_id)
