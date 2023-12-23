@@ -6,7 +6,7 @@ from web_api.db.models import User
 
 
 class UserRepository:
-    def create_new_user(
+    def create_one(
         self,
         new_user_data: dict
     ):
@@ -27,13 +27,13 @@ class UserRepository:
                 raise Conflict(error_datails)
             raise e
 
-    def update_user_by_id(
+    def update_one_by_id(
         self,
         user_id: str,
         user_data: dict
     ):
-        error_datails = []
         try:
+            error_datails = []
             with get_session() as session:
                 user = session.query(User).filter(User.id == user_id).first()
                 if user is None:
@@ -43,20 +43,19 @@ class UserRepository:
                     if value is not None:
                         setattr(user, field, value)
 
-
                 session.commit()
                 session.refresh(user)
                 return user.to_dict()
         except SQLAlchemyError as e:
             if isinstance(e, IntegrityError):
-                if "email" in str(e.orig):
+                if "Key (email)" in str(e.orig):
                     error_datails.append(f"Email `{user_data['email']}` already exists")
-                if "username" in str(e.orig):
+                if "Key (username)" in str(e.orig):
                     error_datails.append(f"Username `{user_data['username']}` already exists")
                 raise Conflict(error_datails)
             raise e
 
-    def logical_delete_user_by_id(
+    def logical_delete_one_by_id(
         self,
         user_id: str
     ):
@@ -71,18 +70,26 @@ class UserRepository:
             session.refresh(user)
             return user.to_dict()
         
-    def get_one_by_id(
+    def get_one_by_unique_filed(
         self,
-        user_id: str
+        user_id: str = None,
+        email: str = None,
+        username: str = None,
+        hashed_password: str = None
     ):
         with get_session() as session:
-            user = session.query(User).filter(User.id == user_id).first()
+            search_filter = or_(
+                User.id == user_id,
+                User.email == email,
+                User.username == username,
+                User.password == hashed_password,
+            )
+            user = session.query(User).filter(search_filter).first()
             if user is None:
                 raise NotFound("User not found")
             return user.to_dict()
-        
 
-    def count_all_users_by_filter(
+    def count_all_by_filter(
         self,
         query: str = None,
         status: int = None
@@ -107,7 +114,7 @@ class UserRepository:
             return len(session.scalars(base_query).all())
         
 
-    def get_users_by_filter(
+    def get_all_by_filter(
         self,
         page: int = 1,
         per_page: int = 10,

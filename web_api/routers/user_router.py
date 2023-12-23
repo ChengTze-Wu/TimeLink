@@ -41,7 +41,7 @@ def register_endpoint():
         request_validator.check(request)
 
         user_json_data = request.get_json()
-        created_user_data = user_service.create(user_json_data)
+        created_user_data = user_service.create_one(user_json_data)
         return RESTfulResponse(created_user_data, hide_fields=["password"]).to_serializable(), 201
     except HTTPException as e:
         abort(e.code, e.description)
@@ -52,7 +52,7 @@ def register_endpoint():
 @bp.route("/<uuid:user_id>", methods=["DELETE"])
 def delete_endpoint(user_id):
     try:
-        deleted_user_data = user_service.delete(user_id)
+        deleted_user_data = user_service.delete_one(user_id)
         return RESTfulResponse(deleted_user_data, hide_fields=["password"]).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -89,7 +89,7 @@ def update_endpoint(user_id):
         request_validator.check(request)
 
         user_json_data = request.get_json()
-        updated_user_data = user_service.update(user_id, user_json_data)
+        updated_user_data = user_service.update_one(user_id, user_json_data)
         return RESTfulResponse(updated_user_data, hide_fields=["password"]).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -115,7 +115,7 @@ def get_all_endpoint():
         per_page = request.args.get("per_page", 10, type=int)
         query = request.args.get("query", None, type=str)
         status = request.args.get("status", None, type=int)
-        user_dataset, total_items_count = user_service.get_list(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
+        user_dataset, total_items_count = user_service.get_all(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
         return RESTfulResponse(
                     user_dataset, 
                     hide_fields=["password", "is_deleted"], 
