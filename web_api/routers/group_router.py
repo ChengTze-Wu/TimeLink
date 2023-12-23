@@ -1,18 +1,18 @@
 from flask import Blueprint, request, abort
 from web_api.validators.request_vaildator import RequestValidator
 from web_api.views.response_view import RESTfulResponse
-from web_api.services import group_service
+from web_api.services.group_service import GroupService
 from werkzeug.exceptions import HTTPException
 
 bp = Blueprint("group_router", __name__)
-
+group_service = GroupService()
 
 @bp.route("", methods=["POST"])
 def create_endpoint():
     try:
         request_validator = RequestValidator(
             request_type="json",
-            required_fields=["name"],
+            required_fields=["name", "line_group_id"],
             field_types={
                 "name": str,
                 "line_group_id": str,
@@ -52,7 +52,7 @@ def update_endpoint(group_id):
         request_validator.check(request)
 
         group_json_data = request.get_json()
-        updated_group_data = group_service.update_one_by_id(group_json_data, group_id)
+        updated_group_data = group_service.update_one(group_id, group_json_data)
         return RESTfulResponse(updated_group_data).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -63,7 +63,7 @@ def update_endpoint(group_id):
 @bp.route("/<uuid:group_id>", methods=["DELETE"])
 def delete_endpoint(group_id):
     try:
-        deleted_group_data = group_service.logical_delete_by_id(group_id)
+        deleted_group_data = group_service.delete_one(group_id)
         return RESTfulResponse(deleted_group_data).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -74,7 +74,7 @@ def delete_endpoint(group_id):
 @bp.route("/<uuid:group_id>", methods=["GET"])
 def get_one_endpoint(group_id):
     try:
-        group_data = group_service.get_one_by_id(group_id)
+        group_data = group_service.get_one(group_id)
         return RESTfulResponse(group_data).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -89,7 +89,7 @@ def get_all_endpoint():
         per_page = request.args.get("per_page", 10, type=int)
         query = request.args.get("query", None, type=str)
         status = request.args.get("status", None, type=int)
-        group_dataset, total_items_count = group_service.get_all_available_by_filter(
+        group_dataset, total_items_count = group_service.get_all(
             page=page,
             per_page=per_page,
             query=query,
