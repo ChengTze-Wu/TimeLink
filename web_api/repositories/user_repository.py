@@ -116,10 +116,10 @@ class UserRepository:
 
     def get_all_by_filter(
         self,
-        page: int = 1,
-        per_page: int = 10,
-        query: str = None,
-        status: int = None
+        page: int,
+        per_page: int,
+        query: str,
+        status: int,
     ):
         with get_session() as session:
             base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())

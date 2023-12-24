@@ -43,7 +43,12 @@ class UserService:
         return self.user_repository.get_one_by_unique_filed(user_id=user_id)
 
     def get_all(
-        self, page: int, per_page: int, query: str, status: int, with_total_items: bool
+        self, 
+        page: int = 1, 
+        per_page: int = 10, 
+        query: str = None, 
+        status: int = None, 
+        with_total_items: bool = False
     ) -> List[dict] | Tuple[List[dict], int]:
         list_dict_users = self.user_repository.get_all_by_filter(
             page, per_page, query, status
