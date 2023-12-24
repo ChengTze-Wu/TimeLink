@@ -1,115 +1,100 @@
 from typing import List, Tuple
-from flask import abort
-from sqlalchemy import or_
-from web_api.db.connect import Session
-from web_api.db.models import Service, UnavailablePeriod
-from werkzeug.exceptions import NotFound, Conflict
+from web_api.repositories.service_repository import ServiceRepository
+from werkzeug.exceptions import BadRequest
 
 
-def create_one(service_data: dict) -> dict:
-    try:
-        unavailable_periods_dataset = service_data.get("unavailable_periods", [])
+class ServiceService:
+    def __init__(self) -> None:
+        self.service_repository = ServiceRepository()
 
-        unavailable_periods = [
-            UnavailablePeriod(
-                start_datetime=service_data.get("start_datetime"),
-                end_datetime=service_data.get("end_datetime"),
-            )
-            for unavailable_period_data in unavailable_periods_dataset
-            if unavailable_period_data
-        ]
+    def create_one(self, service_json_data: dict) -> dict:
+        '''
+        service_json_data example:
+        {
+            "name": "string",
+            "price": 0,
+            "image": "path/to/image",
+            "description": "string",
+            "working_hours": [
+                {
+                    "day_of_week": "Monday",
+                    "start_time": "09:00",
+                    "end_time": "18:00"
+                }
+            ],
+            "unavailable_periods": [
+                {
+                    "start_datetime": "2023-12-11 08:12:00",
+                    "end_datetime": "2023-12-11 09:12:00"
+                }
+            ]
+        }
+        '''
+        working_hours = service_json_data.get("working_hours", [])
+        unavailable_periods = service_json_data.get("unavailable_periods", [])
 
-        service = Service(
-            name=service_data.get("name"),
-            price=service_data.get("price"),
-            image=service_data.get("image"),
-            period_time=service_data.get("period_time"),
-            open_time=service_data.get("open_time"),
-            close_time=service_data.get("close_time"),
-            start_date=service_data.get("start_date"),
-            end_date=service_data.get("end_date"),
-            is_active=service_data.get("is_active"),
-            unavailable_periods=unavailable_periods,
+        for working_hour in working_hours:
+            if working_hour.get("open_time") > working_hour.get("close_time"):
+                raise BadRequest("open_time cannot be greater than close_time")
+        for unavailable_period in unavailable_periods:
+            if unavailable_period.get("start_datetime") > unavailable_period.get("end_datetime"):
+                raise BadRequest("start_datetime cannot be greater than end_datetime")
+            
+        new_service_data = {
+            "name": service_json_data.get("name"),
+            "price": service_json_data.get("price"),
+            "image": service_json_data.get("image"),
+            "description": service_json_data.get("description"),
+            "working_hours": working_hours,
+            "unavailable_periods": unavailable_periods
+        }
+            
+        return self.service_repository.create_one(new_service_data)
+
+
+    def delete_one(self, service_id: str) -> dict:
+        return self.service_repository.logical_delete_one_by_id(service_id)
+
+
+    def update_one(self, service_id: str, service_data: dict) -> dict:
+        working_hours = service_data.get("working_hours", [])
+        unavailable_periods = service_data.get("unavailable_periods", [])
+
+        for working_hour in working_hours:
+            if working_hour.get("open_time") > working_hour.get("close_time"):
+                raise BadRequest("open_time cannot be greater than close_time")
+        for unavailable_period in unavailable_periods:
+            if unavailable_period.get("start_datetime") > unavailable_period.get("end_datetime"):
+                raise BadRequest("start_datetime cannot be greater than end_datetime")
+            
+        update_service_data = {
+            "name": service_data.get("name"),
+            "price": service_data.get("price"),
+            "image": service_data.get("image"),
+            "description": service_data.get("description"),
+            "working_hours": working_hours,
+            "unavailable_periods": unavailable_periods
+        }
+
+        return self.service_repository.update_one_by_id(service_id, update_service_data)
+
+
+    def get_one(self, service_id: str) -> dict:
+        return self.service_repository.get_one_by_unique_filed(service_id=service_id)
+
+
+    def get_all(
+        self,
+        page: int = 1,
+        per_page: int = 10,
+        query: str = None,
+        status: int = None,
+        with_total_items: bool = False,
+    ) -> List[dict] | Tuple[List[dict], int]:
+        list_dict_services = self.service_repository.get_all_by_filter(
+            page, per_page, query, status
         )
-
-        with Session() as session:
-            session.add(service)
-            session.commit()
-            session.refresh(service)
-            return service.to_dict()
-
-    except Exception as e:
-        abort(500, e)
-
-
-def logical_delete_by_id(service_id: str) -> dict:
-    with Session() as session:
-        service = session.query(Service).filter(Service.id == service_id).first()
-        if service is None:
-            raise NotFound(f"Service not found")
-        if service.is_deleted:
-            raise Conflict(f"Service `{service.name}` already deleted")
-        service.is_deleted = True
-        session.commit()
-        return service.to_dict()
-
-
-def update_one_by_id(service_id: str, service_data: dict) -> dict:
-    with Session() as session:
-        service = session.query(Service).filter(Service.id == service_id).first()
-        if service is None:
-            raise NotFound(f"Service not found")
-        for field, value in service_data.items():
-            if hasattr(service, field):
-                if getattr(service, field) != value:
-                    setattr(service, field, value)
-        session.commit()
-        session.refresh(service)
-        return service.to_dict()
-
-
-def get_one_by_id(service_id: str) -> dict:
-    with Session() as session:
-        service = session.query(Service).filter(Service.id == service_id).first()
-        if service is None:
-            raise NotFound(f"Service not found")
-        return service.to_dict()
-
-
-def get_all_available_by_filter(
-    page: int = 1,
-    per_page: int = 10,
-    query: str = None,
-    status: int = None,
-    with_total_items: bool = True,
-) -> List[dict] | Tuple[List[dict], int]:
-    with Session() as session:
-        base_query = (
-            session.query(Service)
-            .filter(Service.is_deleted == False)
-            .order_by(Service.created_at.desc())
-        )
-
-        if status == 0:
-            base_query = base_query.filter(Service.is_active == False)
-
-        if status == 1:
-            base_query = base_query.filter(Service.is_active == True)
-
-        if query is not None:
-            search_filter = or_(
-                Service.name.ilike(f"%{query}%"),
-                Service.price.ilike(f"%{query}%"),
-            )
-            base_query = base_query.filter(search_filter)
-
-        services = session.scalars(
-            base_query.offset((page - 1) * per_page).limit(per_page)
-        ).all()
-        list_dict_services = [service.to_dict() for service in services]
-
-        if with_total_items is True:
-            total_items = len(session.scalars(base_query).all())
-            return list_dict_services, total_items
-
+        if with_total_items:
+            total_items_count = self.service_repository.count_all_by_filter(query, status)
+            return list_dict_services, total_items_count
         return list_dict_services
