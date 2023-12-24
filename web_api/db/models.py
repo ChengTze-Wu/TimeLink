@@ -15,6 +15,16 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
+import enum
+
+class DayOfWeek(enum.Enum):
+    Monday = 1
+    Tuesday = 2
+    Wednesday = 3
+    Thursday = 4
+    Friday = 5
+    Saturday = 6
+    Sunday = 7
 
 
 class BaseModel(DeclarativeBase):
@@ -80,28 +90,6 @@ class CommonColumns:
     )
 
 
-class UnavailablePeriod(BaseModel, CommonColumns):
-    __tablename__ = "unavailable_period"
-
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('service.id'))
-    start_datetime: Mapped[datetime.datetime]  # 不可預約時間段的開始
-    end_datetime: Mapped[datetime.datetime]    # 不可預約時間段的結束
-
-    service: Mapped["Service"] = relationship("Service", back_populates="unavailable_periods")
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "start_datetime": self.start_datetime,
-            "end_datetime": self.end_datetime,
-            "is_active": self.is_active,
-            "is_deleted": self.is_deleted,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-        }
-
-
 class Service(BaseModel, CommonColumns):
     __tablename__ = "service"
 
@@ -109,14 +97,14 @@ class Service(BaseModel, CommonColumns):
     name: Mapped[str] = mapped_column(Text)
     price: Mapped[Optional[float]]
     image: Mapped[Optional[str]] = mapped_column(Text)
-    period_time: Mapped[Optional[int]]  # 作業時間(分鐘)
-    open_time: Mapped[Optional[datetime.time]]  # 每日開始時間
-    close_time: Mapped[Optional[datetime.time]] # 每日結束時間
-    start_date: Mapped[Optional[datetime.date]] # 開始日期
-    end_date: Mapped[Optional[datetime.date]]   # 結束日期
-    
-    unavailable_periods: Mapped[List["UnavailablePeriod"]] = relationship(
-        "UnavailablePeriod", back_populates="service"
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+    working_hours: Mapped[List["WorkingHours"]] = relationship(
+        "WorkingHours", back_populates="service"
+    )
+
+    unavailable_periods: Mapped[List["UnavailablePeriods"]] = relationship(
+        "UnavailablePeriods", back_populates="service"
     )
 
     users: Mapped[List["User"]] = relationship(
@@ -133,16 +121,51 @@ class Service(BaseModel, CommonColumns):
             "name": self.name,
             "price": self.price,
             "image": self.image,
-            "period_time": self.period_time,
-            "open_time": self.open_time,
-            "close_time": self.close_time,
-            "start_date": self.start_date,
-            "end_date": self.end_date,
+            "description": self.description,
+            "working_hours": [working_hour.to_dict() for working_hour in self.working_hours],
+            "unavailable_periods": [unavailable_period.to_dict() for unavailable_period in self.unavailable_periods],
             "is_active": self.is_active,
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "unavailable_periods": [ unavailable_period.to_dict() for unavailable_period in self.unavailable_periods ],
+        }
+
+
+class WorkingHours(BaseModel):
+    __tablename__ = "working_hours"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('service.id'))
+    day_of_week: Mapped[DayOfWeek] = mapped_column(Integer)
+    start_time: Mapped[datetime.time] = mapped_column(DateTime)
+    end_time: Mapped[datetime.time] = mapped_column(DateTime)
+
+    service: Mapped["Service"] = relationship("Service", back_populates="working_hours")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "day_of_week": self.day_of_week,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+        }
+
+
+class UnavailablePeriods(BaseModel):
+    __tablename__ = "unavailable_periods"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('service.id'))
+    start_datetime: Mapped[datetime.datetime]
+    end_datetime: Mapped[datetime.datetime]
+
+    service: Mapped["Service"] = relationship("Service", back_populates="unavailable_periods")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "start_datetime": self.start_datetime,
+            "end_datetime": self.end_datetime,
         }
 
 
