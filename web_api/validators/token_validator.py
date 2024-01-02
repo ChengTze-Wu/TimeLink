@@ -5,7 +5,8 @@ Contact: chengtzewu@gmail.com
 '''
 from functools import wraps
 from flask import current_app, request
-from werkzeug.exceptions import Forbidden, Unauthorized, InternalServerError, HTTPException, NotFound, Conflict, BadRequest
+from werkzeug.exceptions import Forbidden, Unauthorized, InternalServerError, HTTPException
+from web_api.db.models import RoleName
 import re
 import jwt
 
@@ -46,7 +47,7 @@ def verify_access_token(access_roles: list=None, check_owner=False):
 
                 payload_role = payload.get("role")
 
-                if payload_role == "admin":
+                if payload_role is RoleName.ADMIN.value:
                     return func(*args, **kwargs)
 
                 if access_roles and 'role' in payload:
