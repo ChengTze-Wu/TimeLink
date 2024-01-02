@@ -16,6 +16,8 @@ def verify_access_token(access_roles: list=None, check_owner=False):
     Decorator for verifying jwt access token in HTTP Authorization Header Authorization with Bearer prefix.
         > Authorization: Bearer <JWT token>
 
+    If the jwt role is admin, it will pass all the verification.
+
     Basic Usage: only verify access token
     >>> @app.route("/api/users", methods=["GET"])
     >>> @verify_access_token
