@@ -47,10 +47,8 @@ def callback():
 def handle_follow(event):
     try:
         user_id = event.source.user_id
-        
         profile = line_bot_api.get_profile(user_id)
         user_name = profile.display_name
-        
         status = model.member.create(userId=user_id, name=user_name)
         
         if status == True:
