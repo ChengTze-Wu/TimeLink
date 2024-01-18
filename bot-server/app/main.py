@@ -1,9 +1,12 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 import sys
+import logging
 import httpx
 
 from fastapi import Request, FastAPI, HTTPException
-from dotenv import load_dotenv
 from linebot.v3.messaging import (
     AsyncApiClient,
     AsyncMessagingApi,
@@ -17,12 +20,16 @@ from linebot.v3.exceptions import (
 from linebot.v3.webhooks import (
     FollowEvent,
     MessageEvent,
+    JoinEvent,
+    MemberJoinedEvent,
     TextMessageContent
 )
+from http import HTTPStatus
 from .lib.webhook import AsyncWebhookHandler
-from .commands.factory import CommandFactory
+from .commands.selector import CommandSelector
+from .messages import ViewMessage
 
-load_dotenv()
+API_SERVER_HOST = os.getenv("API_SERVER_HOST", None)
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -42,7 +49,10 @@ async_api_client = AsyncApiClient(configuration)
 line_bot_api = AsyncMessagingApi(async_api_client)
 async_handler = AsyncWebhookHandler(channel_secret)
 
-API_SERVER_HOST = os.getenv("API_SERVER_HOST", None)
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
 
 @app.post("/callback")
 async def handle_callback(request: Request):
@@ -54,50 +64,111 @@ async def handle_callback(request: Request):
     except InvalidSignatureError:
         raise HTTPException(status_code=400, detail="Invalid signature")
     except Exception as e:
+        logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
     return 'OK'
 
 
 @async_handler.add(FollowEvent)
-async def handle_follow(event: FollowEvent):
+async def handle_member_follow(event: FollowEvent):
     try:
-        user_id = event.source.user_id
-        user_profile = await line_bot_api.get_profile(user_id)
-        user_name = user_profile.display_name
+        reply_message = ViewMessage.WELCOME_BACK
+        line_user_id: str = event.source.user_id
 
-        print(user_id)
-        print(user_profile)
-        print(user_name)
+        async with httpx.AsyncClient() as client:
+            headers = {'user-agent': 'TimeLink-Line-Bot/0.0.1'}
+            user_resp = await client.get(
+                f'{API_SERVER_HOST}/api/users',
+                params={'line_user_id': line_user_id},
+                timeout=2, 
+                headers=headers
+            )
+
+        if user_resp.status_code == HTTPStatus.NOT_FOUND:
+            reply_message = ViewMessage.WELCOME_NEW_USER
 
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=f"恭喜 {user_name}!\n加入 TimeLink 好友！")]
+                messages=[TextMessage(text=reply_message)]
             )
         )
     except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@async_handler.add(JoinEvent)
+async def handle_bot_join(event: JoinEvent):
+    try:
+        reply_message = ViewMessage.BOT_JOIN_SUCCESS
+        line_group_id = event.source.group_id
+        async with httpx.AsyncClient() as client:
+            headers = {'user-agent': 'TimeLink-Line-Bot/0.0.1'}
+            group_resp = await client.get(
+                f'{API_SERVER_HOST}/api/groups', 
+                params={'line_group_id': line_group_id},
+                timeout=2, 
+                headers=headers
+            )
+
+        if group_resp.status_code == HTTPStatus.NOT_FOUND:
+            reply_message = ViewMessage.GROUP_NOT_LINKED.substitute(line_group_id=line_group_id)
+
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=reply_message)]
+            )
+        )
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@async_handler.add(MemberJoinedEvent)
+async def handle_member_join(event: MemberJoinedEvent):
+    try:
+        reply_message = ViewMessage.WELCOME_MEMBER_JOIN
+        line_user_id = event.joined.members[0].user_id
+        line_group_id = event.source.group_id
+
+        async with httpx.AsyncClient() as client:
+            headers = {'user-agent': 'TimeLink-Line-Bot/0.0.1'}
+            resp = await client.post(f'{API_SERVER_HOST}/api/users/groups', 
+                json={
+                    'line_user_id': line_user_id,
+                    'line_group_id': line_group_id
+                },
+                timeout=2, 
+                headers=headers
+            )
+
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=reply_message)]
+            )
+        )
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @async_handler.add(MessageEvent, message=TextMessageContent)
 async def handle_message(event: MessageEvent):
     try:
-        command = CommandFactory.get_command(event.message.text)
-        if command:
-            command.execute()
+        command = CommandSelector().get_command(event)
+        command_message = await command.async_execute()
+        reply_message = command_message if command_message else event.message.text
 
-        line_user_id: str = event.source.user_id
-        async with httpx.AsyncClient() as client:
-            user_resp = await client.get(f'{API_SERVER_HOST}/api/users/line/{line_user_id}')
-        user_json: dict = user_resp.json()
-        appointments: list = user_json.get("appointments")
-        
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=f'您共有 {len(appointments)} 筆預約.')]
+                messages=[TextMessage(text=reply_message)]
             )
         )
     except Exception as e:
+        logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
