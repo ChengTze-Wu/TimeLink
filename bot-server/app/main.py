@@ -4,7 +4,6 @@ load_dotenv()
 import os
 import sys
 import logging
-import httpx
 
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
@@ -26,10 +25,9 @@ from linebot.v3.webhooks import (
 )
 from http import HTTPStatus
 from .lib.webhook import AsyncWebhookHandler
+from .utils.fetch import APIServerFetchClient
 from .commands.selector import CommandSelector
 from .messages import ViewMessage
-
-API_SERVER_HOST = os.getenv("API_SERVER_HOST", None)
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -48,6 +46,7 @@ app = FastAPI()
 async_api_client = AsyncApiClient(configuration)
 line_bot_api = AsyncMessagingApi(async_api_client)
 async_handler = AsyncWebhookHandler(channel_secret)
+fetch = APIServerFetchClient()
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -76,17 +75,13 @@ async def handle_member_follow(event: FollowEvent):
         reply_message = ViewMessage.WELCOME_BACK
         line_user_id: str = event.source.user_id
 
-        async with httpx.AsyncClient() as client:
-            headers = {'user-agent': 'TimeLink-Line-Bot/0.0.1'}
-            user_resp = await client.get(
-                f'{API_SERVER_HOST}/api/users',
-                params={'line_user_id': line_user_id},
-                timeout=2, 
-                headers=headers
-            )
+        user_resp = await fetch.get(f'/api/users/{line_user_id}')
 
         if user_resp.status_code == HTTPStatus.NOT_FOUND:
             reply_message = ViewMessage.WELCOME_NEW_USER
+
+        if user_resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+            return
 
         await line_bot_api.reply_message(
             ReplyMessageRequest(
@@ -104,17 +99,14 @@ async def handle_bot_join(event: JoinEvent):
     try:
         reply_message = ViewMessage.BOT_JOIN_SUCCESS
         line_group_id = event.source.group_id
-        async with httpx.AsyncClient() as client:
-            headers = {'user-agent': 'TimeLink-Line-Bot/0.0.1'}
-            group_resp = await client.get(
-                f'{API_SERVER_HOST}/api/groups', 
-                params={'line_group_id': line_group_id},
-                timeout=2, 
-                headers=headers
-            )
+
+        group_resp = await fetch.get(f'/api/groups/{line_group_id}')
 
         if group_resp.status_code == HTTPStatus.NOT_FOUND:
             reply_message = ViewMessage.GROUP_NOT_LINKED.substitute(line_group_id=line_group_id)
+
+        if group_resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+            return
 
         await line_bot_api.reply_message(
             ReplyMessageRequest(
@@ -134,16 +126,10 @@ async def handle_member_join(event: MemberJoinedEvent):
         line_user_id = event.joined.members[0].user_id
         line_group_id = event.source.group_id
 
-        async with httpx.AsyncClient() as client:
-            headers = {'user-agent': 'TimeLink-Line-Bot/0.0.1'}
-            resp = await client.post(f'{API_SERVER_HOST}/api/users/groups', 
-                json={
-                    'line_user_id': line_user_id,
-                    'line_group_id': line_group_id
-                },
-                timeout=2, 
-                headers=headers
-            )
+        resp = await fetch.post('/api/users/groups', {
+            'line_user_id': line_user_id,
+            'line_group_id': line_group_id
+        })
 
         await line_bot_api.reply_message(
             ReplyMessageRequest(
@@ -160,9 +146,11 @@ async def handle_member_join(event: MemberJoinedEvent):
 async def handle_message(event: MessageEvent):
     try:
         command = CommandSelector().get_command(event)
-        command_message = await command.async_execute()
-        reply_message = command_message if command_message else event.message.text
+        reply_message = await command.async_execute()
 
+        if reply_message is None:
+            return
+        
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
