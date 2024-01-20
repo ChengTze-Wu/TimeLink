@@ -22,8 +22,12 @@ class CommandSelector:
 
     def get_command(self, event: MessageEvent) -> Command:
         message_text = event.message.text.lower()
-        if self.COMMAND_CALL_KEYWORD in message_text:
-            for key, command_cls in self.strategies.items():
-                if key in message_text:
-                    return command_cls(event)
+        
+        if self.COMMAND_CALL_KEYWORD not in message_text:
+            return DefaultCommand(event)
+        
+        for key, command_cls in self.strategies.items():
+            if key in message_text:
+                return command_cls(event)
+            
         return DefaultCommand(event)
