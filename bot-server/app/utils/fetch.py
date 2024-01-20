@@ -6,7 +6,10 @@ BOT_VERSION = f"/{os.getenv("BOT_VERSION", "0.0.1")}"
 class APIServerFetchClient:
     def __init__(self, base_url: str | None = None):
         self.base_url = os.getenv("API_SERVER_HOST", base_url)
-        self.headers = {'user-agent': f'TimeLinkBotServer{BOT_VERSION}'}
+        self.headers = {
+            'user-agent': f'TimeLinkBotServer{BOT_VERSION}',
+            'Authorization': f'Bearer {os.getenv("API_SERVER_ACCESS_TOKEN")}'
+        }
         self.timeout = 2
 
     async def get(self, endpoint, **kwargs):
