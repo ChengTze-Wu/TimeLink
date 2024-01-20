@@ -25,6 +25,7 @@ poetry install
 ### Step1. 環境變數
 共需要 LINE_CHANNEL_SECRET, LINE_CHANNEL_ACCESS_TOKEN, API_SERVER_HOST
 ```bash
+export BOT_VERSION=<BOT_VERSION>
 export LINE_CHANNEL_SECRET=<LINE_CHANNEL_SECRET>
 export LINE_CHANNEL_ACCESS_TOKEN=<LINE_CHANNEL_ACCESS_TOKEN>
 export API_SERVER_HOST=<API_SERVER_HOST>
@@ -36,7 +37,7 @@ uvicorn app.main:app
 ```
 
 ## 自製套件
-因目前 Line 官方尚未有非同步版本的 `WebhookHandler`, 所以就繼承它來覆寫小修改一下, 以配合非同步 function 使用, 為 `AsyncWebhookHandler` 放在 `/app/lib/webhook.py` 中. 歡迎參考取用.
+因目前 Line 官方尚未有非同步版本的 `WebhookHandler`, 所以就繼承它來覆寫小修改一下, 以配合非同步 handle function 使用, 為 `AsyncWebhookHandler` 放在 `/app/lib/webhook.py` 中. 歡迎參考取用.
 
 ### 使用範例
 ```python
