@@ -146,7 +146,7 @@ async def handle_member_join(event: MemberJoinedEvent):
 @async_handler.add(MessageEvent, message=TextMessageContent)
 async def handle_message(event: MessageEvent):
     try:
-        command = CommandSelector().get_command(event)
+        command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
 
         if reply_message:
@@ -164,7 +164,7 @@ async def handle_message(event: MessageEvent):
 @async_handler.add(PostbackEvent)
 async def handle_postback(event: PostbackEvent):
     try:
-        command = CommandSelector().get_command(event)
+        command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
         
         if reply_message:
