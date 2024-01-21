@@ -8,6 +8,10 @@ from ..messages import ViewMessage
 
 
 class RecordCommand(Command):
+    '''RecordCommand is a class that handles the user record command. It
+    will fetch the user's record from the API server and return it to the
+    user.
+    '''
     def __init__(self, event):
         super().__init__(event)
         self.fetch = APIServerFetchClient()
