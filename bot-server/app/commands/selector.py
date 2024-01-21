@@ -12,7 +12,11 @@ from .command import Command
 
 class CommandSelector:
     '''CommandSelector is a class that selects the appropriate command object
-    to execute based on the event type and the event message.
+    to execute based on the MessageEvent or PostbackEvent type.
+
+    Attributes:
+        COMMAND_CALL_KEYWORD (str): The keyword that triggers the command.
+        COMMAND_MAPPING (dict): A mapping of keywords to command classes.
     '''
     COMMAND_CALL_KEYWORD = "tl"
     COMMAND_MAPPING = {
