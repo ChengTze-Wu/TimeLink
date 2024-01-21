@@ -11,7 +11,7 @@ from linebot.v3.messaging import (
     AsyncMessagingApi,
     Configuration,
     ReplyMessageRequest,
-    TextMessage
+    TextMessage,
 )
 from linebot.v3.exceptions import (
     InvalidSignatureError
@@ -21,6 +21,7 @@ from linebot.v3.webhooks import (
     MessageEvent,
     JoinEvent,
     MemberJoinedEvent,
+    PostbackEvent,
     TextMessageContent
 )
 from http import HTTPStatus
@@ -148,15 +149,31 @@ async def handle_message(event: MessageEvent):
         command = CommandSelector().get_command(event)
         reply_message = await command.async_execute()
 
-        if reply_message is None:
-            return
-        
-        await line_bot_api.reply_message(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=reply_message)]
+        if reply_message:
+            await line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[reply_message]
+                )
             )
-        )
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@async_handler.add(PostbackEvent)
+async def handle_postback(event: PostbackEvent):
+    try:
+        command = CommandSelector().get_command(event)
+        reply_message = await command.async_execute()
+        
+        if reply_message:
+            await line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[reply_message]
+                )
+            )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
