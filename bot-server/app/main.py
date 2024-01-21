@@ -27,7 +27,7 @@ from linebot.v3.webhooks import (
 from http import HTTPStatus
 from .lib.webhook import AsyncWebhookHandler
 from .utils.fetch import APIServerFetchClient
-from .commands.selector import CommandSelector
+from .selector import CommandSelector
 from .messages import ViewMessage
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
@@ -148,6 +148,10 @@ async def handle_message(event: MessageEvent):
     try:
         command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
+
+        line_group_id = event.source.group_id
+
+        print(line_group_id)
 
         if reply_message:
             await line_bot_api.reply_message(
