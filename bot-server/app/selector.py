@@ -2,13 +2,14 @@ from linebot.v3.webhooks import (
     MessageEvent,
     PostbackEvent,
 )
-from .record import RecordCommand
-from .reserve import ReserveCommand
-from .service import ServiceCommand
-from .default import DefaultCommand
-from .menu import MenuCommand
-from .command import Command
-
+from .commands import (
+    RecordCommand,
+    ReserveCommand,
+    ServiceCommand,
+    DefaultCommand,
+    MenuCommand,
+    Command,
+)
 
 class CommandSelector:
     '''CommandSelector is a class that selects the appropriate command object
