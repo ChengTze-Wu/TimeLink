@@ -4,7 +4,7 @@ from linebot.v3.webhooks import (
 )
 from .commands import (
     RecordCommand,
-    ReserveCommand,
+    AppointmentCommand,
     ServiceCommand,
     DefaultCommand,
     MenuCommand,
@@ -19,26 +19,29 @@ class CommandSelector:
         COMMAND_CALL_KEYWORD (str): The keyword that triggers the command.
         COMMAND_MAPPING (dict): A mapping of keywords to command classes.
     '''
-    COMMAND_CALL_KEYWORD = "tl"
+    COMMAND_CALL_KEYWORD = "/"
     COMMAND_MAPPING = {
         "服務": ServiceCommand,
         "記錄": RecordCommand,
-        "預約": ReserveCommand
+        "預約": AppointmentCommand
     }
 
     @staticmethod
     def get_command(event: MessageEvent | PostbackEvent) -> Command:
+        if not isinstance(event, (MessageEvent, PostbackEvent)):
+            raise TypeError("event must be MessageEvent or PostbackEvent")
+
         if isinstance(event, MessageEvent):
             event_keyword = event.message.text.lower()
 
-            if CommandSelector.COMMAND_CALL_KEYWORD not in event_keyword:
+            if CommandSelector.COMMAND_CALL_KEYWORD != event_keyword:
                 return DefaultCommand(event)
 
         if isinstance(event, PostbackEvent):
             event_keyword = event.postback.data.lower()
         
-        for key, command_cls in CommandSelector.COMMAND_MAPPING.items():
+        for key, command in CommandSelector.COMMAND_MAPPING.items():
             if key in event_keyword:
-                return command_cls(event)
+                return command(event)
             
         return MenuCommand(event)
