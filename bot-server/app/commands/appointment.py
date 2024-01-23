@@ -1,6 +1,6 @@
 from .command import Command
 
-class ReserveCommand(Command):
+class AppointmentCommand(Command):
     async def async_execute(self):
         # 預約服務的邏輯
         pass
