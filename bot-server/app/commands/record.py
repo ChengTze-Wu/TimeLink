@@ -16,10 +16,6 @@ class RecordCommand(Command):
         super().__init__(event)
         self.fetch = APIServerFetchClient()
 
-    async def get_user(self):
-        line_user_id: str = self.event.source.user_id
-        return await self.fetch.get(f'/api/users/{line_user_id}')
-
     async def async_execute(self) -> TextMessage | None:
         user_response = await self.get_user()
         handled_response = await self.__handle_response(user_response)
@@ -34,6 +30,10 @@ class RecordCommand(Command):
         appointment_message = await self.__format_appointments(user_json)
 
         return TextMessage(text=appointment_message)
+    
+    async def get_user(self):
+        line_user_id: str = self.event.source.user_id
+        return await self.fetch.get(f'/api/users/{line_user_id}')
     
     async def __format_appointments(self, user_json: dict):
         appointments = user_json.get("appointments")
