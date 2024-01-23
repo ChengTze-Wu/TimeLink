@@ -1,20 +1,28 @@
-from .command import Command
+from abc import ABC, abstractmethod
+from linebot.v3.webhooks import (
+    GroupSource,
+    UserSource
+)
 from linebot.v3.messaging import (
     TemplateMessage,
     ButtonsTemplate,
-    URIAction,
     PostbackAction,
 )
+from .command import Command
 
-class MenuCommand(Command):
-    def __init__(self, event):
-        super().__init__(event)
+class MenuTemplate(ABC):
+    @staticmethod
+    @abstractmethod
+    def get():
+        pass
 
-    async def async_execute(self):
+
+class GroupMenuTemplate(MenuTemplate):
+    @staticmethod
+    def get():
         return TemplateMessage(
-            alt_text='Buttons template',
+            alt_text='TimeLink 功能表',
             template=ButtonsTemplate(
-                # thumbnail_image_url='https://example.com/image.jpg',
                 title='TimeLink 功能表',
                 text='請選擇服務項目',
                 actions=[
@@ -26,14 +34,36 @@ class MenuCommand(Command):
                         label='預約',
                         data='預約'
                     ),
-                    PostbackAction(
-                        label='記錄',
-                        data='記錄'
-                    ),
-                    # URIAction(
-                    #     label='URI',
-                    #     uri='http://example.com/'
-                    # )
                 ]
             )
         )
+    
+
+class ChatMenuTemplate(MenuTemplate):
+    @staticmethod
+    def get():
+        return TemplateMessage(
+            alt_text='TimeLink 功能表',
+            template=ButtonsTemplate(
+                title='TimeLink 功能表',
+                text='請查看您的所有預約記錄',
+                actions=[
+                    PostbackAction(
+                        label='預約記錄',
+                        data='記錄'
+                    ),
+                ]
+            )
+        )
+
+
+class MenuCommand(Command):
+    def __init__(self, event):
+        super().__init__(event)
+
+    async def async_execute(self):
+        if isinstance(self.event.source, GroupSource):
+            return GroupMenuTemplate.get()
+        
+        if isinstance(self.event.source, UserSource):
+            return ChatMenuTemplate.get()
