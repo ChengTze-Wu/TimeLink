@@ -94,6 +94,8 @@ class Service(BaseModel, CommonColumns):
     description: Mapped[Optional[str]] = mapped_column(Text)
     working_period: Mapped[Optional[int]] = mapped_column(Integer)
 
+    owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user_account.id"))
+
     working_hours: Mapped[List["WorkingHour"]] = relationship(
         "WorkingHour", back_populates="service"
     )
@@ -109,6 +111,8 @@ class Service(BaseModel, CommonColumns):
     groups: Mapped[List["Group"]] = relationship(
         secondary=group_service, back_populates="services"
     )
+
+    owner: Mapped["User"] = relationship("User", back_populates="own_services")
 
     def to_dict(self):
         return {
@@ -207,8 +211,12 @@ class User(BaseModel, CommonColumns):
         secondary=group_user, back_populates="users"
     )
 
-    owner_groups: Mapped[List["Group"]] = relationship(
+    own_groups: Mapped[List["Group"]] = relationship(
         "Group", back_populates="owner"
+    )
+
+    own_services: Mapped[List["Service"]] = relationship(
+        "Service", back_populates="owner"
     )
 
     def to_dict(self):
@@ -297,7 +305,7 @@ class Group(BaseModel, CommonColumns):
         secondary=group_service, back_populates="groups"
     )
 
-    owner: Mapped[User] = relationship("User", back_populates="groups")
+    owner: Mapped[User] = relationship("User", back_populates="own_groups")
 
     def to_dict(self):
         return {
