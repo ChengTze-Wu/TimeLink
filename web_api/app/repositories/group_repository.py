@@ -28,7 +28,7 @@ class GroupRepository:
         group_data: dict,
     ):
         with get_session() as session:
-            group = session.query(Group).filter(Group.id == group_id).first()
+            group = session.query(Group).filter(Group.id == group_id, Group.is_deleted == False).first()
             if group is None:
                 raise NotFound("Group not found")
 
@@ -61,7 +61,7 @@ class GroupRepository:
                 Group.id == group_id,
                 Group.line_group_id == line_group_id
             )
-            group = session.query(Group).filter(search_filter).first()
+            group = session.query(Group).filter(search_filter, Group.is_deleted == False).first()
             if group is None:
                 raise NotFound(f"Group not found")
             return group.to_dict()

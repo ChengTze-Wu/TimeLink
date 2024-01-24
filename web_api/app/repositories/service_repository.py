@@ -17,7 +17,7 @@ class ServiceRepository:
 
             if group_ids is not None:
                 for group_id in group_ids:
-                    group = session.query(Group).filter(Group.id == group_id).first()
+                    group = session.query(Group).filter(Group.id == group_id, Group.is_deleted == False).first()
                     if group is None:
                         raise NotFound(f"Group not found when creating service.")
                     new_service.groups.append(group)
@@ -26,17 +26,16 @@ class ServiceRepository:
             session.refresh(new_service)
             return new_service.to_dict()
 
-
     def update_one_by_id(self, service_id: str, service_data: dict, group_ids: list=None, working_hours: list[dict]=None) -> dict:
         with get_session() as session:
-            service = session.query(Service).filter(Service.id == service_id).first()
+            service = session.query(Service).filter(Service.id == service_id, Service.is_deleted == False).first()
             if service is None:
                 raise NotFound("Service not found")
 
             if group_ids is not None:
                 service.groups.clear()
                 for group_id in group_ids:
-                    group = session.query(Group).filter(Group.id == group_id).first()
+                    group = session.query(Group).filter(Group.id == group_id, Group.is_deleted == False).first()
                     if group is None:
                         raise NotFound(f"Group not found when updating service `{service.name}`.")
                     service.groups.append(group)
@@ -54,7 +53,6 @@ class ServiceRepository:
             session.refresh(service)
             return service.to_dict()
 
-
     def logical_delete_one_by_id(self, service_id: str) -> dict:
         with get_session() as session:
             service = session.query(Service).filter(Service.id == service_id).first()
@@ -67,14 +65,12 @@ class ServiceRepository:
             session.refresh(service)
             return service.to_dict()
 
-
     def select_one_by_unique_filed(self, service_id: str) -> dict:
         with get_session() as session:
-            service = session.query(Service).filter(Service.id == service_id).first()
+            service = session.query(Service).filter(Service.id == service_id, Service.is_deleted == False).first()
             if service is None:
                 raise NotFound("Service not found")
             return service.to_dict()
-
 
     def count_all_by_filter(
         self, 
@@ -101,7 +97,6 @@ class ServiceRepository:
                 base_query = base_query.filter(Service.owner_id == owner_id)
 
             return len(session.scalars(base_query).all())
-
 
     def select_all_by_filter(
         self,
