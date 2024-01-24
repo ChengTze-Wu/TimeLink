@@ -2,6 +2,8 @@ from typing import List, Tuple
 from app.repositories.service_repository import ServiceRepository
 from app.repositories.working_hour_repository import WorkingHourRepository
 from app.repositories.unavailable_period_repository import UnavailablePeriodRepository
+from app.repositories.group_repository import GroupRepository
+from app.services.token_service import JWTService
 from app.db.models import DayOfWeek
 from werkzeug.exceptions import BadRequest
 from datetime import datetime
@@ -11,13 +13,19 @@ from uuid import UUID
 class ServiceService:
     def __init__(self) -> None:
         self.service_repository = ServiceRepository()
+        self.group_repository = GroupRepository()
         self.working_hour_repository = WorkingHourRepository()
         self.unavailable_period_repository = UnavailablePeriodRepository()
+        self.payload = JWTService().get_payload()
 
     def create_one(self, service_json_data: dict) -> dict:
         working_hours = service_json_data.get("working_hours", []) or []
         unavailable_periods = service_json_data.get("unavailable_periods", []) or []
         group_ids = service_json_data.get("groups")
+        user_id = self.payload.get("sub")
+
+        if user_id is None:
+            raise BadRequest("sub must be provided in JWT payload")
 
         # Validate working_hours
         days_of_week = set()
@@ -46,16 +54,39 @@ class ServiceService:
             "image": service_json_data.get("image"),
             "description": service_json_data.get("description"),
             "working_period": service_json_data.get("working_period"),
-            "is_active": service_json_data.get("is_active")
+            "is_active": service_json_data.get("is_active"),
+            "owner_id": user_id,
         }
         return self.service_repository.insert_one(new_service_data, working_hours, unavailable_periods, group_ids)
 
+    def get_all(
+        self,
+        page: int = 1,
+        per_page: int = 10,
+        query: str = None,
+        status: int = None,
+        with_total_items: bool = False,
+    ) -> List[dict] | Tuple[List[dict], int]:
+        role = self.payload.get("role")
+        owner_id = self.payload.get("sub") if role != "admin" else None
+        services = self.service_repository.select_all_by_filter(
+            page, per_page, query, status, owner_id
+        )
+        if with_total_items:
+            total_items_count = self.service_repository.count_all_by_filter(query, status, owner_id)
+            return services, total_items_count
+        return services
+
+    def get_one(self, service_id: str) -> dict:
+        return self.__retrieve_service_by_owner(service_id)
 
     def delete_one(self, service_id: str) -> dict:
+        self.__retrieve_service_by_owner(service_id)
         return self.service_repository.logical_delete_one_by_id(service_id)
 
-
     def update_one(self, service_id: str, service_json_data: dict) -> dict:
+        self.__retrieve_service_by_owner(service_id)
+
         input_unavailable_periods = service_json_data.get("unavailable_periods", [])
         input_working_hours = service_json_data.get("working_hours", [])
         group_ids = service_json_data.get("groups")
@@ -75,23 +106,9 @@ class ServiceService:
             input_working_hours,
         )
 
-
-    def get_one(self, service_id: str) -> dict:
-        return self.service_repository.select_one_by_unique_filed(service_id)
-
-
-    def get_all(
-        self,
-        page: int = 1,
-        per_page: int = 10,
-        query: str = None,
-        status: int = None,
-        with_total_items: bool = False,
-    ) -> List[dict] | Tuple[List[dict], int]:
-        services = self.service_repository.select_all_by_filter(
-            page, per_page, query, status
-        )
-        if with_total_items:
-            total_items_count = self.service_repository.count_all_by_filter(query, status)
-            return services, total_items_count
-        return services
+    def __retrieve_service_by_owner(self, service_id: str):
+        role = self.payload.get("role")
+        service_data = self.service_repository.select_one_by_unique_filed(service_id=service_id)
+        if role != "admin" and self.payload.get("sub") != str( service_data.get("owner").get("id")):
+            raise BadRequest("You are not the owner of this service")
+        return service_data

@@ -122,6 +122,7 @@ class Service(BaseModel, CommonColumns):
             "image": self.image,
             "description": self.description,
             "working_period": self.working_period,
+            "owner": self.owner.to_self_dict() if self.owner else None,
             "working_hours": [working_hour.to_dict() for working_hour in self.working_hours],
             "unavailable_periods": [unavailable_period.to_dict() for unavailable_period in self.unavailable_periods],
             "is_active": self.is_active,
@@ -224,7 +225,6 @@ class User(BaseModel, CommonColumns):
             "id": self.id,
             "email": self.email,
             "username": self.username,
-            "password": self.password,
             "name": self.name,
             "line_user_id": self.line_user_id,
             "phone": self.phone,
@@ -242,7 +242,6 @@ class User(BaseModel, CommonColumns):
             "id": self.id,
             "email": self.email,
             "username": self.username,
-            "password": self.password,
             "name": self.name,
             "line_user_id": self.line_user_id,
             "phone": self.phone,
@@ -253,6 +252,17 @@ class User(BaseModel, CommonColumns):
             "updated_at": self.updated_at,
         }
     
+    def to_auth(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "name": self.name,
+            "password": self.password,
+            "email": self.email,
+            "role": self.role.name.value if self.role else None,
+        }
+
+
 class Appointment(BaseModel, CommonColumns):
     __tablename__ = "appointment"
 

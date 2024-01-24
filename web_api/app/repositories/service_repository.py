@@ -79,7 +79,8 @@ class ServiceRepository:
     def count_all_by_filter(
         self, 
         query: str = None,
-        status: int = None
+        status: int = None,
+        owner_id: str = None
     ) -> int:
         with get_session() as session:
             base_query = select(Service).filter(Service.is_deleted == False).order_by(Service.created_at.desc())
@@ -96,6 +97,9 @@ class ServiceRepository:
                 )
                 base_query = base_query.filter(search_filter)
 
+            if owner_id is not None:
+                base_query = base_query.filter(Service.owner_id == owner_id)
+
             return len(session.scalars(base_query).all())
 
 
@@ -105,6 +109,7 @@ class ServiceRepository:
         per_page: int,
         query: str,
         status: int,
+        owner_id: str = None
     ) -> List[dict]:
         with get_session() as session:
             base_query = select(Service).filter(Service.is_deleted == False).order_by(Service.created_at.desc())
@@ -121,6 +126,10 @@ class ServiceRepository:
                 )
                 base_query = base_query.filter(search_filter)
             base_query = base_query.offset((page - 1) * per_page).limit(per_page)
+
+            if owner_id is not None:
+                base_query = base_query.filter(Service.owner_id == owner_id)
+
             services = session.scalars(
                 base_query
             ).all()

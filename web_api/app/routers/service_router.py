@@ -1,16 +1,17 @@
 from flask import Blueprint, request, abort
 from app.utils.validators.request_vaildator import RequestValidator
 from app.views.response_view import RESTfulResponse
-from app.services import service_service
+from app.services.service_service import ServiceService
 from werkzeug.exceptions import HTTPException
-
+from app.utils.validators.token_validator import verify_access_token
 
 bp = Blueprint("service_router", __name__)
-service_service = service_service.ServiceService()
 
 
 @bp.route("", methods=["POST"])
+@verify_access_token(access_roles=["group_owner"])
 def create_endpoint():
+    service_service = ServiceService()
     try:
         request_validator = RequestValidator(
             request_type="json",
@@ -44,6 +45,7 @@ def create_endpoint():
 
 @bp.route("/<uuid:service_id>", methods=["DELETE"])
 def delete_endpoint(service_id):
+    service_service = ServiceService()
     try:
         deleted_service_data = service_service.delete_one(service_id)
         return RESTfulResponse(deleted_service_data).to_serializable()
@@ -55,6 +57,7 @@ def delete_endpoint(service_id):
 
 @bp.route("/<uuid:service_id>", methods=["PUT"])
 def update_endpoint(service_id):
+    service_service = ServiceService()
     try:
         request_validator = RequestValidator(
             request_type="json",
@@ -86,7 +89,9 @@ def update_endpoint(service_id):
 
 
 @bp.route("/<uuid:service_id>", methods=["GET"])
+@verify_access_token(access_roles=["admin", "group_owner"])
 def get_one_endpoint(service_id):
+    service_service = ServiceService()
     try:
         service_data = service_service.get_one(service_id)
         return RESTfulResponse(service_data).to_serializable()
@@ -97,7 +102,9 @@ def get_one_endpoint(service_id):
 
 
 @bp.route("", methods=["GET"])
+@verify_access_token(access_roles=["admin", "group_owner"])
 def get_all_endpoint():
+    service_service = ServiceService()
     try:
         page = request.args.get("page", 1, type=int)
         per_page = request.args.get("per_page", 10, type=int)
