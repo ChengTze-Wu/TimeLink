@@ -30,6 +30,8 @@ class UserRepository:
                     error_datails.append(f"Email `{new_user.email}` already exists")
                 if "Key (username)" in str(e.orig):
                     error_datails.append(f"Username `{new_user.username}` already exists")
+                if "Key (line_user_id)" in str(e.orig):
+                    error_datails.append(f"Line user id `{new_user.line_user_id}` already exists")
                 raise Conflict(error_datails)
             raise e
 
