@@ -11,11 +11,17 @@ class UserService:
     def __init__(self):
         self.user_repository = UserRepository()
         self.jwt_service = JWTService()
+        self.jwt_payload = self.jwt_service.get_payload()
 
     def create_one(self, user_json_data: dict) -> dict:
-        role = user_json_data.get("role")
-        if role is not None and role.lower() not in [role.value for role in RoleName]:
-            raise BadRequest("role must be one of admin, group_owner, group_member")
+        create_role = user_json_data.get("role")
+        client_role = self.jwt_payload.get("role")
+
+        if client_role != RoleName.ADMIN.value and create_role == RoleName.ADMIN.value:
+            raise Forbidden("Only admin can select admin")
+
+        if create_role is not None and create_role.lower() not in [create_role.value for create_role in RoleName]:
+            raise BadRequest("Role must be one of admin, group_owner, group_member")
 
         new_user_data = {
             "email": user_json_data.get("email"),
@@ -25,14 +31,18 @@ class UserService:
             "line_user_id": user_json_data.get("line_user_id"),
             "phone": user_json_data.get("phone"),
             "is_active": user_json_data.get("is_active", True),
-            "is_deleted": user_json_data.get("is_deleted", False),
         }
-        return self.user_repository.insert_one(new_user_data, role.upper() if role is not None else None)
+        return self.user_repository.insert_one(new_user_data, create_role.upper() if create_role is not None else None)
 
     def update_one(self, user_id: str, user_json_data: dict) -> dict:
-        role = user_json_data.get("role")
-        if role is not None and role.lower() not in [role.value for role in RoleName]:
-            raise BadRequest("role must be one of admin, group_owner, group_member")
+        create_role = user_json_data.get("role")
+        client_role = self.jwt_payload.get("role")
+
+        if client_role != RoleName.ADMIN.value and create_role == RoleName.ADMIN.value:
+            raise Forbidden("Only admin can select admin")
+
+        if create_role is not None and create_role.lower() not in [create_role.value for create_role in RoleName]:
+            raise BadRequest("Role must be one of admin, group_owner, group_member")
         
         update_user_data = {
             "email": user_json_data.get("email"),
@@ -46,7 +56,7 @@ class UserService:
             "is_active": user_json_data.get("is_active"),
             "is_deleted": user_json_data.get("is_deleted"),
         }
-        return self.user_repository.update_one_by_id(user_id, update_user_data, role.upper() if role is not None else None)
+        return self.user_repository.update_one_by_id(user_id, update_user_data, create_role.upper() if create_role is not None else None)
 
     def delete_one(self, user_id: str) -> dict:
         return self.user_repository.logical_delete_one_by_id(user_id)
@@ -73,7 +83,6 @@ class UserService:
             total_items_count = self.user_repository.count_all_by_filter(query, status)
             return list_dict_users, total_items_count
         return list_dict_users
-
 
     def auth(self, credentialsObject) -> dict:
         try:
