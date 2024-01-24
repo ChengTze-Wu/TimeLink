@@ -45,7 +45,7 @@ class GroupService:
 
     def get_one(self, group_id: str=None, line_group_id: str=None) -> dict:
         if group_id:
-            return self.__retrieve_group(group_id)
+            return self.__retrieve_group_by_owner(group_id)
         
         if line_group_id:
             return self.group_repository.select_one_by_unique_filed(line_group_id=line_group_id)
@@ -61,7 +61,7 @@ class GroupService:
         with_total_items: bool = False,
     ) -> List[dict] | Tuple[List[dict], int]:
         role = self.payload.get("role")
-        owner_id = self.payload.get("sub") if role == "group_owner" else None
+        owner_id = self.payload.get("sub") if role != "admin" else None
         list_dict_groups = self.group_repository.select_all_by_filter(
             page, per_page, query, status, owner_id
         )
@@ -72,17 +72,17 @@ class GroupService:
         return list_dict_groups
 
     def update_one(self, group_id: str, group_json_data: dict) -> dict:
-        self.__retrieve_group(group_id)
+        self.__retrieve_group_by_owner(group_id)
         update_group_data = {
             "is_active": group_json_data.get("is_active"),
         }
         return self.group_repository.update_one_by_id(group_id, update_group_data)
 
     def delete_one(self, group_id: str) -> dict:
-        self.__retrieve_group(group_id)
+        self.__retrieve_group_by_owner(group_id)
         return self.group_repository.logical_delete_one_by_id(group_id)
     
-    def __retrieve_group(self, group_id: str):
+    def __retrieve_group_by_owner(self, group_id: str):
         role = self.payload.get("role")
         group_data = self.group_repository.select_one_by_unique_filed(group_id=group_id)
         if role != "admin" and self.payload.get("sub") != str( group_data.get("owner").get("id")):
