@@ -4,7 +4,6 @@ Date: 2023-12-28
 Contact: chengtzewu@gmail.com
 '''
 from functools import wraps, partial
-from flask import request
 from werkzeug.exceptions import Forbidden, InternalServerError, HTTPException
 from app.db.models import RoleName
 from app.services.token_service import JWTService
