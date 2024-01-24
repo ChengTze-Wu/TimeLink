@@ -56,7 +56,7 @@ def handle_409_error(e: HTTPException):
         }
     ), 409
 
-def handle_500_error(e: HTTPException):
+def handle_500_error(e: Exception):
     current_app.logger.error(e, exc_info=True)
     return jsonify(
         {
