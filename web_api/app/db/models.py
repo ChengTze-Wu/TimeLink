@@ -260,6 +260,7 @@ class User(BaseModel, CommonColumns):
             "password": self.password,
             "email": self.email,
             "role": self.role.name.value if self.role else None,
+            "is_active": self.is_active,
         }
 
 
