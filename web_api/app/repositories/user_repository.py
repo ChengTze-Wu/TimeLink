@@ -108,7 +108,7 @@ class UserRepository:
             user = session.query(User).filter(User.username == username).first()
             if user is None:
                 raise NotFound("User not found")
-            return user.to_dict()
+            return user.to_auth()
 
     def count_all_by_filter(
         self,
