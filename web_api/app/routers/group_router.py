@@ -35,6 +35,56 @@ def link_bot_endpoint():
         abort(500, e)
 
 
+@bp.route("/users", methods=["POST"])
+@verify_access_token(access_roles=["line_bot"])
+def link_user_endpoint():
+    try:
+        group_service = GroupService()
+        request_validator = RequestValidator(
+            request_type="json",
+            required_fields=["line_user_id", "line_group_id"],
+            field_types={
+                "line_user_id": str,
+                "line_group_id": str,
+            },
+        )
+        request_validator.check(request)
+        group_json_data = request.get_json()
+        created_group_data = group_service.link_user_to_group(group_json_data)
+        return RESTfulResponse(created_group_data).to_serializable(), 201
+    except HTTPException as e:
+        abort(e.code, e.description)
+    except RequestException as e:
+        abort(e.response.status_code, e.response.text)
+    except Exception as e:
+        abort(500, e)
+
+
+@bp.route("/users", methods=["DELETE"])
+@verify_access_token(access_roles=["line_bot"])
+def unlink_user_endpoint():
+    try:
+        group_service = GroupService()
+        request_validator = RequestValidator(
+            request_type="json",
+            required_fields=["line_user_id", "line_group_id"],
+            field_types={
+                "line_user_id": str,
+                "line_group_id": str,
+            },
+        )
+        request_validator.check(request)
+        group_json_data = request.get_json()
+        created_group_data = group_service.unlink_user_from_group(group_json_data)
+        return RESTfulResponse(created_group_data).to_serializable(), 201
+    except HTTPException as e:
+        abort(e.code, e.description)
+    except RequestException as e:
+        abort(e.response.status_code, e.response.text)
+    except Exception as e:
+        abort(500, e)
+
+
 @bp.route("", methods=["GET"])
 @verify_access_token(access_roles=["admin", "group_owner"])
 def get_all_endpoint():
@@ -116,4 +166,3 @@ def delete_endpoint(group_id):
         abort(e.code, e.description)
     except Exception as e:
         abort(500, e)
-

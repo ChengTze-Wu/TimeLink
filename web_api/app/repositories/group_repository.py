@@ -1,6 +1,6 @@
 from sqlalchemy import select, or_
 from app.db.connect import get_session
-from app.db.models import Group
+from app.db.models import Group, User
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.exceptions import NotFound, Conflict
 
@@ -121,3 +121,37 @@ class GroupRepository:
                 base_query
             )
             return [group.to_dict() for group in groups] if groups else []
+
+    def add_user_to_group_by_line_ids(self, line_group_id: str, line_user_id: str):
+        with get_session() as session:
+            group = session.query(Group).filter(Group.line_group_id == line_group_id, Group.is_deleted == False).first()
+            if group is None:
+                raise NotFound("Group not found with provided line_group_id")
+
+            user = session.query(User).filter(User.line_user_id == line_user_id, User.is_deleted == False).first()
+            if user is None:
+                raise NotFound("User not found with provided line_user_id")
+
+            if user in group.users:
+                raise Conflict("User already in group")
+
+            group.users.append(user)
+            session.commit()
+            return group.to_dict()
+
+    def remove_user_from_group_by_line_ids(self, line_group_id: str, line_user_id: str):
+        with get_session() as session:
+            group = session.query(Group).filter(Group.line_group_id == line_group_id, Group.is_deleted == False).first()
+            if group is None:
+                raise NotFound("Group not found with provided line_group_id")
+
+            user = session.query(User).filter(User.line_user_id == line_user_id, User.is_deleted == False).first()
+            if user is None:
+                raise NotFound("User not found with provided line_user_id")
+
+            if user not in group.users:
+                raise NotFound("User not in the specified group")
+
+            group.users.remove(user)
+            session.commit()
+            return group.to_dict()

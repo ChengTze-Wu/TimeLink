@@ -3,6 +3,7 @@ from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 from typing import List, Tuple
 from app.configs.config import CHANNEL_ACCESS_TOKEN
 from app.repositories.group_repository import GroupRepository
+from app.repositories.user_repository import UserRepository
 from app.services.token_service import JWTService
 
 
@@ -12,6 +13,7 @@ class GroupService:
     '''
     def __init__(self):
         self.group_repository = GroupRepository()
+        self.user_repository = UserRepository()
         self.payload = JWTService().get_payload()
 
     def __fetch_group_summary_from_lineapi(self, line_group_id: str) -> dict:
@@ -82,6 +84,16 @@ class GroupService:
         self.__retrieve_group_by_owner(group_id)
         return self.group_repository.logical_delete_one_by_id(group_id)
     
+    def link_user_to_group(self, group_json_data: dict) -> dict:
+        line_group_id = group_json_data.get("line_group_id")
+        line_user_id = group_json_data.get("line_user_id")
+        return self.group_repository.add_user_to_group_by_line_ids(line_group_id, line_user_id)
+    
+    def unlink_user_from_group(self, group_json_data: dict) -> dict:
+        line_group_id = group_json_data.get("line_group_id")
+        line_user_id = group_json_data.get("line_user_id")
+        return self.group_repository.remove_user_from_group_by_line_ids(line_group_id, line_user_id)
+  
     def __retrieve_group_by_owner(self, group_id: str):
         role = self.payload.get("role")
         group_data = self.group_repository.select_one_by_unique_filed(group_id=group_id)
