@@ -42,7 +42,7 @@ class UserRepository:
         try:
             error_datails = []
             with get_session() as session:
-                user = session.query(User).filter(User.id == user_id, User.is_delete == False).first()
+                user = session.query(User).filter(User.id == user_id, User.is_deleted == False).first()
                 if user is None:
                     raise NotFound("User not found")
                 
@@ -95,7 +95,7 @@ class UserRepository:
                 User.line_user_id == line_user_id,
                 User.email == email,
             )
-            user = session.query(User).filter(search_filter, User.is_delete == False).first()
+            user = session.query(User).filter(search_filter, User.is_deleted == False).first()
             if user is None:
                 raise NotFound("User not found")
             return user.to_dict()
@@ -105,7 +105,7 @@ class UserRepository:
         username: str
     ):
         with get_session() as session:
-            user = session.query(User).filter(User.username == username, User.is_delete == False).first()
+            user = session.query(User).filter(User.username == username, User.is_deleted == False).first()
             if user is None:
                 raise NotFound("User not found")
             return user.to_auth()

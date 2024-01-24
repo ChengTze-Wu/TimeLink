@@ -11,11 +11,11 @@ class UserService:
     def __init__(self):
         self.user_repository = UserRepository()
         self.jwt_service = JWTService()
-        self.jwt_payload = self.jwt_service.get_payload()
 
     def create_one(self, user_json_data: dict) -> dict:
+        jwt_payload = self.jwt_service.get_payload()
+        client_role = jwt_payload.get("role")
         create_role = user_json_data.get("role")
-        client_role = self.jwt_payload.get("role")
 
         if client_role != RoleName.ADMIN.value and create_role == RoleName.ADMIN.value:
             raise Forbidden("Only admin can select admin")
@@ -35,8 +35,9 @@ class UserService:
         return self.user_repository.insert_one(new_user_data, create_role.upper() if create_role is not None else None)
 
     def update_one(self, user_id: str, user_json_data: dict) -> dict:
+        jwt_payload = self.jwt_service.get_payload()
         create_role = user_json_data.get("role")
-        client_role = self.jwt_payload.get("role")
+        client_role = jwt_payload.get("role")
 
         if client_role != RoleName.ADMIN.value and create_role == RoleName.ADMIN.value:
             raise Forbidden("Only admin can select admin")
