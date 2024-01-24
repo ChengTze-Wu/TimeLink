@@ -4,7 +4,7 @@ Date: 2023-12-28
 Contact: chengtzewu@gmail.com
 '''
 from functools import wraps, partial
-from werkzeug.exceptions import Forbidden, InternalServerError, HTTPException
+from werkzeug.exceptions import Forbidden, InternalServerError, HTTPException, BadRequest
 from app.db.models import RoleName
 from app.services.token_service import JWTService
 
@@ -40,6 +40,9 @@ def verify_access_token(func=None, *, access_roles: list=None, check_owner=False
     def decorated_function(*args, **kwargs):
         try:
             payload = JWTService().get_payload()
+
+            if not payload:
+                raise BadRequest("Missing access token")
 
             payload_role = payload.get("role")
 

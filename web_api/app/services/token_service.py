@@ -38,7 +38,7 @@ class JWTService:
         '''
         jwt_token_with_bearer = request.headers.get('Authorization')
         if not jwt_token_with_bearer:
-            raise Unauthorized("JWT is required")
+            return {}
 
         jwt_token = re.sub(r'^Bearer ', '', jwt_token_with_bearer)
         payload = self.decode(jwt_token)
