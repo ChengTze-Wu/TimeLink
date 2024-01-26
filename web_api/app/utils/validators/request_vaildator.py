@@ -78,3 +78,7 @@ class RequestValidator:
 
         if len(self.__error_datails) > 0:
             raise BadRequest(self.__error_datails)
+        
+    def process(self, request: Request) -> dict:
+        self.check(request)
+        return request.get_json() if request.is_json else request.form.to_dict()
