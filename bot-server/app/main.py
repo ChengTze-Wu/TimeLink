@@ -21,8 +21,11 @@ from linebot.v3.webhooks import (
     MessageEvent,
     JoinEvent,
     MemberJoinedEvent,
+    MemberLeftEvent,
     PostbackEvent,
-    TextMessageContent
+    TextMessageContent,
+    Event,
+    GroupSource,
 )
 from http import HTTPStatus
 from .lib.webhook import AsyncWebhookHandler
@@ -73,40 +76,16 @@ async def handle_callback(request: Request):
 @async_handler.add(FollowEvent)
 async def handle_member_follow(event: FollowEvent):
     try:
-        reply_message = ViewMessage.WELCOME_BACK
         line_user_id: str = event.source.user_id
 
         user_resp = await fetch.get(f'/api/users/{line_user_id}')
+
+        reply_message = ViewMessage.WELCOME_BACK
 
         if user_resp.status_code == HTTPStatus.NOT_FOUND:
             reply_message = ViewMessage.WELCOME_NEW_USER
 
         if user_resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-            return
-
-        await line_bot_api.reply_message(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=reply_message)]
-            )
-        )
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@async_handler.add(JoinEvent)
-async def handle_bot_join(event: JoinEvent):
-    try:
-        reply_message = ViewMessage.BOT_JOIN_SUCCESS
-        line_group_id = event.source.group_id
-
-        group_resp = await fetch.get(f'/api/groups/{line_group_id}')
-
-        if group_resp.status_code == HTTPStatus.NOT_FOUND:
-            reply_message = ViewMessage.GROUP_NOT_LINKED.substitute(line_group_id=line_group_id)
-
-        if group_resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
             return
 
         await line_bot_api.reply_message(
@@ -127,7 +106,7 @@ async def handle_member_join(event: MemberJoinedEvent):
         line_user_id = event.joined.members[0].user_id
         line_group_id = event.source.group_id
 
-        resp = await fetch.post('/api/users/groups', {
+        resp = await fetch.post('/api/groups/users', {
             'line_user_id': line_user_id,
             'line_group_id': line_group_id
         })
@@ -143,15 +122,49 @@ async def handle_member_join(event: MemberJoinedEvent):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@async_handler.add(MemberLeftEvent)
+async def handle_member_left(event: MemberLeftEvent):
+    try:
+        line_user_id = event.left.members[0].user_id
+        line_group_id = event.source.group_id
+
+        resp = await fetch.delete('/api/groups/users', {
+            'line_user_id': line_user_id,
+            'line_group_id': line_group_id
+        })
+
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@async_handler.add(JoinEvent)
+async def handle_bot_join(event: JoinEvent):
+    try:
+        if not await __check_group_linked(event):
+            return
+
+        reply_message = ViewMessage.BOT_JOIN_SUCCESS
+        
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=reply_message)]
+            )
+        )
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @async_handler.add(MessageEvent, message=TextMessageContent)
 async def handle_message(event: MessageEvent):
     try:
+        if not await __check_group_linked(event):
+            return
+
         command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
-
-        line_group_id = event.source.group_id
-
-        print(line_group_id)
 
         if reply_message:
             await line_bot_api.reply_message(
@@ -168,6 +181,9 @@ async def handle_message(event: MessageEvent):
 @async_handler.add(PostbackEvent)
 async def handle_postback(event: PostbackEvent):
     try:
+        if not await __check_group_linked(event):
+            return
+
         command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
         
@@ -181,3 +197,29 @@ async def handle_postback(event: PostbackEvent):
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+async def __check_group_linked(event: Event):
+    '''Check if the group is linked to the TimeLink System.
+    If not, notify the message to line.
+    '''
+    if not isinstance(event.source, GroupSource):
+        return True
+
+    line_group_id = event.source.group_id
+    group_api_response = await fetch.get(f'/api/groups/{line_group_id}')
+
+    if group_api_response.status_code == HTTPStatus.OK:
+        return True
+
+    if group_api_response.status_code == HTTPStatus.NOT_FOUND:
+        unbound_group_message = ViewMessage.GROUP_NOT_LINKED.substitute(line_group_id=line_group_id)
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=unbound_group_message)]
+            )
+        )
+        return False
+
+    return False
