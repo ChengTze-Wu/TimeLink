@@ -234,7 +234,7 @@ class User(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "groups": [group.to_self_dict() for group in self.groups],
-            "appointments": [appointment.to_dict() for appointment in self.appointments if not appointment.is_deleted],
+            "appointments": [appointment.to_self_dict() for appointment in self.appointments if not appointment.is_deleted],
         }
     
     def to_self_dict(self):
@@ -287,7 +287,20 @@ class Appointment(BaseModel, CommonColumns):
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "service": self.service.to_self_dict(),
+            "service": self.service.to_self_dict() if self.service else None,
+        }
+    
+    def to_self_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "service_id": self.service_id,
+            "reserved_at": self.reserved_at,
+            "notes": self.notes,
+            "is_active": self.is_active,
+            "is_deleted": self.is_deleted,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }
     
 
