@@ -55,11 +55,12 @@ class GroupRepository:
             session.refresh(group)
             return group.to_dict()
   
-    def select_one_by_unique_filed(self, group_id: str = None, line_group_id: str = None):
+    def select_one_by_unique_filed(self, group_id: str = None, line_group_id: str = None, owner_id: str = None):
         with get_session() as session:
             search_filter = or_(
                 Group.id == group_id,
-                Group.line_group_id == line_group_id
+                Group.line_group_id == line_group_id,
+                Group.owner_id == owner_id,
             )
             group = session.query(Group).filter(search_filter, Group.is_deleted == False).first()
             if group is None:
