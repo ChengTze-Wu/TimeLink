@@ -1,10 +1,10 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import NotFound, Forbidden, Unauthorized
-from app.repositories.user_repository import UserRepository
+from app.repositories import UserRepository
 from typing import List, Tuple
 from app.db.models import RoleName
 from werkzeug.exceptions import BadRequest
-from app.services.token_service import JWTService
+from .token_service import JWTService
 
 
 class UserService:

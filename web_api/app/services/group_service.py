@@ -2,9 +2,11 @@ import requests
 from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 from typing import List, Tuple
 from app.configs.config import CHANNEL_ACCESS_TOKEN
-from app.repositories.group_repository import GroupRepository
-from app.repositories.user_repository import UserRepository
-from app.services.token_service import JWTService
+from app.repositories import (
+    GroupRepository, 
+    UserRepository,
+)
+from .token_service import JWTService
 
 
 class GroupService:

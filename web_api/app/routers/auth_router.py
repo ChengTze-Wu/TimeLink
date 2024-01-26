@@ -1,5 +1,5 @@
 from flask import Blueprint, request, abort
-from app.services.user_service import UserService
+from app.services import UserService
 from app.utils.validators.request_vaildator import RequestValidator
 from app.utils.validators.field_validators import PasswordValidator
 from app.views.response_view import RESTfulResponse

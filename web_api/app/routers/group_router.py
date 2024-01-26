@@ -1,7 +1,7 @@
 from flask import Blueprint, request, abort
 from app.utils.validators.request_vaildator import RequestValidator
 from app.views.response_view import RESTfulResponse
-from app.services.group_service import GroupService
+from app.services import GroupService
 from werkzeug.exceptions import HTTPException
 from requests.exceptions import RequestException
 from app.utils.validators.token_validator import verify_access_token

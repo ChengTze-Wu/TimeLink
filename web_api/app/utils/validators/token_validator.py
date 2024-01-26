@@ -6,7 +6,7 @@ Contact: chengtzewu@gmail.com
 from functools import wraps, partial
 from werkzeug.exceptions import Forbidden, InternalServerError, HTTPException, BadRequest
 from app.db.models import RoleName
-from app.services.token_service import JWTService
+from app.services import JWTService
 
 def verify_access_token(func=None, *, access_roles: list=None, check_owner=False):
     '''

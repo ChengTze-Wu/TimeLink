@@ -1,9 +1,11 @@
 from typing import List, Tuple
-from app.repositories.service_repository import ServiceRepository
-from app.repositories.working_hour_repository import WorkingHourRepository
-from app.repositories.unavailable_period_repository import UnavailablePeriodRepository
-from app.repositories.group_repository import GroupRepository
-from app.services.token_service import JWTService
+from app.repositories import (
+    ServiceRepository,
+    WorkingHourRepository,
+    UnavailablePeriodRepository,
+    GroupRepository,
+)
+from .token_service import JWTService
 from app.db.models import DayOfWeek
 from werkzeug.exceptions import BadRequest
 from datetime import datetime

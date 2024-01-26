@@ -3,7 +3,7 @@ from app.utils.validators.request_vaildator import RequestValidator
 from app.utils.validators.field_validators import EmailValidator, PasswordValidator
 from app.utils.validators.token_validator import verify_access_token
 from app.views.response_view import RESTfulResponse
-from app.services.user_service import UserService
+from app.services import UserService
 from werkzeug.exceptions import HTTPException
 
 
