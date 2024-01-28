@@ -3,8 +3,8 @@ from linebot.v3.messaging import (
     TextMessage,
 )
 from .command import Command
-from ..utils.fetch import APIServerFetchClient
-from ..messages import ViewMessage
+from app.messages import ViewMessage
+from app.utils.fetch import APIServerFetchClient
 
 
 class RecordCommand(Command):
@@ -14,10 +14,10 @@ class RecordCommand(Command):
     '''
     def __init__(self, event):
         super().__init__(event)
-        self.fetch = APIServerFetchClient()
+        self.fetch_client = APIServerFetchClient()
 
     async def async_execute(self) -> TextMessage | None:
-        user_response = await self.get_user()
+        user_response = await self.__get_user()
         handled_response = await self.__handle_response(user_response)
 
         if not handled_response:
@@ -31,9 +31,9 @@ class RecordCommand(Command):
 
         return TextMessage(text=appointment_message)
     
-    async def get_user(self):
+    async def __get_user(self):
         line_user_id: str = self.event.source.user_id
-        return await self.fetch.get(f'/api/users/{line_user_id}')
+        return await self.fetch_client.get(f'/api/users/{line_user_id}')
     
     async def __format_appointments(self, user_json: dict):
         appointments = user_json.get("appointments")
@@ -49,16 +49,10 @@ class RecordCommand(Command):
                                              appointments=formatted_appointments)
     
     async def __handle_response(self, response) -> ViewMessage | None:
-        if not response:
-            return None
-
         if response.status_code == HTTPStatus.NOT_FOUND:
             return ViewMessage.USER_NOT_LINKED
         
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            return None
+        if response.status_code == HTTPStatus.OK:
+            return response
 
-        if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-            return None
-        
-        return response
+        return None
