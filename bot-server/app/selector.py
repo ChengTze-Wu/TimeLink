@@ -11,15 +11,17 @@ from .commands import (
     Command,
 )
 
+
 class CommandSelector:
     '''CommandSelector is a class that selects the appropriate command object
     to execute based on the MessageEvent or PostbackEvent type.
-
-    Attributes:
-        COMMAND_CALL_KEYWORD (str): The keyword that triggers the command.
-        COMMAND_MAPPING (dict): A mapping of keywords to command classes.
     '''
+
+    # Configuration:
+    # COMMAND_CALL_KEYWORD (str): The keyword that triggers the command.
     COMMAND_CALL_KEYWORD = "/"
+
+    # COMMAND_MAPPING (dict): A mapping of keywords to command classes.
     COMMAND_MAPPING = {
         "服務": ServiceCommand,
         "記錄": RecordCommand,
@@ -32,16 +34,16 @@ class CommandSelector:
             raise TypeError("event must be MessageEvent or PostbackEvent")
 
         if isinstance(event, MessageEvent):
-            event_keyword = event.message.text.lower()
+            client_command_keyword = event.message.text.lower()
 
-            if CommandSelector.COMMAND_CALL_KEYWORD != event_keyword:
+            if client_command_keyword != CommandSelector.COMMAND_CALL_KEYWORD:
                 return DefaultCommand(event)
 
         if isinstance(event, PostbackEvent):
-            event_keyword = event.postback.data.lower()
+            client_command_keyword = event.postback.data.lower()
         
         for key, command in CommandSelector.COMMAND_MAPPING.items():
-            if key in event_keyword:
+            if key in client_command_keyword:
                 return command(event)
             
         return MenuCommand(event)
