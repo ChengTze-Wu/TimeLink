@@ -1,7 +1,27 @@
 import os
 import httpx
+from abc import ABC, abstractmethod
 
-class APIServerFetchClient:
+
+class FetchClient(ABC):
+    @abstractmethod
+    async def get(self, endpoint, **kwargs):
+        pass
+
+    @abstractmethod
+    async def post(self, endpoint, data, **kwargs):
+        pass
+
+    @abstractmethod
+    async def put(self, endpoint, data, **kwargs):
+        pass
+
+    @abstractmethod
+    async def delete(self, endpoint, **kwargs):
+        pass
+
+
+class APIServerFetchClient(FetchClient):
     BOT_VERSION = f"/{os.getenv("BOT_VERSION", "0.0.1")}"
 
     def __init__(self, base_url: str | None = None):
