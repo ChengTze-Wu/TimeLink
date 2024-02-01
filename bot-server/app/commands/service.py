@@ -29,7 +29,7 @@ class ServiceCommand(Command):
             raise ValueError("ServiceCommand needs a GroupSource event.")
 
         line_group_id: str = self.event.source.group_id
-        group_resp = await self.fetch_client.get(f'/api/groups/{line_group_id}')
+        group_resp = await self.fetch_client.get(f'/api/groups/{line_group_id}/services')
 
         group_resp.raise_for_status()
 
@@ -37,9 +37,19 @@ class ServiceCommand(Command):
 
         if not services:
             return TextMessage(text=ViewMessage.NO_SERVICE)
-        
-        template_message = await self.__template_message(services)
+
+        top5_services = await self.__top_by_appointment(services, top=5)
+
+        template_message = await self.__template_message(top5_services)
         return template_message
+    
+    async def __top_by_appointment(self, services, top: int = 5):
+        rank_services = {}
+        for service in services:
+            rank_services.update({
+                len(service.get("appointments")): service
+            })
+        return [rank_services.get(key) for key in sorted(rank_services.keys(), reverse=True)][:top]
 
     async def __template_message(self, services: list[dict]) -> TemplateMessage:
         columns = [
