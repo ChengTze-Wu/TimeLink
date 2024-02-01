@@ -22,12 +22,10 @@ export default function LiffProvider({
   const [liffError, setLiffError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("start liff.init()...");
     const liffId = process.env.LIFF_ID || "";
     liff
       .init({ liffId: liffId })
       .then(() => {
-        console.log("liff.init() done");
         setLiffObject(liff);
       })
       .catch((error) => {

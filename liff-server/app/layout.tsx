@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import LiffProvider from "./liff-provider";
-
-const inter = Inter({ subsets: ["latin"] });
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import LiffProvider from "@/app/liff-provider";
 
 export const metadata: Metadata = {
-  title: "LIFF App Starter",
-  description: "A starter template for LIFF apps.",
+  title: "TimeLink 預約系統",
 };
 
 export default function RootLayout({
@@ -17,9 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <LiffProvider>{children}</LiffProvider>
-      </body>
+      <AntdRegistry>
+        <body className="px-5">
+          <LiffProvider>{children}</LiffProvider>
+        </body>
+      </AntdRegistry>
     </html>
   );
 }
