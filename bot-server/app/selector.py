@@ -3,8 +3,8 @@ from linebot.v3.webhooks import (
     PostbackEvent,
 )
 from .commands import (
-    RecordCommand,
-    AppointmentCommand,
+    ComingRecordCommand,
+    AllRecordCommand,
     ServiceCommand,
     DefaultCommand,
     MenuCommand,
@@ -23,9 +23,9 @@ class CommandSelector:
 
     # COMMAND_MAPPING (dict): A mapping of keywords to command classes.
     COMMAND_MAPPING = {
-        "服務": ServiceCommand,
-        "記錄": RecordCommand,
-        "預約": AppointmentCommand
+        "熱門服務": ServiceCommand,
+        "即將到來預約": ComingRecordCommand,
+        "所有記錄": AllRecordCommand,
     }
 
     @staticmethod
@@ -34,9 +34,9 @@ class CommandSelector:
             raise TypeError("event must be MessageEvent or PostbackEvent")
 
         if isinstance(event, MessageEvent):
-            client_command_keyword = event.message.text.lower()
+            client_command_keyword: str = event.message.text.lower()
 
-            if client_command_keyword != CommandSelector.COMMAND_CALL_KEYWORD:
+            if client_command_keyword.strip() != CommandSelector.COMMAND_CALL_KEYWORD:
                 return DefaultCommand(event)
 
         if isinstance(event, PostbackEvent):

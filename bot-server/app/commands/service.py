@@ -47,7 +47,7 @@ class ServiceCommand(Command):
                 image_url=service.get("image") or "https://via.placeholder.com/1024x1024.png?text=No+Image",
                 action=URIAction(
                     label=service.get("name"),
-                    uri=LIFF_URL,
+                    uri=f"{LIFF_URL}/services/{service.get('id')}",
                 )
             ) for service in services
         ]
