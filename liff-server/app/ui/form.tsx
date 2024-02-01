@@ -13,7 +13,7 @@ export default function ReserveForm({ service }: { service: Service }) {
   const initialState = { message: "", errors: {} };
   const [state, dispatch] = useFormState(createReserve, initialState);
 
-  // if (!liff?.isInClient()) return <ContextAlert />;
+  if (!liff?.isInClient()) return <ContextAlert />;
 
   const context = liff?.getContext();
   const lineUserId = context?.userId;
