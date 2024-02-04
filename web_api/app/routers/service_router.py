@@ -89,7 +89,7 @@ def update_endpoint(service_id):
 
 
 @bp.route("/<uuid:service_id>", methods=["GET"])
-@verify_access_token(access_roles=["admin", "group_owner"])
+@verify_access_token(access_roles=["admin", "group_owner", "liff", "line_bot"])
 def get_one_endpoint(service_id):
     service_service = ServiceService()
     try:

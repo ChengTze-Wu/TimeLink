@@ -80,7 +80,12 @@ class ServiceService:
         return services
 
     def get_one(self, service_id: str) -> dict:
-        return self.__retrieve_service_by_owner(service_id)
+        role = self.payload.get("role")
+
+        if role == "liff" or role == "line_bot":
+            return self.service_repository.select_one_by_unique_filed(service_id=service_id)
+
+        return self.__retrieve_service_by_owner(service_id, role)
 
     def delete_one(self, service_id: str) -> dict:
         self.__retrieve_service_by_owner(service_id)
@@ -108,8 +113,7 @@ class ServiceService:
             input_working_hours,
         )
 
-    def __retrieve_service_by_owner(self, service_id: str):
-        role = self.payload.get("role")
+    def __retrieve_service_by_owner(self, service_id: str, role: str | None = None):
         service_data = self.service_repository.select_one_by_unique_filed(service_id=service_id)
         if role != "admin" and self.payload.get("sub") != str( service_data.get("owner").get("id")):
             raise BadRequest("You are not the owner of this service")
