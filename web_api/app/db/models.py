@@ -130,6 +130,7 @@ class Service(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "groups" : [group.to_self_dict() for group in self.groups],
+            "appointments": [appointment.to_self_dict() for appointment in self.appointments if not appointment.is_deleted],
         }
     
     def to_self_dict(self):
