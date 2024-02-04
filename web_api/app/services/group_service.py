@@ -5,6 +5,7 @@ from app.configs.config import CHANNEL_ACCESS_TOKEN
 from app.repositories import (
     GroupRepository, 
     UserRepository,
+    ServiceRepository,
 )
 from .token_service import JWTService
 
@@ -16,6 +17,7 @@ class GroupService:
     def __init__(self):
         self.group_repository = GroupRepository()
         self.user_repository = UserRepository()
+        self.service_repository = ServiceRepository()
         self.payload = JWTService().get_payload()
 
     def __fetch_group_summary_from_lineapi(self, line_group_id: str) -> dict:
@@ -55,6 +57,21 @@ class GroupService:
             return self.group_repository.select_one_by_unique_filed(line_group_id=line_group_id)
         
         raise BadRequest("group_id or line_group_id must be provided")
+
+    def get_one_with_appointments(self, line_group_id: str) -> dict:
+        group_data = self.group_repository.select_one_by_unique_filed(line_group_id=line_group_id)
+        if group_data is None:
+            raise NotFound("Group not found")
+        
+        services = group_data.get("services")
+
+        group_data["services"] = []
+
+        for service in services:
+            service = self.service_repository.select_one_by_unique_filed(service.get("id"))
+            group_data["services"].append(service)
+            
+        return group_data
 
     def get_all(
         self,
