@@ -108,6 +108,7 @@ class UserService:
         }
         
         return {
+            "id": user_data.get("id"),
             "name": user_data.get("name"),
             "username": user_data.get("username"),
             "email": user_data.get("email"),

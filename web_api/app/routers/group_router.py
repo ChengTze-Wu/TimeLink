@@ -121,8 +121,21 @@ def get_one_endpoint(group_id):
         abort(500, e)
 
 
+@bp.route("/<line_group_id>/services", methods=["GET"])
+@verify_access_token(access_roles=["line_bot", "liff"])
+def get_line_group_services_endpoint(line_group_id):
+    try:
+        group_service = GroupService()
+        group_data = group_service.get_one_with_appointments(line_group_id=line_group_id)
+        return RESTfulResponse(group_data).to_serializable()
+    except HTTPException as e:
+        abort(e.code, e.description)
+    except Exception as e:
+        abort(500, e)
+
+
 @bp.route("/<line_group_id>", methods=["GET"])
-@verify_access_token(access_roles=["line_bot"])
+@verify_access_token(access_roles=["line_bot", "liff"])
 def get_line_group_endpoint(line_group_id):
     try:
         group_service = GroupService()
