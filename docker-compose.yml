@@ -4,12 +4,18 @@ services:
   web_api:
     build:
       context: ./web_api
-      dockerfile: Dockerfile
-    image: changtze/web_api:0.0.1-alpha
+      dockerfile: Dockerfile.local-dev
+    image: chengtze/web_api:0.0.1-local-dev
     container_name: web_api
     ports:
       - "8000:8000"
     volumes:
-      - ./web_api/app/configs/config.py:/usr/src/app/configs/config.py
       - ./logs/web_api:/usr/src/app/logs
+    env_file:
+      - ./web_api/.env
     restart: unless-stopped
+
+networks:
+  default:
+    name: timelink_net
+    external: true
