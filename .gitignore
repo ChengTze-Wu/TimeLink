@@ -1,10 +1,7 @@
 .env
 *.log
-/logs
 .venv/
-timelink.cc/
-instance/
-configs
+config.py
 
 *.sh
 
