@@ -1,10 +1,14 @@
+import os
 import jwt
 import re
 from datetime import datetime, timedelta
 from werkzeug.exceptions import Unauthorized
 from flask import request
-from app.configs.config import JWT_SECRET_KEY, JWT_ACCESS_TOKEN_EXPIRE_HOURS
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_HOURS", 24))
+if JWT_SECRET_KEY is None:
+        raise ValueError("JWT_SECRET_KEY Environment Variable is not set")
 
 class JWTService:
     def __init__(self, algorithm='HS256'):

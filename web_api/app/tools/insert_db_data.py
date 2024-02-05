@@ -1,9 +1,12 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy import text
 from faker import Faker
 from werkzeug.security import generate_password_hash
-from app.configs.config import DATABASE
 
+DATABASE = os.getenv('DATABASE')
+if DATABASE is None:
+    raise ValueError('DATABASE Environment Variable is not set')
 
 fake = Faker(locale='zh_TW')
 engine = create_engine(DATABASE, echo=False)

@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 import os
 from flask import Flask
 
@@ -7,28 +9,13 @@ def create_app(test_config=None):
 
     app = Flask(
         __name__,
-        root_path=ROOT_PATH,
-        instance_relative_config=True,
-        instance_path=os.path.join(
-            ROOT_PATH, "configs"
-        ),
-    )
-
-    app.config.from_mapping(
-        SECRET_KEY='test',
+        root_path=ROOT_PATH
     )
 
     app.json.sort_keys = False  # [2023-11-06 Tze] To make the JSON response ordered
 
-    if test_config is None:
-        app.config.from_pyfile("config.py", silent=True)
-    else:
+    if test_config is not None:
         app.config.from_mapping(test_config)
-
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
 
     with app.app_context():
         from .routers import user_router, auth_router, service_router, group_router, appointment_router

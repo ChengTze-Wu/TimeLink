@@ -1,13 +1,17 @@
+import os
 import requests
 from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 from typing import List, Tuple
-from app.configs.config import CHANNEL_ACCESS_TOKEN
 from app.repositories import (
     GroupRepository, 
     UserRepository,
     ServiceRepository,
 )
 from .token_service import JWTService
+
+CHANNEL_ACCESS_TOKEN = os.getenv("CHANNEL_ACCESS_TOKEN")
+if CHANNEL_ACCESS_TOKEN is None:
+        raise ValueError("CHANNEL_ACCESS_TOKEN Environment Variable is not set")
 
 
 class GroupService:
