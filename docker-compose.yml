@@ -1,22 +1,15 @@
 version: "3"
 
 services:
-    web:
-        image: chengtze/timelink_web
-        volumes:
-            - ./instance:/usr/src/instance
-            - ./logs:/usr/src/logs
-        environment:
-            - TZ="Asia/Taipei"
-        working_dir: /usr/src
-        command: gunicorn -c ./timelink/gunicorn.conf.py 'timelink:create_app()'
-
-    # socket-server:
-
-    linebot:
-        image: chengtze/timelink_bot
-        env_file:
-            - ./.env
-        environment:
-            - TZ="Asia/Taipei"
-        command: gunicorn -w 2 -b :5000 app:timelink_bot
+  web_api:
+    build:
+      context: ./web_api
+      dockerfile: Dockerfile
+    image: changtze/web_api:0.0.1-alpha
+    container_name: web_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./web_api/app/configs/config.py:/usr/src/app/configs/config.py
+      - ./logs/web_api:/usr/src/app/logs
+    restart: unless-stopped
