@@ -1,7 +1,16 @@
-FROM python:3.7-slim
+FROM python:3.12-slim
 
-WORKDIR /usr/src/timelink
+WORKDIR /usr/src
 COPY requirements.txt .
-RUN pip install -r requirements.txt 
+RUN apt-get update && \
+    apt-get install -y libpq-dev gcc && \
+    apt-get clean && \
+    pip install --no-cache-dir -r requirements.txt && \
+    rm -rf requirements.txt && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY . .
+COPY gunicorn.conf.py .
+COPY app app
+
+EXPOSE 8000
+ENTRYPOINT ["gunicorn"]
