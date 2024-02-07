@@ -8,10 +8,11 @@ from flask import request
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_HOURS", 24))
 if JWT_SECRET_KEY is None:
-        raise ValueError("JWT_SECRET_KEY Environment Variable is not set")
+    raise ValueError("JWT_SECRET_KEY Environment Variable is not set")
+
 
 class JWTService:
-    def __init__(self, algorithm='HS256'):
+    def __init__(self, algorithm="HS256"):
         self.secret = JWT_SECRET_KEY
         self.algorithm = algorithm
         self.exp_time = JWT_ACCESS_TOKEN_EXPIRE_HOURS * 60
@@ -28,7 +29,7 @@ class JWTService:
 
         token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
         return token
-    
+
     def decode(self, token):
         try:
             return jwt.decode(token, self.secret, algorithms=[self.algorithm])
@@ -36,14 +37,13 @@ class JWTService:
             raise Unauthorized("Token is expired")
         except jwt.InvalidTokenError:
             raise Unauthorized("Token is invalid")
-        
+
     def get_payload(self) -> dict:
-        '''Get payload from JWT token in request header
-        '''
-        jwt_token_with_bearer = request.headers.get('Authorization')
+        """Get payload from JWT token in request header"""
+        jwt_token_with_bearer = request.headers.get("Authorization")
         if not jwt_token_with_bearer:
             return {}
 
-        jwt_token = re.sub(r'^Bearer ', '', jwt_token_with_bearer)
+        jwt_token = re.sub(r"^Bearer ", "", jwt_token_with_bearer)
         payload = self.decode(jwt_token)
         return payload

@@ -6,11 +6,7 @@ from app.db.models import User, Role
 
 
 class UserRepository:
-    def insert_one(
-        self,
-        new_user_data: dict,
-        role: str=None
-    ):
+    def insert_one(self, new_user_data: dict, role: str = None):
         try:
             error_datails = []
             with get_session() as session:
@@ -29,25 +25,28 @@ class UserRepository:
                 if "Key (email)" in str(e.orig):
                     error_datails.append(f"Email `{new_user.email}` already exists")
                 if "Key (username)" in str(e.orig):
-                    error_datails.append(f"Username `{new_user.username}` already exists")
+                    error_datails.append(
+                        f"Username `{new_user.username}` already exists"
+                    )
                 if "Key (line_user_id)" in str(e.orig):
-                    error_datails.append(f"Line user id `{new_user.line_user_id}` already exists")
+                    error_datails.append(
+                        f"Line user id `{new_user.line_user_id}` already exists"
+                    )
                 raise Conflict(error_datails)
             raise e
 
-    def update_one_by_id(
-        self,
-        user_id: str,
-        user_data: dict,
-        role: str=None
-    ):
+    def update_one_by_id(self, user_id: str, user_data: dict, role: str = None):
         try:
             error_datails = []
             with get_session() as session:
-                user = session.query(User).filter(User.id == user_id, User.is_deleted == False).first()
+                user = (
+                    session.query(User)
+                    .filter(User.id == user_id, User.is_deleted == False)
+                    .first()
+                )
                 if user is None:
                     raise NotFound("User not found")
-                
+
                 if role is not None:
                     role_entity = session.query(Role).filter(Role.name == role).first()
                     if role_entity is None:
@@ -66,14 +65,13 @@ class UserRepository:
                 if "Key (email)" in str(e.orig):
                     error_datails.append(f"Email `{user_data['email']}` already exists")
                 if "Key (username)" in str(e.orig):
-                    error_datails.append(f"Username `{user_data['username']}` already exists")
+                    error_datails.append(
+                        f"Username `{user_data['username']}` already exists"
+                    )
                 raise Conflict(error_datails)
             raise e
 
-    def logical_delete_one_by_id(
-        self,
-        user_id: str
-    ):
+    def logical_delete_one_by_id(self, user_id: str):
         with get_session() as session:
             user = session.query(User).filter(User.id == user_id).first()
             if user is None:
@@ -84,7 +82,7 @@ class UserRepository:
             session.commit()
             session.refresh(user)
             return user.to_dict()
-        
+
     def select_one_by_unique_filed(
         self,
         user_id: str = None,
@@ -97,28 +95,33 @@ class UserRepository:
                 User.line_user_id == line_user_id,
                 User.email == email,
             )
-            user = session.query(User).filter(search_filter, User.is_deleted == False).first()
+            user = (
+                session.query(User)
+                .filter(search_filter, User.is_deleted == False)
+                .first()
+            )
             if user is None:
                 raise NotFound("User not found")
             return user.to_dict()
-        
-    def select_one_by_username(
-        self,
-        username: str
-    ):
+
+    def select_one_by_username(self, username: str):
         with get_session() as session:
-            user = session.query(User).filter(User.username == username, User.is_deleted == False).first()
+            user = (
+                session.query(User)
+                .filter(User.username == username, User.is_deleted == False)
+                .first()
+            )
             if user is None:
                 raise NotFound("User not found")
             return user.to_auth()
 
-    def count_all_by_filter(
-        self,
-        query: str = None,
-        status: int = None
-    ):
+    def count_all_by_filter(self, query: str = None, status: int = None):
         with get_session() as session:
-            base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())
+            base_query = (
+                select(User)
+                .filter(User.is_deleted == False)
+                .order_by(User.created_at.desc())
+            )
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)
 
@@ -127,10 +130,10 @@ class UserRepository:
 
             if query is not None:
                 search_filter = or_(
-                    User.email.ilike(f'%{query}%'),
-                    User.username.ilike(f'%{query}%'),
-                    User.name.ilike(f'%{query}%'),
-                    User.phone.ilike(f'%{query}%')
+                    User.email.ilike(f"%{query}%"),
+                    User.username.ilike(f"%{query}%"),
+                    User.name.ilike(f"%{query}%"),
+                    User.phone.ilike(f"%{query}%"),
                 )
                 base_query = base_query.filter(search_filter)
 
@@ -144,7 +147,11 @@ class UserRepository:
         status: int,
     ):
         with get_session() as session:
-            base_query = select(User).filter(User.is_deleted == False).order_by(User.created_at.desc())
+            base_query = (
+                select(User)
+                .filter(User.is_deleted == False)
+                .order_by(User.created_at.desc())
+            )
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)
 
@@ -153,14 +160,12 @@ class UserRepository:
 
             if query is not None:
                 search_filter = or_(
-                    User.email.ilike(f'%{query}%'),
-                    User.username.ilike(f'%{query}%'),
-                    User.name.ilike(f'%{query}%'),
-                    User.phone.ilike(f'%{query}%')
+                    User.email.ilike(f"%{query}%"),
+                    User.username.ilike(f"%{query}%"),
+                    User.name.ilike(f"%{query}%"),
+                    User.phone.ilike(f"%{query}%"),
                 )
                 base_query = base_query.filter(search_filter)
             base_query = base_query.offset((page - 1) * per_page).limit(per_page)
-            users = session.scalars(
-                base_query
-            )
+            users = session.scalars(base_query)
             return [user.to_dict() for user in users] if users else []

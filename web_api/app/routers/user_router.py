@@ -37,13 +37,18 @@ def register_endpoint():
             field_validators={
                 "email": EmailValidator,
                 "password": PasswordValidator,
-            }
+            },
         )
         request_validator.check(request)
 
         user_json_data = request.get_json()
         created_user_data = user_service.create_one(user_json_data)
-        return RESTfulResponse(created_user_data, hide_fields=["password"]).to_serializable(), 201
+        return (
+            RESTfulResponse(
+                created_user_data, hide_fields=["password"]
+            ).to_serializable(),
+            201,
+        )
     except HTTPException as e:
         abort(e.code, e.description)
     except Exception as e:
@@ -64,7 +69,7 @@ def get_one_endpoint(user_id):
 
 
 @bp.route("/<line_user_id>", methods=["GET"])
-@verify_access_token(access_roles=['line_bot'])
+@verify_access_token(access_roles=["line_bot"])
 def get_line_member_endpoint(line_user_id):
     try:
         user_service = UserService()
@@ -77,7 +82,7 @@ def get_line_member_endpoint(line_user_id):
 
 
 @bp.route("", methods=["GET"])
-@verify_access_token(access_roles=['admin'])
+@verify_access_token(access_roles=["admin"])
 def get_all_endpoint():
     try:
         user_service = UserService()
@@ -86,12 +91,18 @@ def get_all_endpoint():
         query = request.args.get("query", None, type=str)
         status = request.args.get("status", None, type=int)
 
-        user_dataset, total_items_count = user_service.get_all(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
+        user_dataset, total_items_count = user_service.get_all(
+            page=page,
+            per_page=per_page,
+            query=query,
+            status=status,
+            with_total_items=True,
+        )
         return RESTfulResponse(
-                    user_dataset, 
-                    hide_fields=["password", "is_deleted"], 
-                    pagination=(page, per_page, total_items_count)
-                ).to_serializable()
+            user_dataset,
+            hide_fields=["password", "is_deleted"],
+            pagination=(page, per_page, total_items_count),
+        ).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
     except Exception as e:
@@ -126,13 +137,15 @@ def update_endpoint(user_id):
             field_validators={
                 "email": EmailValidator,
                 "password": PasswordValidator,
-            }
+            },
         )
         request_validator.check(request)
 
         user_json_data = request.get_json()
         updated_user_data = user_service.update_one(user_id, user_json_data)
-        return RESTfulResponse(updated_user_data, hide_fields=["password"]).to_serializable()
+        return RESTfulResponse(
+            updated_user_data, hide_fields=["password"]
+        ).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
     except Exception as e:
@@ -145,7 +158,9 @@ def delete_endpoint(user_id):
     try:
         user_service = UserService()
         deleted_user_data = user_service.delete_one(user_id)
-        return RESTfulResponse(deleted_user_data, hide_fields=["password"]).to_serializable()
+        return RESTfulResponse(
+            deleted_user_data, hide_fields=["password"]
+        ).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
     except Exception as e:

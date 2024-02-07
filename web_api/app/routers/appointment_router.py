@@ -11,7 +11,7 @@ bp = Blueprint("appointment_router", __name__)
 
 
 @bp.route("", methods=["POST"])
-@verify_access_token(access_roles=['liff'])
+@verify_access_token(access_roles=["liff"])
 def create_endpoint():
     try:
         appointment_service = AppointmentService()
@@ -58,7 +58,9 @@ def get_all_endpoint():
         appointment_service = AppointmentService()
         line_user_id = request.args.get("line_user_id", None, type=str)
         service_id = request.args.get("service_id", None, type=str)
-        appointments_dataset = appointment_service.get_all(line_user_id=line_user_id, service_id=service_id)
+        appointments_dataset = appointment_service.get_all(
+            line_user_id=line_user_id, service_id=service_id
+        )
         return RESTfulResponse(appointments_dataset).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -84,7 +86,9 @@ def update_endpoint(appointment_id):
             },
         )
         appointment_json_data = request_validator.process(request)
-        updated_appointment = appointment_service.update_one(appointment_id, appointment_json_data)
+        updated_appointment = appointment_service.update_one(
+            appointment_id, appointment_json_data
+        )
         return RESTfulResponse(updated_appointment).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
@@ -100,7 +104,9 @@ def cancel_endpoint(appointment_id):
     try:
         appointment_service = AppointmentService()
         line_user_id = request.args.get("line_user_id", None, type=str)
-        appointment_service.cancel_one(appointment_id=appointment_id, line_user_id=line_user_id)
+        appointment_service.cancel_one(
+            appointment_id=appointment_id, line_user_id=line_user_id
+        )
         return RESTfulResponse().to_serializable(), 204
     except HTTPException as e:
         abort(e.code, e.description)

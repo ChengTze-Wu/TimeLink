@@ -1,23 +1,30 @@
 import pytest
 
+
 @pytest.fixture
 def setup_exist_user(client):
-    client.post("/api/users", json={
-        "id": "3b27d130-9a97-4752-8690-d4d551120a83",
-        "email": "testuser@email.com",
-        "username": "testuser",
-        "password": "Testuser.123",
-        "name": "Test User",
-        "phone": "0912345678",
-    })
-    client.post("/api/users", json={
-        "id": "3b27d130-9a97-4752-8690-d4d551120a84",
-        "email": "testuser1@email.com",
-        "username": "testuser1",
-        "password": "Testuser.123",
-        "name": "Test User 1",
-        "phone": "0912345678",
-    })
+    client.post(
+        "/api/users",
+        json={
+            "id": "3b27d130-9a97-4752-8690-d4d551120a83",
+            "email": "testuser@email.com",
+            "username": "testuser",
+            "password": "Testuser.123",
+            "name": "Test User",
+            "phone": "0912345678",
+        },
+    )
+    client.post(
+        "/api/users",
+        json={
+            "id": "3b27d130-9a97-4752-8690-d4d551120a84",
+            "email": "testuser1@email.com",
+            "username": "testuser1",
+            "password": "Testuser.123",
+            "name": "Test User 1",
+            "phone": "0912345678",
+        },
+    )
     yield
     client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a83")
     client.delete("/api/users/3b27d130-9a97-4752-8690-d4d551120a84")
@@ -66,4 +73,3 @@ class TestDeleteUserApi:
             "line_user_id",
         }
         assert response.json["is_deleted"] is True
-        

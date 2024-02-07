@@ -123,16 +123,25 @@ class Service(BaseModel, CommonColumns):
             "description": self.description,
             "working_period": self.working_period,
             "owner": self.owner.to_self_dict() if self.owner else None,
-            "working_hours": [working_hour.to_dict() for working_hour in self.working_hours],
-            "unavailable_periods": [unavailable_period.to_dict() for unavailable_period in self.unavailable_periods],
+            "working_hours": [
+                working_hour.to_dict() for working_hour in self.working_hours
+            ],
+            "unavailable_periods": [
+                unavailable_period.to_dict()
+                for unavailable_period in self.unavailable_periods
+            ],
             "is_active": self.is_active,
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "groups" : [group.to_self_dict() for group in self.groups],
-            "appointments": [appointment.to_self_dict() for appointment in self.appointments if not appointment.is_deleted],
+            "groups": [group.to_self_dict() for group in self.groups],
+            "appointments": [
+                appointment.to_self_dict()
+                for appointment in self.appointments
+                if not appointment.is_deleted
+            ],
         }
-    
+
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -141,8 +150,13 @@ class Service(BaseModel, CommonColumns):
             "image": self.image,
             "description": self.description,
             "working_period": self.working_period,
-            "working_hours": [working_hour.to_dict() for working_hour in self.working_hours],
-            "unavailable_periods": [unavailable_period.to_dict() for unavailable_period in self.unavailable_periods],
+            "working_hours": [
+                working_hour.to_dict() for working_hour in self.working_hours
+            ],
+            "unavailable_periods": [
+                unavailable_period.to_dict()
+                for unavailable_period in self.unavailable_periods
+            ],
             "is_active": self.is_active,
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
@@ -154,7 +168,7 @@ class WorkingHour(BaseModel):
     __tablename__ = "working_hour"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('service.id'))
+    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("service.id"))
     day_of_week: Mapped[DayOfWeek] = mapped_column(SQLAlchemyEnum(DayOfWeek))
     start_time: Mapped[datetime.time] = mapped_column(Time)
     end_time: Mapped[datetime.time] = mapped_column(Time)
@@ -174,11 +188,13 @@ class UnavailablePeriod(BaseModel):
     __tablename__ = "unavailable_period"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('service.id'))
+    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("service.id"))
     start_datetime: Mapped[datetime.datetime]
     end_datetime: Mapped[datetime.datetime]
 
-    service: Mapped["Service"] = relationship("Service", back_populates="unavailable_periods")
+    service: Mapped["Service"] = relationship(
+        "Service", back_populates="unavailable_periods"
+    )
 
     def to_dict(self):
         return {
@@ -213,9 +229,7 @@ class User(BaseModel, CommonColumns):
         secondary=group_user, back_populates="users"
     )
 
-    own_groups: Mapped[List["Group"]] = relationship(
-        "Group", back_populates="owner"
-    )
+    own_groups: Mapped[List["Group"]] = relationship("Group", back_populates="owner")
 
     own_services: Mapped[List["Service"]] = relationship(
         "Service", back_populates="owner"
@@ -235,9 +249,13 @@ class User(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "groups": [group.to_self_dict() for group in self.groups],
-            "appointments": [appointment.to_self_dict() for appointment in self.appointments if not appointment.is_deleted],
+            "appointments": [
+                appointment.to_self_dict()
+                for appointment in self.appointments
+                if not appointment.is_deleted
+            ],
         }
-    
+
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -252,7 +270,7 @@ class User(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
-    
+
     def to_auth(self):
         return {
             "id": self.id,
@@ -269,8 +287,12 @@ class Appointment(BaseModel, CommonColumns):
     __tablename__ = "appointment"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user_account.id"), nullable=False)
-    service_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("service.id"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user_account.id"), nullable=False
+    )
+    service_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("service.id"), nullable=False
+    )
     reserved_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
@@ -290,7 +312,7 @@ class Appointment(BaseModel, CommonColumns):
             "updated_at": self.updated_at,
             "service": self.service.to_self_dict() if self.service else None,
         }
-    
+
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -303,7 +325,7 @@ class Appointment(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
-    
+
 
 class Role(BaseModel):
     __tablename__ = "role"
@@ -342,10 +364,16 @@ class Group(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "owner": self.owner.to_self_dict(),
-            "users": [user.to_self_dict() for user in self.users if not user.is_deleted],
-            "services": [service.to_self_dict() for service in self.services if not service.is_deleted]
+            "users": [
+                user.to_self_dict() for user in self.users if not user.is_deleted
+            ],
+            "services": [
+                service.to_self_dict()
+                for service in self.services
+                if not service.is_deleted
+            ],
         }
-    
+
     def to_self_dict(self):
         return {
             "id": self.id,

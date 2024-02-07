@@ -15,12 +15,12 @@ def auth_endpoint():
     try:
         user_service = UserService()
         request_validator = RequestValidator(
-                request_type="json",
-                required_fields=["username", "password"],
-                field_types={"username": str, "password": str},
-                field_max_lengths={"username": 100, "password": 100},
-                field_validators={"password": PasswordValidator}
-            )
+            request_type="json",
+            required_fields=["username", "password"],
+            field_types={"username": str, "password": str},
+            field_max_lengths={"username": 100, "password": 100},
+            field_validators={"password": PasswordValidator},
+        )
         request_validator.check(request)
         credentialsObject = request.get_json()
         auth_result = user_service.auth(credentialsObject)

@@ -25,13 +25,13 @@ def create_endpoint():
                 "is_active": bool,
                 "working_hours": list,
                 "unavailable_periods": list,
-                "groups": list
+                "groups": list,
             },
             field_max_lengths={
                 "name": 50,
                 "image": 100,
                 "description": 100,
-            }
+            },
         )
         request_validator.check(request)
         service_json_data = request.get_json()
@@ -70,13 +70,13 @@ def update_endpoint(service_id):
                 "is_active": bool,
                 "working_hours": list,
                 "unavailable_periods": list,
-                "groups": list
+                "groups": list,
             },
             field_max_lengths={
                 "name": 50,
                 "image": 100,
                 "description": 100,
-            }
+            },
         )
         request_validator.check(request)
         service_json_data = request.get_json()
@@ -110,8 +110,16 @@ def get_all_endpoint():
         per_page = request.args.get("per_page", 10, type=int)
         query = request.args.get("query", None, type=str)
         status = request.args.get("status", None, type=int)
-        service_dataset, total_items_count = service_service.get_all(page=page, per_page=per_page, query=query, status=status, with_total_items=True)
-        return RESTfulResponse(service_dataset, pagination=(page, per_page, total_items_count)).to_serializable()
+        service_dataset, total_items_count = service_service.get_all(
+            page=page,
+            per_page=per_page,
+            query=query,
+            status=status,
+            with_total_items=True,
+        )
+        return RESTfulResponse(
+            service_dataset, pagination=(page, per_page, total_items_count)
+        ).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
     except Exception as e:

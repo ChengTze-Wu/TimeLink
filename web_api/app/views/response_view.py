@@ -1,12 +1,13 @@
-'''
+"""
 Author: Cheng-Tze Wu
 Date: 2023-12-18
 Contact: chengtzewu@gmail.com
-'''
+"""
 from typing import Tuple, Optional, List, Dict, Union
 
+
 class RESTfulResponse:
-    '''
+    """
     RESTfulResponse is a class that handles the serialization of data
     to be returned to the client.
 
@@ -27,7 +28,7 @@ class RESTfulResponse:
                 "email": "john@email.com",
             }
         >>> restful_response = RESTfulResponse(
-                data=result_data, 
+                data=result_data,
                 hide_fields=["age"])
         >>> restful_response.to_serializable()
         {"name": "John Doe", "email": "john@email.com"}
@@ -55,7 +56,8 @@ class RESTfulResponse:
                 "total_items": 100,
             },
         }
-    '''
+    """
+
     def __init__(
         self,
         data: Optional[Union[Dict, List]] = None,
@@ -73,9 +75,15 @@ class RESTfulResponse:
             raise TypeError("Data type must be dict or list")
 
     def _apply_field_filters(self, data_item: Dict) -> Dict:
-        return {key: value for key, value in data_item.items() if key not in self.hide_fields}
+        return {
+            key: value
+            for key, value in data_item.items()
+            if key not in self.hide_fields
+        }
 
-    def _generate_pagination_info(self, current_page_items: int) -> Dict[str, Union[int, None]]:
+    def _generate_pagination_info(
+        self, current_page_items: int
+    ) -> Dict[str, Union[int, None]]:
         page, per_page, total_items = self.pagination
         total_pages = max((total_items + per_page - 1) // per_page, 1)
         next_page = page + 1 if page < total_pages else None
@@ -99,7 +107,9 @@ class RESTfulResponse:
 
         if self.pagination:
             processed_data = [] if not processed_data else processed_data
-            pagination_info = self._generate_pagination_info(len(processed_data) if isinstance(self.data, list) else 0)
+            pagination_info = self._generate_pagination_info(
+                len(processed_data) if isinstance(self.data, list) else 0
+            )
             return {"data": processed_data, "pagination": pagination_info}
 
         return processed_data

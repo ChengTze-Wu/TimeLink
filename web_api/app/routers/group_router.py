@@ -101,7 +101,9 @@ def get_all_endpoint():
             status=status,
             with_total_items=True,
         )
-        return RESTfulResponse(group_dataset, pagination=(page, per_page, total_items_count)).to_serializable()
+        return RESTfulResponse(
+            group_dataset, pagination=(page, per_page, total_items_count)
+        ).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
     except Exception as e:
@@ -126,7 +128,9 @@ def get_one_endpoint(group_id):
 def get_line_group_services_endpoint(line_group_id):
     try:
         group_service = GroupService()
-        group_data = group_service.get_one_with_appointments(line_group_id=line_group_id)
+        group_data = group_service.get_one_with_appointments(
+            line_group_id=line_group_id
+        )
         return RESTfulResponse(group_data).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)

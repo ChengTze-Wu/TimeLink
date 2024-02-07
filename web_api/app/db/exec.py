@@ -3,6 +3,7 @@ from .models import BaseModel
 
 engine = get_engine()
 
+
 def init_db():
     """Initialize the database by creating all tables."""
     BaseModel.metadata.create_all(engine)

@@ -2,7 +2,6 @@ import pytest
 from views.response_view import RESTfulResponse
 
 
-
 @pytest.fixture
 def fake_result_data():
     return {
@@ -33,15 +32,23 @@ class TestRESTfulResponse:
     def test_serialization_with_list_data(self, fake_result_data: dict):
         restful_response = RESTfulResponse(data=[fake_result_data, fake_result_data])
         assert isinstance(restful_response.to_serializable(), list)
-        assert restful_response.to_serializable() == [fake_result_data, fake_result_data]
+        assert restful_response.to_serializable() == [
+            fake_result_data,
+            fake_result_data,
+        ]
 
-    def test_serialization_with_hidden_fields_and_list_data(self, fake_result_data: dict):
+    def test_serialization_with_hidden_fields_and_list_data(
+        self, fake_result_data: dict
+    ):
         restful_response = RESTfulResponse(
             data=[fake_result_data, fake_result_data], hide_fields=["name"]
         )
         assert isinstance(restful_response.to_serializable(), list)
         del fake_result_data["name"]
-        assert restful_response.to_serializable() == [fake_result_data, fake_result_data]
+        assert restful_response.to_serializable() == [
+            fake_result_data,
+            fake_result_data,
+        ]
 
     def test_serialization_with_empty_list_data(self):
         restful_response = RESTfulResponse(data=[])
@@ -56,8 +63,10 @@ class TestRESTfulResponse:
     def test_serialization_with_non_dict_or_list_data(self):
         with pytest.raises(TypeError):
             RESTfulResponse(data=1)
-        
-    def test_serialization_with_pagination_all_items_on_one_page(self, fake_result_data: dict):
+
+    def test_serialization_with_pagination_all_items_on_one_page(
+        self, fake_result_data: dict
+    ):
         restful_response = RESTfulResponse(
             data=[fake_result_data, fake_result_data],
             pagination=(1, 2, 2),
@@ -91,7 +100,9 @@ class TestRESTfulResponse:
             },
         }
 
-    def test_serialization_with_hidden_fields_and_pagination(self, fake_result_data: dict):
+    def test_serialization_with_hidden_fields_and_pagination(
+        self, fake_result_data: dict
+    ):
         restful_response = RESTfulResponse(
             data=[fake_result_data, fake_result_data],
             hide_fields=["name"],
@@ -138,7 +149,9 @@ class TestRESTfulResponse:
             },
         }
 
-    def test_serialization_with_pagination_and_empty_data_and_hide_fields_and_data(self):
+    def test_serialization_with_pagination_and_empty_data_and_hide_fields_and_data(
+        self,
+    ):
         restful_response = RESTfulResponse(
             data=[],
             pagination=(1, 2, 0),
