@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { inter } from "@/app/ui/fonts";
 import "@/app/ui/globals.css";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 export const metadata: Metadata = {
   title: {
@@ -17,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <AntdRegistry>
+        <body className={inter.className}>{children}</body>
+      </AntdRegistry>
     </html>
   );
 }

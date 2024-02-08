@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import CreateForm from "@/app/ui/accounts/create-form";
+import CreateForm from "@/app/ui/services/create-form";
 import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 
 export const metadata: Metadata = {
-  title: "Create | Accounts | Dashboard",
+  title: "Create | Services | Dashboard",
 };
 
 export default function Page() {
@@ -12,10 +12,10 @@ export default function Page() {
       <Breadcrumbs
         breadcrumbs={[
           { label: "儀表板", href: "/dashboard" },
-          { label: "系統帳號", href: "/dashboard/accounts" },
+          { label: "服務", href: "/dashboard/services" },
           {
             label: "建立",
-            href: "/dashboard/accounts/create",
+            href: "/dashboard/services/create",
             active: true,
           },
         ]}

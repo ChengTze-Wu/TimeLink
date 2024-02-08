@@ -1,16 +1,18 @@
 "use server";
 
 import { unstable_noStore as noStore } from "next/cache";
+import { cookies } from "next/headers";
+
 const { API_GATEWAY } = process.env;
 
 export async function getJson(apiEndpoint: string) {
-  noStore();
   try {
+    noStore();
+    const access_token = cookies().get("access_token")?.value;
     const res = await fetch(API_GATEWAY + apiEndpoint, {
       method: "GET",
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
       },
     });
     const jsonResonseBody = await res.json();
@@ -23,14 +25,16 @@ export async function getJson(apiEndpoint: string) {
 }
 
 export async function postJson(apiEndpoint: string, data: any) {
-  noStore();
   try {
+    noStore();
+    const access_token = cookies().get("access_token")?.value;
     const res = await fetch(API_GATEWAY + apiEndpoint, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
+      headers: new Headers({
         "Content-Type": "application/json",
-      },
+        Accept: "application/json",
+        Authorization: `Bearer ${access_token}`,
+      }),
       body: JSON.stringify(data),
     });
     const jsonResonseBody = await res.json();
@@ -43,13 +47,15 @@ export async function postJson(apiEndpoint: string, data: any) {
 }
 
 export async function putJson(apiEndpoint: string, data: any) {
-  noStore();
   try {
+    noStore();
+    const access_token = cookies().get("access_token")?.value;
     const res = await fetch(API_GATEWAY + apiEndpoint, {
       method: "PUT",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
       },
       body: JSON.stringify(data),
     });
@@ -63,10 +69,16 @@ export async function putJson(apiEndpoint: string, data: any) {
 }
 
 export async function deleteJson(apiEndpoint: string) {
-  noStore();
   try {
+    noStore();
+    const access_token = cookies().get("access_token")?.value;
     const res = await fetch(API_GATEWAY + apiEndpoint, {
       method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${access_token}`,
+      },
     });
     const jsonResonseBody = await res.json();
     jsonResonseBody.status = res.status;

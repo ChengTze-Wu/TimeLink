@@ -8,7 +8,7 @@ import {
   DevicePhoneMobileIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/solid";
-import { updateAccount } from "@/app/ui/accounts/actions";
+import { updateAccount } from "@/app/lib/accounts/actions";
 import { useFormState } from "react-dom";
 import { User } from "@/app/lib/definitions";
 
@@ -36,6 +36,7 @@ export default function EditForm({ user }: { user: User }) {
           id="username"
           className="w-full rounded-md border-0 py-1.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
           defaultValue={user.username}
+          placeholder="Username"
         />
       </div>
       <div className="relative mt-6 rounded-md shadow-sm">
@@ -51,6 +52,7 @@ export default function EditForm({ user }: { user: User }) {
           id="name"
           className="w-full rounded-md border-0 py-1.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
           defaultValue={user.name}
+          placeholder="Name"
         />
       </div>
       <div className="relative mt-6 rounded-md shadow-sm">
@@ -66,6 +68,7 @@ export default function EditForm({ user }: { user: User }) {
           id="email"
           className="w-full rounded-md border-0 py-1.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
           defaultValue={user.email}
+          placeholder="Email"
         />
       </div>
       <div className="relative mt-6 rounded-md shadow-sm">
@@ -81,9 +84,22 @@ export default function EditForm({ user }: { user: User }) {
           id="phone"
           className="w-full rounded-md border-0 py-1.5 pl-10 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
           defaultValue={user.phone}
+          placeholder="Phone"
         />
       </div>
-      <div className="mt-2 rounded-md flex gap-2 items-center">
+      <div className="relative mt-6 rounded-md shadow-sm">
+        <select
+          name="role"
+          defaultValue={user.role}
+          className="w-full rounded-md border-0 py-2 pl-3 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
+        >
+          <option>----請下拉選擇----</option>
+          <option value="admin">管理員</option>
+          <option value="group_owner">群組管理員</option>
+          <option value="group_member">群組成員</option>
+        </select>
+      </div>
+      <div className="mt-6 rounded-md flex gap-2 items-center">
         <label htmlFor="isActive" className="">
           啟用
         </label>

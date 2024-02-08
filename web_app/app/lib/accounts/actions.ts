@@ -43,6 +43,7 @@ const FormSchema = z.object({
     .string()
     .max(50, { message: "Phone must be less than 50 characters" }),
   is_active: z.coerce.boolean(),
+  role: z.string().optional().nullable(),
 });
 
 const CreateAccount = FormSchema.omit({});
@@ -68,6 +69,7 @@ export type State = {
     confirmPassword?: string[];
     phone?: string[];
     isActive?: string[];
+    role?: string[];
   };
   message?: string | null;
 };
@@ -84,6 +86,7 @@ export async function createAccount(
     name: formData.get("name"),
     phone: formData.get("phone"),
     is_active: formData.get("isActive"),
+    role: formData.get("role"),
   });
 
   if (!validatedFields.success) {
@@ -122,6 +125,7 @@ export async function updateAccount(
     name: formData.get("name"),
     phone: formData.get("phone"),
     is_active: formData.get("isActive"),
+    role: formData.get("role"),
   });
 
   if (!validatedFields.success) {
@@ -144,7 +148,6 @@ export async function updateAccount(
       message: "Failed to Create Account.",
     };
   }
-
   revalidatePath("/dashboard/accounts");
   redirect("/dashboard/accounts");
 }

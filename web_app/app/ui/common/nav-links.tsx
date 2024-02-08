@@ -12,24 +12,46 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 const links = [
-  { name: "儀表板", href: "/dashboard", icon: RectangleGroupIcon },
-  { name: "群組", href: "/dashboard/groups", icon: UserGroupIcon },
+  {
+    name: "儀表板",
+    href: "/dashboard",
+    icon: RectangleGroupIcon,
+    roles: ["admin", "group_owner"],
+  },
+  {
+    name: "群組",
+    href: "/dashboard/groups",
+    icon: UserGroupIcon,
+    roles: ["admin", "group_owner"],
+  },
   {
     name: "服務",
     href: "/dashboard/services",
     icon: SquaresPlusIcon,
+    roles: ["admin", "group_owner"],
   },
-  { name: "預約", href: "/dashboard/bookings", icon: CalendarDaysIcon },
-  { name: "系統帳號", href: "/dashboard/accounts", icon: UserIcon },
+  {
+    name: "預約",
+    href: "/dashboard/bookings",
+    icon: CalendarDaysIcon,
+    roles: ["admin", "group_owner", "group_member"],
+  },
+  {
+    name: "系統帳號",
+    href: "/dashboard/accounts",
+    icon: UserIcon,
+    roles: ["admin"],
+  },
 ];
 
-export default function NavLinks() {
+export default function NavLinks({ role }: { role: string }) {
   const pathname = usePathname();
 
   return (
     <>
       {links.map((link) => {
         const LinkIcon = link.icon;
+        if (!link.roles.includes(role)) return null;
         return (
           <Link
             key={link.name}

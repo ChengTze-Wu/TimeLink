@@ -1,4 +1,4 @@
-import Form from "@/app/ui/accounts/edit-form";
+import Form from "@/app/ui/groups/edit-form";
 import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
@@ -6,14 +6,14 @@ import { getJson } from "@/app/lib/fetch-api-data";
 import { UUID } from "crypto";
 
 export const metadata: Metadata = {
-  title: "Edit | Accounts | Dashboard",
+  title: "Edit | Groups | Dashboard",
 };
 
-export default async function Page({ params }: { params: { userId: UUID } }) {
-  const user_id = params.userId;
-  const user = await getJson(`/api/users/${user_id}`);
+export default async function Page({ params }: { params: { groupId: UUID } }) {
+  const group_id = params.groupId;
+  const group = await getJson(`/api/groups/${group_id}`);
 
-  if (user.status === 404) {
+  if (group.status === 404) {
     notFound();
   }
 
@@ -22,15 +22,15 @@ export default async function Page({ params }: { params: { userId: UUID } }) {
       <Breadcrumbs
         breadcrumbs={[
           { label: "儀表板", href: "/dashboard" },
-          { label: "系統帳號", href: "/dashboard/accounts" },
+          { label: "群組", href: "/dashboard/groups" },
           {
-            label: `修改 ${user.name}`,
-            href: `/dashboard/accounts/${user_id}/edit`,
+            label: `修改 ${group.name}`,
+            href: `/dashboard/groups/${group_id}/edit`,
             active: true,
           },
         ]}
       />
-      <Form user={user} />
+      <Form group={group} />
     </main>
   );
 }

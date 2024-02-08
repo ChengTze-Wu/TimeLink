@@ -3,11 +3,11 @@ import { useEffect } from "react";
 
 export function DeletePopup({
   showPopup,
-  username,
+  title,
   action,
 }: {
   showPopup: (value: boolean) => void;
-  username: string;
+  title: string;
   action: () => void;
 }) {
   useEffect(() => {
@@ -41,7 +41,7 @@ export function DeletePopup({
         <div className="flex items-center">
           <ExclamationCircleIcon className="w-12 text-pink-600" />
           <h2 className="text-gray-600 text-lg">
-            確定刪除 <span className="font-semibold ">{username}</span> ?
+            確定刪除 <span className="font-semibold ">{title}</span> ?
           </h2>
         </div>
         <div className="flex justify-center items-center space-x-4 mt-4">

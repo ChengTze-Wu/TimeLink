@@ -38,7 +38,7 @@ export default function StatusFilter({ status }: { status: string }) {
       )}
       onClick={handleStatus}
     >
-      <p>Status</p>
+      <p>狀態</p>
       {status === "0" ? (
         <XCircleIcon className="w-4 h-4" />
       ) : status === "1" ? (

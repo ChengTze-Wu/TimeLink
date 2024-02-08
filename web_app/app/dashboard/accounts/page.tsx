@@ -1,7 +1,7 @@
 import Table from "@/app/ui/accounts/table";
-import SearchBar from "@/app/ui/accounts/search";
-import Pagination from "@/app/ui/accounts/pagination";
-import Breadcrumbs from "@/app/ui/dashboard/breadcrumbs";
+import SearchBar from "@/app/ui/common/search";
+import Pagination from "@/app/ui/common/pagination";
+import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { getJson } from "@/app/lib/fetch-api-data";
 import { Metadata } from "next";
 import { Suspense } from "react";
@@ -26,7 +26,7 @@ export default async function Page({
   const status = searchParams?.status || "";
 
   const userDataSet = await getJson(
-    `/api/users?per_page=6&$page=${currentPage}&query=${query}&status=${status}`
+    `/api/users?per_page=6&query=${query}&status=${status}`
   );
   const totalPages = userDataSet?.pagination?.total_pages || 1;
   const totalItems = userDataSet?.pagination?.total_items || 0;
@@ -43,13 +43,13 @@ export default async function Page({
         <SearchBar placeholder="Name, Username, Email, Phone..." />
         <Link
           href="/dashboard/accounts/create"
-          className="flex place-items-center p-3 text-sm text-white bg-primary-green rounded-md hover:bg-green-600"
+          className="flex place-items-center p-2 text-sm text-white bg-primary-green rounded-md hover:bg-green-600"
         >
           <UserPlusIcon className="w-5 h-5 md:mr-2" />
           <p className="hidden md:block">建立</p>
         </Link>
       </div>
-      <Suspense key={query + status} fallback={<div>Loading...</div>}>
+      <Suspense key={query + currentPage} fallback={<div>Loading...</div>}>
         <Table query={query} status={status} currentPage={currentPage} />
       </Suspense>
       <div className="w-full flex mt-7">

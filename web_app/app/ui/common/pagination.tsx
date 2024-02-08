@@ -17,13 +17,10 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
     return `${pathname}?${params.toString()}`;
   };
 
-  // NOTE: comment in this code when you get to this point in the course
   const allPages = generatePagination(currentPage, totalPages);
 
   return (
     <>
-      {/* NOTE: comment in this code when you get to this point in the course */}
-
       <div className="inline-flex">
         <PaginationArrow
           direction="left"
@@ -42,7 +39,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
 
             return (
               <PaginationNumber
-                key={page}
+                key={index}
                 href={createPageURL(page)}
                 page={page}
                 position={position}
@@ -76,8 +73,8 @@ function PaginationNumber({
   const className = clsx(
     "flex h-10 w-10 items-center justify-center text-sm border",
     {
-      "rounded-l-md": position === "first" || position === "single",
-      "rounded-r-md": position === "last" || position === "single",
+      "rounded-l-full": position === "first" || position === "single",
+      "rounded-r-full": position === "last" || position === "single",
       "bg-primary-green border-primary-green text-white": isActive,
       "hover:bg-gray-100": !isActive && position !== "middle",
       "text-gray-300": position === "middle",
@@ -103,7 +100,7 @@ function PaginationArrow({
   isDisabled?: boolean;
 }) {
   const className = clsx(
-    "flex h-10 w-10 items-center justify-center rounded-md border",
+    "flex h-10 w-10 items-center justify-center rounded-full border",
     {
       "pointer-events-none text-gray-300": isDisabled,
       "hover:bg-gray-100": !isDisabled,
