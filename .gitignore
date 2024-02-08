@@ -19,6 +19,10 @@ note.sql
 
 node_modules/
 
+db/data/*
+
 alembic.ini
 # React Component Preview
 previewConfig.json
+
+!**/.gitkeep
