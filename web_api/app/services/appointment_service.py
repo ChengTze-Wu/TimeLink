@@ -125,6 +125,8 @@ class AppointmentService:
 
     def get_all(
         self,
+        page: int = 1,
+        per_page: int = 10,
         line_user_id: str | None = None,
         service_id: str | None = None,
         with_total_count: bool = False,
@@ -149,20 +151,29 @@ class AppointmentService:
                 appointment
                 for service_id in service_ids
                 for appointment in self.appointment_repository.select_all_by_filter(
-                    service_id=service_id
+                    page=page, per_page=per_page, service_id=service_id
                 )
             ]
+            if with_total_count:
+                total_count = 0
+                for service_id in service_ids:
+                    total_count += self.appointment_repository.count_all_by_filter(
+                        service_id=service_id
+                    )
+                return appointments, total_count
         elif role == RoleName.ADMIN.value:
             appointments = self.appointment_repository.select_all_by_filter(
-                service_id=service_id
+                page=page, per_page=per_page, service_id=service_id
             )
         else:
             appointments = self.appointment_repository.select_all_by_filter(
-                user_id=user_id, service_id=service_id
+                page=page, per_page=per_page, user_id=user_id, service_id=service_id
             )
 
         if with_total_count:
-            return appointments, len(appointments)
+            return appointments, self.appointment_repository.count_all_by_filter(
+                user_id=user_id, service_id=service_id
+            )
         return appointments
 
     def __check_service_availability(self, service_id: str, reserved_at: str):
