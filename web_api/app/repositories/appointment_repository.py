@@ -74,20 +74,25 @@ class AppointmentRepository:
             return [appointment.to_dict() for appointment in appointments]
 
     def select_all_by_filter(
-        self, user_id: str | None = None, service_id: str | None = None
+        self,
+        page: int = 1,
+        per_page: int = 10,
+        user_id: str | None = None,
+        service_id: str | None = None,
     ):
         with get_session() as session:
-            appointments = (
-                session.query(Appointment)
+            base_query = (
+                select(Appointment)
                 .filter(
                     or_(
                         Appointment.user_id == user_id,
                         Appointment.service_id == service_id,
                     )
                 )
-                .all()
+                .order_by(Appointment.created_at.desc())
             )
-
+            base_query = base_query.offset((page - 1) * per_page).limit(per_page)
+            appointments = session.scalars(base_query).all()
             return [appointment.to_dict() for appointment in appointments]
 
     def count_all_by_filter(

@@ -310,6 +310,7 @@ class Appointment(BaseModel, CommonColumns):
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
+            "user": self.user.to_self_dict() if self.user else None,
             "service": self.service.to_self_dict() if self.service else None,
         }
 

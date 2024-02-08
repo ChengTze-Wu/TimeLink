@@ -56,12 +56,20 @@ def get_one_endpoint(appointment_id):
 def get_all_endpoint():
     try:
         appointment_service = AppointmentService()
+        page = request.args.get("page", 1, type=int)
+        per_page = request.args.get("per_page", 10, type=int)
         line_user_id = request.args.get("line_user_id", None, type=str)
         service_id = request.args.get("service_id", None, type=str)
-        appointments_dataset = appointment_service.get_all(
-            line_user_id=line_user_id, service_id=service_id
+        appointments_dataset, total_items_count = appointment_service.get_all(
+            page=page,
+            per_page=per_page,
+            line_user_id=line_user_id,
+            service_id=service_id,
+            with_total_count=True,
         )
-        return RESTfulResponse(appointments_dataset).to_serializable()
+        return RESTfulResponse(
+            data=appointments_dataset, pagination=(page, per_page, total_items_count)
+        ).to_serializable()
     except HTTPException as e:
         abort(e.code, e.description)
     except RequestException as e:
