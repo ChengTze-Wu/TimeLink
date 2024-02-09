@@ -5,7 +5,7 @@ services:
     build:
       context: ./web_api
       dockerfile: Dockerfile.local-dev
-    image: chengtze/web_api:0.0.1-local-dev
+    image: chengtze/timelink-web_api:0.0.1-local-dev
     container_name: web_api
     ports:
       - "8000:8000"
@@ -14,8 +14,35 @@ services:
     env_file:
       - ./web_api/.env
     restart: unless-stopped
+    depends_on:
+      - db
+  bot-server:
+    build:
+      context: ./bot-server
+      dockerfile: Dockerfile
+    image: chengtze/timelink-bot-server:0.0.1-local-dev
+    container_name: bot-server
+    ports:
+      - "8800:8800"
+    env_file:
+      - ./bot-server/.env
+    restart: unless-stopped
+    depends_on:
+      - web_api
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    image: chengtze/timelink-db:0.0.1-local-dev
+    container_name: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+      - ./logs/db:/var/log/postgresql
+    restart: unless-stopped
 
 networks:
   default:
     name: timelink_net
-    external: true
+    driver: bridge

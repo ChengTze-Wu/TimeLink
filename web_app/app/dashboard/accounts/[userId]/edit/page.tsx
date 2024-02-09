@@ -1,5 +1,5 @@
 import Form from "@/app/ui/accounts/edit-form";
-import Breadcrumbs from "@/app/ui/dashboard/breadcrumbs";
+import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getJson } from "@/app/lib/fetch-api-data";

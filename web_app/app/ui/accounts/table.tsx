@@ -1,10 +1,17 @@
 import { PencilIcon } from "@heroicons/react/24/solid";
-import { DeleteAccount } from "./buttons";
+import { DeleteAccount } from "@/app/ui/accounts/buttons";
 import { getJson } from "@/app/lib/fetch-api-data";
-import StatusFilter from "./statusFilter";
+import StatusFilter from "@/app/ui/common/statusFilter";
 import clsx from "clsx";
 import { User } from "@/app/lib/definitions";
 import Link from "next/link";
+
+const roleMap = {
+  admin: "管理員",
+  group_owner: "群組管理員",
+  group_member: "群組成員",
+  undefined: "未定義",
+};
 
 export default async function AccountsTable({
   query,
@@ -15,7 +22,7 @@ export default async function AccountsTable({
   status: string;
   currentPage: number;
 }) {
-  const userDataSet = await getJson(
+  const userJsonResponse = await getJson(
     `/api/users?per_page=6&query=${query}&status=${status}&page=${currentPage}`
   );
 
@@ -23,10 +30,11 @@ export default async function AccountsTable({
     <table className="w-full h-full">
       <thead className="border-b-[1px] border-gray-300">
         <tr className="text-left font-light">
-          <th>Name</th>
-          <th>Username</th>
+          <th>名稱</th>
+          <th>帳號</th>
           <th>Email</th>
-          <th>Phone</th>
+          <th>電話</th>
+          <th>角色</th>
           <th>
             <StatusFilter status={status} />
           </th>
@@ -34,12 +42,19 @@ export default async function AccountsTable({
         </tr>
       </thead>
       <tbody>
-        {userDataSet?.data.map((user: User) => (
+        {userJsonResponse?.data?.map((user: User) => (
           <tr
             key={user.id}
             className="border-b-[1px] border-gray-300 last:border-b-0"
           >
-            <td className="h-[4.5rem]">{user.name}</td>
+            <td className="h-[4.5rem]">
+              <Link
+                className="hover:text-primary-green"
+                href={`/dashboard/accounts/${user.id}`}
+              >
+                {user.name}
+              </Link>
+            </td>
             <td>{user.username}</td>
             <td>{user.email}</td>
             <td>
@@ -48,6 +63,10 @@ export default async function AccountsTable({
               ) : (
                 <span className="text-gray-400">None</span>
               )}
+            </td>
+            <td>
+              {roleMap[user.role as keyof typeof roleMap] ||
+                roleMap["undefined"]}
             </td>
             <td
               className={clsx(

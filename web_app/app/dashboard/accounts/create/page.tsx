@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import CreateForm from "@/app/ui/accounts/create-form";
-import Breadcrumbs from "@/app/ui/dashboard/breadcrumbs";
+import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 
 export const metadata: Metadata = {
   title: "Create | Accounts | Dashboard",

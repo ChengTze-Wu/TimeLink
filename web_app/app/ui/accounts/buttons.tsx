@@ -1,12 +1,10 @@
 "use client";
 
 import { TrashIcon } from "@heroicons/react/24/solid";
-import { deleteAccount } from "./actions";
-import { DeletePopup } from "./popup";
+import { deleteAccount } from "../../lib/accounts/actions";
+import { DeletePopup } from "@/app/ui/common/popup";
 import { useState } from "react";
 import { User } from "@/app/lib/definitions";
-
-export function EditAccount({ user }: { user: User }) {}
 
 export function DeleteAccount({ user }: { user: User }) {
   const deleteAccountWithUuid = deleteAccount.bind(null, user.id);
@@ -25,7 +23,7 @@ export function DeleteAccount({ user }: { user: User }) {
         <DeletePopup
           showPopup={showPopup}
           action={deleteAccountWithUuid}
-          username={user.username}
+          title={user.username}
         />
       )}
     </>

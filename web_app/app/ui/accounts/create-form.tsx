@@ -8,7 +8,7 @@ import {
   DevicePhoneMobileIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/solid";
-import { createAccount } from "@/app/ui/accounts/actions";
+import { createAccount } from "@/app/lib/accounts/actions";
 import { useFormState } from "react-dom";
 
 const createInputFields = [
@@ -83,6 +83,17 @@ export default function CerateForm() {
           </div>
         );
       })}
+      <div className="relative mt-6 rounded-md shadow-sm">
+        <select
+          name="role"
+          className="w-full rounded-md border-0 py-2 pl-3 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
+        >
+          <option>----請下拉選擇----</option>
+          <option value="admin">管理員</option>
+          <option value="group_owner">群組管理員</option>
+          <option value="group_member">群組成員</option>
+        </select>
+      </div>
       <div className="mt-2 rounded-md flex gap-2 items-center">
         <label htmlFor="isActive" className="">
           啟用
@@ -95,7 +106,7 @@ export default function CerateForm() {
           className="rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-green sm:text-sm sm:leading-6 outline-none"
         />
       </div>
-      <div className="mt-4 grow flex items-end justify-center">
+      <div className="mt-2 grow flex items-end justify-center">
         <button
           type="submit"
           className="w-20 rounded-md bg-primary-green py-2 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 self-end"
