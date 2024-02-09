@@ -4,6 +4,7 @@ load_dotenv()
 import os
 import sys
 import logging
+import httpx
 
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
@@ -60,8 +61,11 @@ logging.basicConfig(level=logging.INFO,
 @app.get("/ping-line-api")
 async def ping_line_api():
     try:
-        await line_bot_api.get_profile('U1234567890')
-        return 'OK'
+        async with httpx.AsyncClient() as client:
+            response = await client.get('https://api.line.me/v2/bot/message/ping', headers={
+                'Authorization': f'Bearer {channel_access_token}'
+            })
+        return {"status": "OK"}
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
