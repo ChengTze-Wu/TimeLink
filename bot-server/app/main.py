@@ -43,7 +43,7 @@ if channel_access_token is None:
     sys.exit(1)
 
 configuration = Configuration(
-    access_token=channel_access_token
+    access_token=channel_access_token,
 )
 
 app = FastAPI()
@@ -57,6 +57,16 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 
+@app.get("/ping-line-api")
+async def ping_line_api():
+    try:
+        await line_bot_api.get_profile('U1234567890')
+        return 'OK'
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/callback")
 async def handle_callback(request: Request):
     signature = request.headers['X-Line-Signature']
@@ -68,7 +78,7 @@ async def handle_callback(request: Request):
         raise HTTPException(status_code=400, detail="Invalid signature")
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
     return 'OK'
 
@@ -96,7 +106,7 @@ async def handle_member_follow(event: FollowEvent):
         )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @async_handler.add(MemberJoinedEvent)
@@ -119,7 +129,7 @@ async def handle_member_join(event: MemberJoinedEvent):
         )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @async_handler.add(MemberLeftEvent)
@@ -135,7 +145,7 @@ async def handle_member_left(event: MemberLeftEvent):
 
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @async_handler.add(JoinEvent)
@@ -154,7 +164,7 @@ async def handle_bot_join(event: JoinEvent):
         )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @async_handler.add(MessageEvent, message=TextMessageContent)
@@ -175,7 +185,7 @@ async def handle_message(event: MessageEvent):
             )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @async_handler.add(PostbackEvent)
@@ -196,7 +206,7 @@ async def handle_postback(event: PostbackEvent):
             )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 async def __check_group_linked(event: Event):
