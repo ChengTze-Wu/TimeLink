@@ -77,7 +77,7 @@ async def ping_line_api():
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get('https://bun-demo.chengtze.cc/')
-        return response
+        return {"status": "OK", "response": response.text}
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
@@ -87,7 +87,7 @@ async def ping_line_api():
 def sync_ping_line_api():
     try:
         response =  requests.get('https://bun-demo.chengtze.cc/')
-        return response
+        return {"status": "OK", "response": response.text}
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
