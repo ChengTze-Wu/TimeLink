@@ -5,7 +5,6 @@ import os
 import sys
 import logging
 import httpx
-import requests
 from datetime import datetime
 
 from fastapi import Request, FastAPI, HTTPException
@@ -73,21 +72,11 @@ async def ping_line_api():
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@app.get("/ping/<url>")
+@app.get("/ping")
 async def ping_test(url: str):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(url)
-        return {"status": "OK", "response": response.text, "time": datetime.now()}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.get("/sync-ping/<url>")
-def sync_ping_test(url: str):
-    try:
-        response =  requests.get(url)
         return {"status": "OK", "response": response.text, "time": datetime.now()}
     except Exception as e:
         logging.error(msg=e, exc_info=True)
