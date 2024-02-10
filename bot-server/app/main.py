@@ -59,30 +59,6 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 
-@app.get("/ping-line-api")
-async def ping_line_api():
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get('https://api.line.me/v2/bot/message/ping', headers={
-                'Authorization': f'Bearer {channel_access_token}'
-            })
-        return {"status": "OK"}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.get("/ping")
-async def ping_test(url: str):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
-        return {"status": "OK", "response": response.text, "time": datetime.now()}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.post("/callback")
 async def handle_callback(request: Request):
     signature = request.headers['X-Line-Signature']
