@@ -4,8 +4,6 @@ load_dotenv()
 import os
 import sys
 import logging
-import httpx
-from datetime import datetime
 
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
