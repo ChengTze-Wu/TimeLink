@@ -6,6 +6,7 @@ import sys
 import logging
 import httpx
 import requests
+from datetime import datetime
 
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
@@ -72,22 +73,22 @@ async def ping_line_api():
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@app.get("/ping-bun")
-async def ping_line_api():
+@app.get("/ping/<url>")
+async def ping_test(url: str):
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get('https://bun-demo.chengtze.cc/')
-        return {"status": "OK", "response": response.text}
+            response = await client.get(url)
+        return {"status": "OK", "response": response.text, "time": datetime.now()}
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@app.get("/sync-ping-bun")
-def sync_ping_line_api():
+@app.get("/sync-ping/<url>")
+def sync_ping_test(url: str):
     try:
-        response =  requests.get('https://bun-demo.chengtze.cc/')
-        return {"status": "OK", "response": response.text}
+        response =  requests.get(url)
+        return {"status": "OK", "response": response.text, "time": datetime.now()}
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
