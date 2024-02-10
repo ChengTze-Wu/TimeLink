@@ -1,9 +1,7 @@
 .env
 *.log
-/logs
-venv/
-timelink.cc/
-instance/
+.venv/
+config.py
 
 *.sh
 
@@ -15,9 +13,17 @@ htmlcov/
 .DS_Store
 __pycache__/
 *.pyc
+.vscode
 
 note.sql
 
 node_modules/
-package-lock.json
-package.json
+
+db/data/*
+logs/db/*
+
+alembic.ini
+# React Component Preview
+previewConfig.json
+
+!**/.gitkeep

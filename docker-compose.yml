@@ -1,43 +1,48 @@
-version: "3.3"
+version: "3"
 
 services:
-    taipei_oneday:
-        image: chengtze/taipei_oneday
-        env_file:
-            - ./taipei_oneday/.env
-        environment:
-            - TZ="Asia/Taipei"
-        command: gunicorn -w 2 -b :3000 app:app
+  web_api:
+    build:
+      context: ./web_api
+      dockerfile: Dockerfile.local-dev
+    image: chengtze/timelink-web_api:0.0.1-local-dev
+    container_name: web_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs/web_api:/usr/src/app/logs
+    env_file:
+      - ./web_api/.env
+    restart: unless-stopped
+    depends_on:
+      - db
+  bot-server:
+    build:
+      context: ./bot-server
+      dockerfile: Dockerfile
+    image: chengtze/timelink-bot-server:0.0.1-local-dev
+    container_name: bot-server
+    ports:
+      - "8800:8800"
+    env_file:
+      - ./bot-server/.env
+    restart: unless-stopped
+    depends_on:
+      - web_api
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    image: chengtze/timelink-db:0.0.1-local-dev
+    container_name: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+      - ./logs/db:/var/log/postgresql
+    restart: unless-stopped
 
-    timelink_web:
-        image: chengtze/timelink_web
-        volumes:
-            - ./instance:/usr/src/instance
-            - ./logs:/usr/src/logs
-        environment:
-            - TZ="Asia/Taipei"
-        working_dir: /usr/src
-        command: gunicorn -c ./timelink/gunicorn.conf.py 'timelink:create_app()'
-
-    timelink_bot:
-        image: chengtze/timelink_bot
-        env_file:
-            - ./.env
-        environment:
-            - TZ="Asia/Taipei"
-        command: gunicorn -w 2 -b :5000 app:timelink_bot
-
-    nginx:
-        image: chengtze/timelink_nginx
-        environment:
-            - TZ="Asia/Taipei"
-        volumes:
-            - ./certificate.crt:/etc/ssl/certificate.crt
-            - ./private.key:/etc/ssl/private.key
-        ports:
-            - "80:80"
-            - "443:443"
-        depends_on:
-            - taipei_oneday
-            - timelink_web
-            - timelink_bot
+networks:
+  default:
+    name: timelink_net
+    driver: bridge

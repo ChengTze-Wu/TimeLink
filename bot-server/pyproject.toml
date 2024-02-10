@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "bot-server"
+version = "0.1.0"
+description = ""
+authors = ["ChengTze-Wu <yaoop3050777@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+line-bot-sdk = "^3.7.0"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
+httpx = "^0.26.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
