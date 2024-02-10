@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import httpx
+import requests
 
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
@@ -66,6 +67,27 @@ async def ping_line_api():
                 'Authorization': f'Bearer {channel_access_token}'
             })
         return {"status": "OK"}
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.get("/ping-bun")
+async def ping_line_api():
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get('https://bun-demo.chengtze.cc/')
+        return response
+    except Exception as e:
+        logging.error(msg=e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.get("/sync-ping-bun")
+def sync_ping_line_api():
+    try:
+        response =  requests.get('https://bun-demo.chengtze.cc/')
+        return response
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
