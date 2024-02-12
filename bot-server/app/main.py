@@ -28,10 +28,10 @@ from linebot.v3.webhooks import (
     GroupSource,
 )
 from http import HTTPStatus
-from .lib.webhook import AsyncWebhookHandler
-from .utils.fetch import APIServerFetchClient
-from .selector import CommandSelector
-from .messages import ViewMessage
+from app.lib.webhook import AsyncWebhookHandler
+from app.utils.fetch import APIServerFetchClient
+from app.selector import CommandSelector
+from app.messages import ViewMessage
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
