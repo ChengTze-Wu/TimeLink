@@ -4,8 +4,6 @@ load_dotenv()
 import os
 import sys
 import logging
-import httpx
-from datetime import datetime
 
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
@@ -57,30 +55,6 @@ fetch = APIServerFetchClient()
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
-
-
-@app.get("/ping-line-api")
-async def ping_line_api():
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get('https://api.line.me/v2/bot/message/ping', headers={
-                'Authorization': f'Bearer {channel_access_token}'
-            })
-        return {"status": "OK"}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.get("/ping")
-async def ping_test(url: str):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
-        return {"status": "OK", "response": response.text, "time": datetime.now()}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/callback")

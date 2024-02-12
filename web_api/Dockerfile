@@ -7,8 +7,11 @@ RUN apt-get update && \
     rm -rf requirements.txt && \
     rm -rf /var/lib/apt/lists/*
 
+ENV TZ=Asia/Taipei
+
 COPY gunicorn.conf.py .
 COPY app app
 
 EXPOSE 8000
+ENV PORT 8000
 ENTRYPOINT ["gunicorn"]
