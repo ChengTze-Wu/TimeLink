@@ -1,6 +1,6 @@
 import os
 
-PORT = os.environ.get("PORT")
+PORT = os.environ.get("PORT", 8000)
 
 # Description: Gunicorn configuration file
 wsgi_app = "app:create_app()"
