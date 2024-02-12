@@ -23,12 +23,25 @@ services:
     image: chengtze/timelink-bot-server:0.0.1-local-dev
     container_name: bot-server
     ports:
-      - "8800:8800"
+      - "8800:8000"
     env_file:
       - ./bot-server/.env
     restart: unless-stopped
     depends_on:
       - web_api
+  # liff-server:
+  #   build:
+  #     context: ./liff-server
+  #     dockerfile: Dockerfile
+  #   image: chengtze/timelink-liff-server:0.0.1-local-dev
+  #   container_name: liff-server
+  #   ports:
+  #     - "8801:3000"
+  #   env_file:
+  #     - ./liff-server/.env
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - web_api
   db:
     build:
       context: ./db
