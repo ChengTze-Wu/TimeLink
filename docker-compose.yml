@@ -1,18 +1,18 @@
 version: "3"
 
 services:
-  web_api:
+  api-server:
     build:
-      context: ./web_api
+      context: ./api-server
       dockerfile: Dockerfile.local-dev
-    image: chengtze/timelink-web_api:0.0.1-local-dev
-    container_name: web_api
+    image: chengtze/timelink-api-server:0.0.1-local-dev
+    container_name: api-server
     ports:
       - "8000:8000"
     volumes:
-      - ./logs/web_api:/usr/src/app/logs
+      - ./logs/api-server:/usr/src/app/logs
     env_file:
-      - ./web_api/.env
+      - ./api-server/.env
     restart: unless-stopped
     depends_on:
       - db
@@ -28,7 +28,7 @@ services:
       - ./bot-server/.env
     restart: unless-stopped
     depends_on:
-      - web_api
+      - api-server
   liff-server:
     build:
       context: ./liff-server
@@ -41,7 +41,7 @@ services:
       - ./liff-server/.env.production.local
     restart: unless-stopped
     depends_on:
-      - web_api
+      - api-server
   db:
     build:
       context: ./db
