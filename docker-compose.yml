@@ -29,19 +29,19 @@ services:
     restart: unless-stopped
     depends_on:
       - web_api
-  # liff-server:
-  #   build:
-  #     context: ./liff-server
-  #     dockerfile: Dockerfile
-  #   image: chengtze/timelink-liff-server:0.0.1-local-dev
-  #   container_name: liff-server
-  #   ports:
-  #     - "8801:3000"
-  #   env_file:
-  #     - ./liff-server/.env
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - web_api
+  liff-server:
+    build:
+      context: ./liff-server
+      dockerfile: Dockerfile
+    image: chengtze/timelink-liff-server:0.0.1-local-dev
+    container_name: liff-server
+    ports:
+      - "8801:3000"
+    env_file:
+      - ./liff-server/.env.production.local
+    restart: unless-stopped
+    depends_on:
+      - web_api
   db:
     build:
       context: ./db
