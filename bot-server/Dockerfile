@@ -6,7 +6,9 @@ COPY requirements.txt .
 # Set the environment variable to install multidict on 
 # another operating system (or Alpine Linux inside a Docker)
 # See: https://pypi.org/project/multidict/#library-installation
-env MULTIDICT_NO_EXTENSIONS=1
+ENV MULTIDICT_NO_EXTENSIONS=1
+
+ENV TZ=Asia/Taipei
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc && \
@@ -16,5 +18,6 @@ RUN apt-get update && \
 
 COPY app app
 
-EXPOSE 8800
-ENTRYPOINT ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8800"]
+EXPOSE 8000
+ENV PORT 8000
+ENTRYPOINT ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
