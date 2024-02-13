@@ -2,14 +2,9 @@
 
 import { unstable_noStore as noStore } from "next/cache";
 
-const { API_SERVER_URL } = process.env;
-const { API_SERVER_ACCESS_TOKEN } = process.env;
-
-if (!API_SERVER_URL || !API_SERVER_ACCESS_TOKEN) {
-  throw new Error("API_SERVER_URL or API_SERVER_ACCESS_TOKEN not set");
-}
-
 export async function getJson(apiEndpoint: string) {
+  const { API_SERVER_URL } = process.env;
+  const { API_SERVER_ACCESS_TOKEN } = process.env;
   try {
     noStore();
     const res = await fetch(API_SERVER_URL + apiEndpoint, {
@@ -28,6 +23,8 @@ export async function getJson(apiEndpoint: string) {
 }
 
 export async function postJson(apiEndpoint: string, data: any) {
+  const { API_SERVER_URL } = process.env;
+  const { API_SERVER_ACCESS_TOKEN } = process.env;
   try {
     noStore();
     const res = await fetch(API_SERVER_URL + apiEndpoint, {
@@ -49,6 +46,8 @@ export async function postJson(apiEndpoint: string, data: any) {
 }
 
 export async function putJson(apiEndpoint: string, data: any) {
+  const { API_SERVER_URL } = process.env;
+  const { API_SERVER_ACCESS_TOKEN } = process.env;
   try {
     noStore();
     const res = await fetch(API_SERVER_URL + apiEndpoint, {
@@ -70,6 +69,8 @@ export async function putJson(apiEndpoint: string, data: any) {
 }
 
 export async function deleteJson(apiEndpoint: string) {
+  const { API_SERVER_URL } = process.env;
+  const { API_SERVER_ACCESS_TOKEN } = process.env;
   try {
     noStore();
     const res = await fetch(API_SERVER_URL + apiEndpoint, {
