@@ -128,5 +128,6 @@ class UserService:
             "token": {
                 "access_token": self.jwt_service.generate(payload),
                 "token_type": "bearer",
+                "expires_in": self.jwt_service.exp_time,
             },
         }
