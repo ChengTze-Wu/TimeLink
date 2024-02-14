@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 
+from contextlib import asynccontextmanager
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
     AsyncApiClient,
@@ -46,7 +47,14 @@ configuration = Configuration(
     access_token=channel_access_token,
 )
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await async_api_client.close()  # Close client session
+
+
+app = FastAPI(lifespan=lifespan)
 async_api_client = AsyncApiClient(configuration)
 line_bot_api = AsyncMessagingApi(async_api_client)
 async_handler = AsyncWebhookHandler(channel_secret)
