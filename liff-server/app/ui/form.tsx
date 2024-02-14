@@ -67,7 +67,6 @@ export default function ReserveForm({ service }: { service: Service }) {
       {state.message !== "" && (
         <p className="text-red-600">*請填開放及未來時間</p>
       )}
-      <p>{state.message}</p>
       <form action={dispatch}>
         <p className="text">請選擇預約時間: </p>
         <div className="flex flex-row gap-1">
