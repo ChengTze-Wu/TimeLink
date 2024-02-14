@@ -65,6 +65,11 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 
+@app.get("/ping")
+async def health_check():
+    return {"status": "ok"}
+
+
 @app.post("/callback")
 async def handle_callback(request: Request):
     signature = request.headers['X-Line-Signature']
@@ -119,6 +124,8 @@ async def handle_member_join(event: MemberJoinedEvent):
             'line_group_id': line_group_id
         })
 
+        resp.raise_for_status()
+
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -140,6 +147,8 @@ async def handle_member_left(event: MemberLeftEvent):
             'line_user_id': line_user_id,
             'line_group_id': line_group_id
         })
+
+        resp.raise_for_status()
 
     except Exception as e:
         logging.error(msg=e, exc_info=True)

@@ -39,6 +39,7 @@ export const { auth, signIn, signOut } = NextAuth({
           cookies().set("access_token", authResp.token.access_token, {
             httpOnly: true,
             sameSite: "lax",
+            maxAge: authResp.token.expires_in,
           });
           cookies().set(
             "user_info",
@@ -50,6 +51,7 @@ export const { auth, signIn, signOut } = NextAuth({
             {
               httpOnly: true,
               sameSite: "lax",
+              maxAge: authResp.token.expires_in,
             }
           );
           return authResp;

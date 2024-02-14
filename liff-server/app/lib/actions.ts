@@ -52,6 +52,7 @@ export async function createReserve(
     });
 
     if (result.status !== 201) {
+      console.error("Failed to Create Reserve", result.message);
       return {
         message: result.message,
       };
