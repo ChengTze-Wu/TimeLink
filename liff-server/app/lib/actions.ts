@@ -57,6 +57,7 @@ export async function createReserve(
       };
     }
   } catch (error) {
+    console.error("Error creating reserve", error);
     return {
       message: "Failed to Create Reserve.",
     };
