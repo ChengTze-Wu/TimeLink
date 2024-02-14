@@ -42,6 +42,19 @@ services:
     restart: unless-stopped
     depends_on:
       - api-server
+  web_app:
+    build:
+      context: ./web_app
+      dockerfile: Dockerfile
+    image: chengtze/timelink-web-app:0.0.1-local-dev
+    container_name: web_app
+    ports:
+      - "8802:3000"
+    env_file:
+      - ./web_app/.env.production.local
+    restart: unless-stopped
+    depends_on:
+      - api-server
   db:
     build:
       context: ./db
