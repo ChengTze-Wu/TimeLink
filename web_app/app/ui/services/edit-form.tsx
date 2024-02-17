@@ -1,6 +1,6 @@
 "use client";
 
-import { updateService } from "@/app/lib/services/actions";
+import { updateService, uploadImageToGCS } from "@/app/lib/services/actions";
 import { useFormState } from "react-dom";
 import { Service, Group } from "@/app/lib/definitions";
 import { useState, useEffect } from "react";
@@ -19,7 +19,11 @@ import {
   InputNumber,
   Select,
   Flex,
+  Upload,
 } from "antd";
+
+import { UploadOutlined } from "@ant-design/icons";
+import { UploadRequestOption } from "rc-upload/lib/interface";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -39,6 +43,7 @@ export default function EditForm({ service }: { service: Service }) {
 
   const updateServiceWithUuid = updateService.bind(null, service.id);
   const [state, dispatch] = useFormState(updateServiceWithUuid, initialState);
+  const [imageName, setImageName] = useState<string | null>(service.image);
 
   const [checkboxStatus, setCheckboxStatus] = useState(() => {
     const checkboxStatus: { [key: string]: boolean } = {};
@@ -114,11 +119,30 @@ export default function EditForm({ service }: { service: Service }) {
 
     const formData = {
       ...values,
+      image: imageName,
       working_hours: workingHoursArray,
       groups: groupIds,
     };
 
     dispatch(formData);
+  };
+
+  const handleUpload = async (options: UploadRequestOption) => {
+    const { file, onSuccess, onError } = options;
+    const { name } = file as File;
+    const arrayBuffer = await (file as File).arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+    try {
+      const uploadedFileName = await uploadImageToGCS(buffer, name);
+      if (onSuccess) {
+        setImageName(uploadedFileName);
+        onSuccess("ok");
+      }
+    } catch (error) {
+      if (onError) {
+        onError(new Error("Upload failed"));
+      }
+    }
   };
 
   return (
@@ -141,6 +165,29 @@ export default function EditForm({ service }: { service: Service }) {
               initialValue={service.name}
             >
               <Input size="large" />
+            </Form.Item>
+            <Form.Item label="上傳圖片" valuePropName="fileList">
+              <Upload
+                listType="picture"
+                maxCount={1}
+                accept="image/*"
+                customRequest={handleUpload}
+                onRemove={() => setImageName(null)}
+                defaultFileList={
+                  service?.image
+                    ? [
+                        {
+                          uid: "1",
+                          name: service.image.split("/").pop() || "",
+                          status: "done",
+                          url: service.image,
+                        },
+                      ]
+                    : []
+                }
+              >
+                <Button icon={<UploadOutlined />}>Upload</Button>
+              </Upload>
             </Form.Item>
             <Form.Item label="價格" name="price" initialValue={service.price}>
               <InputNumber

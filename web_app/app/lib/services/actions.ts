@@ -4,8 +4,8 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { postJson, deleteJson, putJson } from "@/app/lib/fetch-api-data";
-import { UUID } from "crypto";
-import { Service } from "@/app/lib/definitions";
+import { Storage } from "@google-cloud/storage";
+import { UUID, randomUUID } from "crypto";
 
 const FormSchema = z.object({
   name: z
@@ -14,6 +14,7 @@ const FormSchema = z.object({
     })
     .min(1, { message: "name is required" })
     .max(50, { message: "name must be less than 50 characters" }),
+  image: z.string().url().nullable().optional(),
   price: z.coerce
     .number()
     .min(0, { message: "price must be greater than 0" })
@@ -142,4 +143,29 @@ export async function deleteService(service_id: UUID) {
   }
 
   revalidatePath("/dashboard/services");
+}
+
+export async function uploadImageToGCS(
+  imageFile: Uint8Array,
+  fileName: string
+) {
+  const storage = new Storage({
+    credentials: {
+      client_email: process.env.GCS_CLIENT_EMAIL,
+      private_key: process.env.GCS_PRIVATE_KEY,
+    },
+  });
+  const BUCKET_NAME = process.env.GCS_BUCKET_NAME;
+
+  if (!BUCKET_NAME) {
+    throw new Error("BUCKET_NAME is not defined");
+  }
+
+  const firstRandomUUID = randomUUID().split("-")[0];
+  const uuidWithFileName = `${firstRandomUUID}-${fileName}`;
+  const bucket = storage.bucket(BUCKET_NAME);
+  const file = bucket.file(uuidWithFileName);
+  await file.save(Buffer.from(imageFile));
+  const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${uuidWithFileName}`;
+  return publicUrl;
 }
