@@ -22,6 +22,9 @@ const nextConfig = {
     // see: https://github.com/vercel/next.js/issues/59432#issuecomment-1876846798 and
     // https://nextjs.org/docs/app/api-reference/next-config-js/serverComponentsExternalPackages
     serverComponentsExternalPackages: ["@google-cloud/storage"],
+    serverActions: {
+      bodySizeLimit: "10MB",
+    },
   },
   output: "standalone",
 };
