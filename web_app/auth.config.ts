@@ -1,4 +1,3 @@
-import { Session } from "inspector";
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
@@ -20,6 +19,7 @@ export const authConfig = {
   },
   providers: [], // Add providers with an empty array for now
   session: {
+    strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours
   },
   trustHost: true,
