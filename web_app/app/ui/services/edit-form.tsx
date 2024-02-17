@@ -20,6 +20,7 @@ import {
   Select,
   Flex,
   Upload,
+  message,
 } from "antd";
 
 import { UploadOutlined } from "@ant-design/icons";
@@ -145,6 +146,25 @@ export default function EditForm({ service }: { service: Service }) {
     }
   };
 
+  const beforeUpload = (file: any) => {
+    const asscptedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+    const isImage = asscptedTypes.includes(file.type);
+    if (!isImage) {
+      message.error("You can only upload image file!");
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2.005;
+    console.log("file.size", file.size);
+    if (!isLt2M) {
+      message.error("Image must smaller than 2MB!");
+    }
+    return isImage && isLt2M;
+  };
+
   return (
     <ConfigProvider
       theme={{
@@ -173,6 +193,7 @@ export default function EditForm({ service }: { service: Service }) {
                 accept="image/*"
                 customRequest={handleUpload}
                 onRemove={() => setImageName(null)}
+                beforeUpload={beforeUpload}
                 defaultFileList={
                   service?.image
                     ? [
