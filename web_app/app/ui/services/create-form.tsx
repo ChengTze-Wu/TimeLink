@@ -1,6 +1,6 @@
 "use client";
 
-import { createService } from "@/app/lib/services/actions";
+import { createService, uploadImageToGCS } from "@/app/lib/services/actions";
 import { useFormState } from "react-dom";
 import { useState, useEffect } from "react";
 import { getJson } from "@/app/lib/fetch-api-data";
@@ -17,7 +17,11 @@ import {
   Typography,
   InputNumber,
   Select,
+  Upload,
 } from "antd";
+
+import { UploadOutlined } from "@ant-design/icons";
+import { UploadRequestOption } from "rc-upload/lib/interface";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -35,14 +39,15 @@ const weekdays = [
 export default function CerateForm() {
   const initialState = { message: "", errors: {} };
   const [state, dispatch] = useFormState(createService, initialState);
+  const [imageName, setImageName] = useState<string | null>(null);
   const [checkboxStatus, setCheckboxStatus] = useState<{
     [key: string]: boolean;
   }>({});
   const [timeRange, setTimeRange] = useState<{
     [key: string]: [string, string];
   }>({});
-
   const [groupOptions, setGroupOptions] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       const groupJsonResponse = await getJson("/api/groups?per_page=999");
@@ -77,11 +82,30 @@ export default function CerateForm() {
 
     const formData = {
       ...values,
+      image: imageName,
       working_hours: workingHoursArray,
       groups: groupIds,
     };
 
     dispatch(formData);
+  };
+
+  const handleUpload = async (options: UploadRequestOption) => {
+    const { file, onSuccess, onError } = options;
+    const { name } = file as File;
+    const arrayBuffer = await (file as File).arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+    try {
+      const uploadedFileName = await uploadImageToGCS(buffer, name);
+      if (onSuccess) {
+        setImageName(uploadedFileName);
+        onSuccess("ok");
+      }
+    } catch (error) {
+      if (onError) {
+        onError(new Error("Upload failed"));
+      }
+    }
   };
 
   return (
@@ -103,6 +127,17 @@ export default function CerateForm() {
               rules={[{ required: true, message: "請輸入服務名稱" }]}
             >
               <Input placeholder="剪頭髮" size="large" />
+            </Form.Item>
+            <Form.Item label="上傳圖片" valuePropName="fileList">
+              <Upload
+                listType="picture"
+                maxCount={1}
+                accept="image/*"
+                customRequest={handleUpload}
+                onRemove={() => setImageName(null)}
+              >
+                <Button icon={<UploadOutlined />}>Upload</Button>
+              </Upload>
             </Form.Item>
             <Form.Item label="價格" name="price">
               <InputNumber
