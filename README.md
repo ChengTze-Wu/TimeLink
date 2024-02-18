@@ -6,7 +6,7 @@
 </p>
 
 # TimeLink 2.0
-TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透過 Line 群組機器人簡便預約服務，商家可以透過平台管理服務。TimeLink 2.0 版本是 TimeLink 1.0 版本的重構版本，以提高程式的可讀性、可維護性、可擴展性，並且使用更多的雲端服務，以提高系統的效能與安全性。
+TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透過 Line 群組機器人簡便預約服務，商家可以透過平台管理服務。TimeLink 2.0 版本是 TimeLink 1.0 版本的重構版本，將應用拆分模組，提高程式的可讀性、可維護性、可擴展性，並且使用更多的雲端服務，以提高系統的效能與安全性。
 
 - 各模組:
   - [API Server](api-server) : 作為整個系統的核心，處理商業邏輯，並與資料庫溝通。
@@ -24,7 +24,8 @@ TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透�
 - Line Bot 改以非同步方式撰寫，以處理更多的使用者同時操作。
 
 
-### 伺服器架構
+### 雲伺服器架構
+<img src="https://storage.googleapis.com/timelink-assets/TimeLink-Architecture.png" alt="TimeLink 2.0 Server Architecture" style="width: 100%;">
 - 將原本使用 EC2 VM 作為伺服器，改使用 GCP Cloud Run 作為伺服器，它可以自動擴展 instance，再不需要時自動縮減 instance，以節省成本。
 - 使用 GCP Cloud Build 作為 CD 工具，監控此 Repository 的更動，並自動部署到 GCP Cloud Run。
 - API Server 只開放從 VPC 流入流量，以提高伺服器的安全性。
