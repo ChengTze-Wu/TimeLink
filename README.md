@@ -8,11 +8,11 @@
 # TimeLink 2.0
 TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透過 Line 群組機器人簡便預約服務，商家可以透過平台管理服務。TimeLink 2.0 版本是 TimeLink 1.0 版本的重構版本，以提高程式的可讀性、可維護性、可擴展性，並且使用更多的雲端服務，以提高系統的效能與安全性。
 
-- 各模組 README:
-  - [API Server](api-server/README.md) : 作為整個系統的核心，處理商業邏輯，並與資料庫溝通。
-  - [Web Frontend](web_app/README.md) : 提供商家管理服務的介面。
-  - [LIFF Frontend](liff-server/README.md) : 提供消費者預約服務的介面。
-  - [Line Bot](bot-server/README.md) : 提供消費者在 Line 群組中的機器人介面。
+- 各模組:
+  - [API Server](api-server) : 作為整個系統的核心，處理商業邏輯，並與資料庫溝通。
+  - [Web Frontend](web_app) : 提供商家管理服務的介面。
+  - [LIFF Frontend](liff-server) : 提供消費者預約服務的介面。
+  - [Line Bot](bot-server) : 提供消費者在 Line 群組中的機器人介面。
 
 ## 改動
 相較於 2022 年 [TimeLink 1.0](https://github.com/ChengTze-Wu/TimeLink/tree/v1.0.0) 版本，TimeLink 2.0 版本有以下改動：
