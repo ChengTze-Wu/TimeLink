@@ -26,6 +26,7 @@ TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透�
 
 ### 雲伺服器架構
 <img src="https://storage.googleapis.com/timelink-assets/TimeLink-Architecture.png" alt="TimeLink 2.0 Server Architecture" style="width: 100%;">
+
 - 將原本使用 EC2 VM 作為伺服器，改使用 GCP Cloud Run 作為伺服器，它可以自動擴展 instance，再不需要時自動縮減 instance，以節省成本。
 - 使用 GCP Cloud Build 作為 CD 工具，監控此 Repository 的更動，並自動部署到 GCP Cloud Run。
 - API Server 只開放從 VPC 流入流量，以提高伺服器的安全性。
