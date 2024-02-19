@@ -15,16 +15,16 @@ class JWTService:
     def __init__(self, algorithm="HS256"):
         self.secret = JWT_SECRET_KEY
         self.algorithm = algorithm
-        self.exp_time = JWT_ACCESS_TOKEN_EXPIRE_HOURS * 60
+        self.exp_second = JWT_ACCESS_TOKEN_EXPIRE_HOURS * 60 * 60
 
     def set_exp_time(self, exp_time):
-        self.exp_time = exp_time
+        self.exp_second = exp_time
 
     def generate(self, payload):
         if not isinstance(payload, dict):
             raise ValueError("Payload must be a dictionary")
 
-        exp = datetime.utcnow() + timedelta(minutes=self.exp_time)
+        exp = datetime.utcnow() + timedelta(seconds=self.exp_second)
         payload.update({"exp": exp, "iat": datetime.utcnow()})
 
         token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
