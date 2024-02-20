@@ -15,7 +15,7 @@ export async function authenticate(
         case "CredentialsSignin":
           return "帳號或密碼錯誤。";
         default:
-          return "Something went wrong.";
+          return "伺服器錯誤，請稍後再試。";
       }
     }
     throw error;

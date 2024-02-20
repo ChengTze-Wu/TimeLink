@@ -21,10 +21,11 @@ export default async function ServicesTable({
   );
 
   return (
-    <table className="w-full h-full">
+    <table className="w-full h-full table-fixed">
       <thead className="border-b-[1px] border-gray-300">
         <tr className="text-left font-light">
           <th>項目</th>
+          <th>隸屬群組</th>
           <th>服務單位時間</th>
           <th>價格</th>
           <th>
@@ -37,19 +38,29 @@ export default async function ServicesTable({
         {serviceJsonResponse?.data?.map((service: Service) => (
           <tr
             key={service.id}
-            className="border-b-[1px] border-gray-300 last:border-b-0"
+            className="border-b-[1px] border-gray-300 last:border-b-0 h-[4.5rem]"
           >
-            <td className="flex items-center gap-2 h-[4.5rem]">
-              {service.image && (
-                <Image
-                  src={service.image}
-                  className="rounded-full w-12 h-12"
-                  width={48}
-                  height={48}
-                  alt="服務的示意圖"
-                />
+            <td className="flex items-center gap-2 h-full">
+              <Image
+                src={
+                  service.image ||
+                  "https://via.placeholder.com/1024x1024.png?text=No+Image"
+                }
+                className="rounded-full w-12 h-12"
+                width={48}
+                height={48}
+                alt="服務的示意圖"
+              />
+              <p>{service.name}</p>
+            </td>
+            <td>
+              {service.groups.length === 0 ? (
+                <p className="text-gray-500 font-light">尚未隸屬於任何群組</p>
+              ) : (
+                service.groups.map((group) => (
+                  <p key={group.id}>{group.name}</p>
+                ))
               )}
-              {service.name}
             </td>
             <td className={clsx(service.working_period || "text-gray-400")}>
               {service.working_period || "待定"}
@@ -62,7 +73,7 @@ export default async function ServicesTable({
             >
               {service.is_active ? "● 啟用" : "● 停用"}
             </td>
-            <td className="md:flex gap-4 items-center ">
+            <td className="md:flex gap-4 items-center h-full">
               <Link
                 href={`/dashboard/services/${service.id}/edit`}
                 className="rounded-md border hover:bg-gray-100 p-2"

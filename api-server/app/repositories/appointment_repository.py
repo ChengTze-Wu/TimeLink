@@ -50,55 +50,56 @@ class AppointmentRepository:
 
             return appointment.to_dict()
 
-    def select_all_by_filter_and_paganation(
-        self,
-        page: int,
-        per_page: int,
-        user_id: str | None = None,
-        service_id: str | None = None,
-    ):
-        with get_session() as session:
-            appointments = (
-                session.query(Appointment)
-                .filter(
-                    or_(
-                        Appointment.user_id == user_id,
-                        Appointment.service_id == service_id,
-                    )
-                )
-                .offset((page - 1) * per_page)
-                .limit(per_page)
-                .all()
-            )
-
-            return [appointment.to_dict() for appointment in appointments]
-
     def select_all_by_filter(
         self,
         page: int = 1,
         per_page: int = 10,
         user_id: str | None = None,
         service_id: str | None = None,
+        service_owner_id: str | None = None,
     ):
         with get_session() as session:
             base_query = (
                 select(Appointment)
                 .filter(
-                    or_(
-                        Appointment.user_id == user_id,
-                        Appointment.service_id == service_id,
-                    )
+                   Appointment.is_deleted == False
                 )
                 .order_by(Appointment.created_at.desc())
             )
+
+            if user_id is not None:
+                base_query = base_query.filter(Appointment.user_id == user_id)
+
+            if service_id is not None:
+                base_query = base_query.filter(Appointment.service_id == service_id)
+
+            if service_owner_id is not None:
+                base_query = base_query.join(Service).filter(Service.owner_id == service_owner_id)
+
             base_query = base_query.offset((page - 1) * per_page).limit(per_page)
             appointments = session.scalars(base_query).all()
             return [appointment.to_dict() for appointment in appointments]
 
     def count_all_by_filter(
-        self, user_id: str | None = None, service_id: str | None = None
+        self, user_id: str | None = None, service_id: str | None = None, service_owner_id: str | None = None,
     ):
-        return len(self.select_all_by_filter(user_id=user_id, service_id=service_id))
+        with get_session() as session:
+            base_query = (
+                select(Appointment)
+                .filter(Appointment.is_deleted == False)
+                .order_by(Appointment.created_at.desc())
+            )
+
+            if user_id is not None:
+                base_query = base_query.filter(Appointment.user_id == user_id)
+
+            if service_id is not None:
+                base_query = base_query.filter(Appointment.service_id == service_id)
+            
+            if service_owner_id is not None:
+                base_query = base_query.join(Service).filter(Service.owner_id == service_owner_id)
+
+            return len(session.scalars(base_query).all())
 
     def update_one(self, appointment_id: str, appointment_data: dict):
         with get_session() as session:

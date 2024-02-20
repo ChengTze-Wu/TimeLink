@@ -53,6 +53,7 @@ export type Service = {
   image: string;
   description: string;
   working_period: number;
+  owner: Owner;
   is_active: boolean;
   created_at: string;
   updated_at: string;
