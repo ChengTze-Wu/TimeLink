@@ -40,7 +40,7 @@ export default async function Page({
         ]}
       />
       <div className="flex justify-between gap-4 mb-4">
-        <SearchBar placeholder="搜尋'名稱','簡介'..." />
+        <SearchBar placeholder="搜尋名稱" />
         <Link
           href="/dashboard/services/create"
           className="flex place-items-center p-2 text-sm text-white bg-primary-green rounded-md hover:bg-green-600"
