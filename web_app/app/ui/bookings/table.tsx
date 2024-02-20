@@ -5,10 +5,12 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 export default function BookingsTable({
   displayAppointments,
+  pageSize,
   currentPage,
   totalItems,
 }: {
   displayAppointments: any[];
+  pageSize: number;
   currentPage: number;
   totalItems: number;
 }) {
@@ -63,7 +65,7 @@ export default function BookingsTable({
       columns={columns}
       dataSource={displayAppointments}
       pagination={{
-        pageSize: 9,
+        pageSize: pageSize,
         position: ["bottomCenter"],
         current: currentPage,
         total: totalItems,

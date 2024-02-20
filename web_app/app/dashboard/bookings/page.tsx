@@ -62,6 +62,7 @@ export default async function Page({
   return (
     <BookingsTable
       displayAppointments={displayAppointments}
+      pageSize={9}
       currentPage={currentPage}
       totalItems={appointmentsResp.pagination.total_items}
     />
