@@ -46,6 +46,7 @@ export default function ReserveForm({ service }: { service: Service }) {
         <div className="w-1/2">
           <p>價格：NT$ {service.price}</p>
           <p>狀態：{status}</p>
+          <p>服務時長：{service.working_period} 分鐘</p>
           <p>說明：{description}</p>
         </div>
         <Image
@@ -56,7 +57,7 @@ export default function ReserveForm({ service }: { service: Service }) {
           alt="service image"
         />
       </div>
-      <h2 className="text-xl">開放預約時間</h2>
+      <h2 className="text-xl">營業時間</h2>
       {service.working_hours.map((working_hour) => (
         <p key={working_hour.id}>
           {dayOfWeekMap[working_hour.day_of_week as keyof typeof dayOfWeekMap]}{" "}
@@ -64,11 +65,10 @@ export default function ReserveForm({ service }: { service: Service }) {
         </p>
       ))}
       <hr />
-      {state.message !== "" && (
-        <p className="text-red-600">*請填開放及未來時間</p>
-      )}
+      {state.message !== "" && <p className="text-red-600">*請填合理時間</p>}
       <form action={dispatch}>
         <p className="text">請選擇預約時間: </p>
+        <em>* 請填未來時間以及營業時間範圍內（不超過預約時間+服務時長）</em>
         <div className="flex flex-row gap-1">
           <input
             type="text"
