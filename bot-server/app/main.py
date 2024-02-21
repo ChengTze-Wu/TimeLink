@@ -4,10 +4,8 @@ load_dotenv()
 import os
 import sys
 import logging
-import httpx
-import requests
-from datetime import datetime
 
+from contextlib import asynccontextmanager
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
     AsyncApiClient,
@@ -31,10 +29,10 @@ from linebot.v3.webhooks import (
     GroupSource,
 )
 from http import HTTPStatus
-from .lib.webhook import AsyncWebhookHandler
-from .utils.fetch import APIServerFetchClient
-from .selector import CommandSelector
-from .messages import ViewMessage
+from app.lib.webhook import AsyncWebhookHandler
+from app.lib.fetch import APIServerFetchClient
+from app.utils.selector import CommandSelector
+from app.messages import ViewMessage
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -49,7 +47,14 @@ configuration = Configuration(
     access_token=channel_access_token,
 )
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await async_api_client.close()  # Close client session
+
+
+app = FastAPI(lifespan=lifespan)
 async_api_client = AsyncApiClient(configuration)
 line_bot_api = AsyncMessagingApi(async_api_client)
 async_handler = AsyncWebhookHandler(channel_secret)
@@ -60,38 +65,9 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 
-@app.get("/ping-line-api")
-async def ping_line_api():
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get('https://api.line.me/v2/bot/message/ping', headers={
-                'Authorization': f'Bearer {channel_access_token}'
-            })
-        return {"status": "OK"}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.get("/ping/<url>")
-async def ping_test(url: str):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
-        return {"status": "OK", "response": response.text, "time": datetime.now()}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.get("/sync-ping/<url>")
-def sync_ping_test(url: str):
-    try:
-        response =  requests.get(url)
-        return {"status": "OK", "response": response.text, "time": datetime.now()}
-    except Exception as e:
-        logging.error(msg=e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/ping")
+async def health_check():
+    return {"status": "ok"}
 
 
 @app.post("/callback")
@@ -113,24 +89,23 @@ async def handle_callback(request: Request):
 @async_handler.add(FollowEvent)
 async def handle_member_follow(event: FollowEvent):
     try:
-        line_user_id: str = event.source.user_id
+        reply_message = None
+        resp = await __register_user(event.source.user_id)
 
-        user_resp = await fetch.get(f'/api/users/{line_user_id}')
+        if resp.status_code == HTTPStatus.CONFLICT:
+            reply_message = ViewMessage.WELCOME_BACK
 
-        reply_message = ViewMessage.WELCOME_BACK
+        if resp.status_code == HTTPStatus.CREATED:
+            name = resp.json().get('name')
+            reply_message = ViewMessage.WELCOME_NEW_USER.substitute(name=name)
 
-        if user_resp.status_code == HTTPStatus.NOT_FOUND:
-            reply_message = ViewMessage.WELCOME_NEW_USER
-
-        if user_resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-            return
-
-        await line_bot_api.reply_message(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=reply_message)]
+        if reply_message:
+            await line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=reply_message)]
+                )
             )
-        )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -139,7 +114,7 @@ async def handle_member_follow(event: FollowEvent):
 @async_handler.add(MemberJoinedEvent)
 async def handle_member_join(event: MemberJoinedEvent):
     try:
-        reply_message = ViewMessage.WELCOME_MEMBER_JOIN
+        reply_message = None
         line_user_id = event.joined.members[0].user_id
         line_group_id = event.source.group_id
 
@@ -148,12 +123,19 @@ async def handle_member_join(event: MemberJoinedEvent):
             'line_group_id': line_group_id
         })
 
-        await line_bot_api.reply_message(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=reply_message)]
+        if resp.status_code == HTTPStatus.CONFLICT:
+            reply_message = ViewMessage.WELCOME_BACK
+
+        if resp.status_code == HTTPStatus.CREATED:
+            reply_message = ViewMessage.WELCOME_MEMBER_JOIN
+
+        if reply_message:
+            await line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=reply_message)]
+                )
             )
-        )
     except Exception as e:
         logging.error(msg=e, exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -169,6 +151,8 @@ async def handle_member_left(event: MemberLeftEvent):
             'line_user_id': line_user_id,
             'line_group_id': line_group_id
         })
+
+        resp.raise_for_status()
 
     except Exception as e:
         logging.error(msg=e, exc_info=True)
@@ -197,8 +181,11 @@ async def handle_bot_join(event: JoinEvent):
 @async_handler.add(MessageEvent, message=TextMessageContent)
 async def handle_message(event: MessageEvent):
     try:
-        if not await __check_group_linked(event):
-            return
+        await __register_user(event.source.user_id)
+        if isinstance(event.source, GroupSource):
+            if not await __check_group_linked(event):
+                return
+            await __connect_user_to_group(event.source.user_id, event.source.group_id)
 
         command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
@@ -218,8 +205,11 @@ async def handle_message(event: MessageEvent):
 @async_handler.add(PostbackEvent)
 async def handle_postback(event: PostbackEvent):
     try:
-        if not await __check_group_linked(event):
-            return
+        await __register_user(event.source.user_id)
+        if isinstance(event.source, GroupSource):
+            if not await __check_group_linked(event):
+                return
+            await __connect_user_to_group(event.source.user_id, event.source.group_id)
 
         command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
@@ -240,9 +230,6 @@ async def __check_group_linked(event: Event):
     '''Check if the group is linked to the TimeLink System.
     If not, notify the message to line.
     '''
-    if not isinstance(event.source, GroupSource):
-        return True
-
     line_group_id = event.source.group_id
     group_api_response = await fetch.get(f'/api/groups/{line_group_id}')
 
@@ -259,4 +246,42 @@ async def __check_group_linked(event: Event):
         )
         return False
 
+    return False
+
+
+async def __register_user(line_user_id):
+    user_profile = await line_bot_api.get_profile(line_user_id)
+    user_api_response = await fetch.post('/api/users', {
+        "username": line_user_id,
+        "name": user_profile.display_name,
+        "email": f"{line_user_id}@mail.com",
+        "password": __generate_random_password(),
+        'line_user_id': line_user_id,
+        'role': 'group_member'
+    })
+    return user_api_response
+
+
+def __generate_random_password(length: int = 12):
+    import random
+    import string
+    characters = [
+        random.choice(string.ascii_uppercase),  # At least one uppercase letter
+        random.choice(string.ascii_lowercase),  # At least one lowercase letter
+        random.choice(string.digits),  # At least one digit
+        random.choice('@$!%*?&.')  # At least one special character
+    ]
+    characters += random.choices(string.ascii_letters + string.digits, k=length-4)
+    random.shuffle(characters)
+    password = ''.join(characters)
+    return password
+
+
+async def __connect_user_to_group(line_user_id, line_group_id):
+    user_group_api_response = await fetch.post('/api/groups/users', {
+        "line_user_id": line_user_id,
+        "line_group_id": line_group_id
+    })
+    if user_group_api_response.status_code in [HTTPStatus.CONFLICT, HTTPStatus.CREATED]:
+        return True
     return False

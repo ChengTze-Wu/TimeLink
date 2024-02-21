@@ -3,9 +3,8 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { cookies } from "next/headers";
 
-const { API_GATEWAY } = process.env;
-
 export async function getJson(apiEndpoint: string) {
+  const { API_GATEWAY } = process.env;
   try {
     noStore();
     const access_token = cookies().get("access_token")?.value;
@@ -25,6 +24,7 @@ export async function getJson(apiEndpoint: string) {
 }
 
 export async function postJson(apiEndpoint: string, data: any) {
+  const { API_GATEWAY } = process.env;
   try {
     noStore();
     const access_token = cookies().get("access_token")?.value;
@@ -47,6 +47,7 @@ export async function postJson(apiEndpoint: string, data: any) {
 }
 
 export async function putJson(apiEndpoint: string, data: any) {
+  const { API_GATEWAY } = process.env;
   try {
     noStore();
     const access_token = cookies().get("access_token")?.value;
@@ -69,6 +70,7 @@ export async function putJson(apiEndpoint: string, data: any) {
 }
 
 export async function deleteJson(apiEndpoint: string) {
+  const { API_GATEWAY } = process.env;
   try {
     noStore();
     const access_token = cookies().get("access_token")?.value;

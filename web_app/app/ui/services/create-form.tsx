@@ -1,6 +1,6 @@
 "use client";
 
-import { createService } from "@/app/lib/services/actions";
+import { createService, uploadImageToGCS } from "@/app/lib/services/actions";
 import { useFormState } from "react-dom";
 import { useState, useEffect } from "react";
 import { getJson } from "@/app/lib/fetch-api-data";
@@ -17,7 +17,12 @@ import {
   Typography,
   InputNumber,
   Select,
+  Upload,
+  message,
 } from "antd";
+
+import { UploadOutlined } from "@ant-design/icons";
+import { UploadRequestOption } from "rc-upload/lib/interface";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -35,14 +40,15 @@ const weekdays = [
 export default function CerateForm() {
   const initialState = { message: "", errors: {} };
   const [state, dispatch] = useFormState(createService, initialState);
+  const [imageName, setImageName] = useState<string | null>(null);
   const [checkboxStatus, setCheckboxStatus] = useState<{
     [key: string]: boolean;
   }>({});
   const [timeRange, setTimeRange] = useState<{
     [key: string]: [string, string];
   }>({});
-
   const [groupOptions, setGroupOptions] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       const groupJsonResponse = await getJson("/api/groups?per_page=999");
@@ -77,11 +83,48 @@ export default function CerateForm() {
 
     const formData = {
       ...values,
+      image: imageName,
       working_hours: workingHoursArray,
       groups: groupIds,
     };
 
     dispatch(formData);
+  };
+
+  const handleUpload = async (options: UploadRequestOption) => {
+    const { file, onSuccess, onError } = options;
+    const { name } = file as File;
+    const arrayBuffer = await (file as File).arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+    try {
+      const uploadedFileName = await uploadImageToGCS(buffer, name);
+      if (onSuccess) {
+        setImageName(uploadedFileName);
+        onSuccess("ok");
+      }
+    } catch (error) {
+      if (onError) {
+        onError(new Error("Upload failed"));
+      }
+    }
+  };
+
+  const beforeUpload = (file: any) => {
+    const asscptedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+    ];
+    const isImage = asscptedTypes.includes(file.type);
+    if (!isImage) {
+      message.error("You can only upload image file!");
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2.005;
+    if (!isLt2M) {
+      message.error("Image must smaller than 2MB!");
+    }
+    return isImage && isLt2M;
   };
 
   return (
@@ -104,6 +147,18 @@ export default function CerateForm() {
             >
               <Input placeholder="剪頭髮" size="large" />
             </Form.Item>
+            <Form.Item label="上傳圖片" valuePropName="fileList">
+              <Upload
+                listType="picture"
+                maxCount={1}
+                accept="image/*"
+                customRequest={handleUpload}
+                beforeUpload={beforeUpload}
+                onRemove={() => setImageName(null)}
+              >
+                <Button icon={<UploadOutlined />}>Upload</Button>
+              </Upload>
+            </Form.Item>
             <Form.Item label="價格" name="price">
               <InputNumber
                 placeholder="399"
@@ -113,7 +168,7 @@ export default function CerateForm() {
                 style={{ width: "100%" }}
               />
             </Form.Item>
-            <Form.Item label="服務單位時間" name="working_period">
+            <Form.Item label="服務時長" name="working_period">
               <InputNumber
                 placeholder="15"
                 size="large"
@@ -150,7 +205,7 @@ export default function CerateForm() {
                 options={groupOptions}
               />
             </Form.Item>
-            <Title level={4}>開放時間</Title>
+            <Title level={4}>營業時間</Title>
             {weekdays?.map((day) => (
               <Row key={day.value}>
                 <Form.Item valuePropName="checked">

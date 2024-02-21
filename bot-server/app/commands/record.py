@@ -4,7 +4,7 @@ from linebot.v3.messaging import (
 )
 from .command import Command
 from app.messages import ViewMessage
-from app.utils.fetch import APIServerFetchClient
+from app.lib.fetch import APIServerFetchClient
 from datetime import datetime, tzinfo
 
 
