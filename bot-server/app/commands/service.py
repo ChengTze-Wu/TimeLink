@@ -11,7 +11,7 @@ from linebot.v3.webhooks import (
 )
 from .command import Command
 from app.messages import ViewMessage
-from app.utils.fetch import APIServerFetchClient
+from app.lib.fetch import APIServerFetchClient
 
 
 LIFF_URL = os.getenv("LIFF_URL")
