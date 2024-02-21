@@ -168,7 +168,7 @@ export default function CerateForm() {
                 style={{ width: "100%" }}
               />
             </Form.Item>
-            <Form.Item label="服務單位時間" name="working_period">
+            <Form.Item label="服務時長" name="working_period">
               <InputNumber
                 placeholder="15"
                 size="large"
@@ -205,7 +205,7 @@ export default function CerateForm() {
                 options={groupOptions}
               />
             </Form.Item>
-            <Title level={4}>開放時間</Title>
+            <Title level={4}>營業時間</Title>
             {weekdays?.map((day) => (
               <Row key={day.value}>
                 <Form.Item valuePropName="checked">
