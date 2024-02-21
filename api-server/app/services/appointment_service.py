@@ -202,7 +202,6 @@ class AppointmentService:
         reserved_time = reserved_datetime.time()
         reserved_finish_time = reserved_finish_datetime.time()  # 預約經過服務時間後的結束時間
         reserved_weekday = weekday_mapping.get(reserved_datetime.weekday())
-
         working_days = set()
         for working_hour in working_hours:
             working_days.add(working_hour.get("day_of_week"))
@@ -213,12 +212,13 @@ class AppointmentService:
                 end_time = datetime.strptime(
                     working_hour.get("end_time"), "%H:%M:%S"
                 ).time()
-                if (
-                    not start_time <= reserved_time < end_time
-                    or not start_time < reserved_finish_time <= end_time
-                ):
+                if not start_time <= reserved_time < end_time:
                     raise BadRequest(
                         f"Invalid reserved time. The service is only available from {start_time} to {end_time} on {reserved_weekday}"
+                    )
+                if not start_time < reserved_finish_time <= end_time:
+                    raise BadRequest(
+                        f"Invalid reserved time. Your reserved finish time is {reserved_finish_time}. The service is only available from {start_time} to {end_time} on {reserved_weekday}"
                     )
                 break
         else:
