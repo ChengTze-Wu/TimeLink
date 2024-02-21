@@ -19,8 +19,8 @@ TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透�
 
   <img src="https://storage.googleapis.com/timelink-assets/demo-group.JPG" alt="TimeLink 2.0 Demo" style="width: 12rem; padding-left: 8rem;">
 
-- [點選登入此後台](https://timelink.chengtze.cc/login)，體驗群組管理者的管理服務功能。
-  - 帳密: `demo` / `P@ssword123` 
+- <a href="https://timelink.chengtze.cc/login" target="_blank">點選登入此後台</a>，體驗群組管理者的管理服務功能。
+  - 帳密: `demo` / `P@ssw0rd123` 
 
 ## 改動
 相較於 2022 年 [TimeLink 1.0](https://github.com/ChengTze-Wu/TimeLink/tree/v1.0.0) 版本，TimeLink 2.0 版本有以下改動：
