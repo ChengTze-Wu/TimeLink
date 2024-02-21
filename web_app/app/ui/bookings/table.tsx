@@ -41,11 +41,6 @@ export default function BookingsTable({
       key: "userPhone",
     },
     {
-      title: "電子郵件",
-      dataIndex: "userEmail",
-      key: "userEmail",
-    },
-    {
       title: "預約日期",
       dataIndex: "reservedAt",
       key: "reservedAt",
