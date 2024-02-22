@@ -15,9 +15,14 @@ TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透�
   - [Line Bot](bot-server) : 提供消費者在 Line 群組中的機器人介面。
 
 ## Demo
-- 手機掃描此 QR Code，加入 Demo 群組，體驗消費者預約服務的流程。
+- 使用手機兩步驟，掃描 QR Code，體驗消費者預約服務的流程。
+  - Step1. 加入 TimeLink 機器人（左圖）
+  - Step2. 加入 Demo 群組 (右圖)
 
-  <img src="https://storage.googleapis.com/timelink-assets/demo-group.JPG" alt="TimeLink 2.0 Demo" style="width: 12rem; padding-left: 8rem;">
+<div style="display: flex; justify-content: left;">
+  <img src="https://storage.googleapis.com/timelink-assets/bot-qr.png" alt="TimeLink 2.0 Demo" style="width: 12rem; padding-left: 6rem;">
+  <img src="https://storage.googleapis.com/timelink-assets/demo-group.JPG" alt="TimeLink Bot QR" style="width: 12rem; padding-left: 2rem;">
+</div>
 
 - <a href="https://timelink.chengtze.cc/login" target="_blank">點選登入此後台</a>，體驗群組管理者的管理服務功能。
   - 帳密: `demo` / `P@ssw0rd123` 

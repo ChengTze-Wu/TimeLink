@@ -35,7 +35,6 @@ class AppointmentService:
             )
 
         self.__check_service_availability(service_id, reserved_at)
-        self.__check_service_in_user_group(service_id, user_id=user_id)
 
         return self.appointment_repository.insert_one(
             user_id=user_id,
@@ -225,28 +224,6 @@ class AppointmentService:
             raise BadRequest(
                 f"Invalid reserved time. The service is only available on {working_days}"
             )
-
-    def __check_service_in_user_group(self, service_id: str, user_id: str):
-        if user_id is None and service_id is None:
-            raise BadRequest("user_id and service_id must be provided")
-
-        user = self.user_repository.select_one_by_unique_filed(user_id=user_id)
-        service = self.service_repository.select_one_by_unique_filed(
-            service_id=service_id
-        )
-
-        user_groups: list[dict] = user.get("groups")
-        service_groups: list[dict] = service.get("groups")
-
-        user_group_ids = set(user_group.get("id") for user_group in user_groups)
-        service_group_ids = set(
-            service_group.get("id") for service_group in service_groups
-        )
-
-        if user_group_ids.intersection(service_group_ids):
-            return
-
-        raise Forbidden("The service does not belong to user's group")
 
     def __check_appointment_belongs_owner_groups(
         self, appointment_id: str, owner_id: str
