@@ -123,9 +123,7 @@ class GroupService:
             line_group_id, line_user_id
         )
 
-    def unlink_user_from_group(self, group_json_data: dict) -> dict:
-        line_group_id = group_json_data.get("line_group_id")
-        line_user_id = group_json_data.get("line_user_id")
+    def unlink_user_from_group(self, line_group_id: str, line_user_id: str) -> dict:
         return self.group_repository.remove_user_from_group_by_line_ids(
             line_group_id, line_user_id
         )
