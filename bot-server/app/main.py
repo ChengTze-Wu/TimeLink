@@ -147,10 +147,7 @@ async def handle_member_left(event: MemberLeftEvent):
         line_user_id = event.left.members[0].user_id
         line_group_id = event.source.group_id
 
-        resp = await fetch.delete('/api/groups/users', {
-            'line_user_id': line_user_id,
-            'line_group_id': line_group_id
-        })
+        resp = await fetch.delete('/api/groups/{line_group_id}/users/{line_user_id}')
 
         resp.raise_for_status()
 
