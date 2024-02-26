@@ -6,10 +6,10 @@
 </p>
 
 # TimeLink 2.0
-TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透過 Line 群組機器人簡便預約服務，商家可以透過平台管理服務。TimeLink 2.0 版本是 [TimeLink 1.0](https://github.com/ChengTze-Wu/TimeLink/tree/v1.0.0) 版本的重構版本，將應用拆分模組，提高程式的可讀性、可維護性、可擴展性，並且使用更多的雲端服務，以提高系統的效能與安全性。
+TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透過 Line 群組機器人簡便預約服務，商家可以透過平台管理服務。TimeLink 2.0 版本是 [TimeLink 1.0](https://github.com/ChengTze-Wu/TimeLink/tree/v1.0.0) 版本的重寫版本，最大的不同是將前後端分離為不同的伺服器，使其更專注於處理各自的任務。
 
-- 各模組:
-  - [API Server](api-server) : 作為整個系統的核心，處理商業邏輯，並與資料庫溝通。
+- 各伺服:
+  - [API Server](api-server) : 作為整個系統的核心，處理資料存取權限控管、商業邏輯，並與資料庫溝通。
   - [Web Frontend](web_app) : 提供商家管理服務的介面。
   - [LIFF Frontend](liff-server) : 提供消費者預約服務的介面。
   - [Line Bot](bot-server) : 提供消費者在 Line 群組中的機器人介面。
@@ -31,7 +31,7 @@ TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透�
 相較於 2022 年 [TimeLink 1.0](https://github.com/ChengTze-Wu/TimeLink/tree/v1.0.0) 版本，TimeLink 2.0 版本有以下改動：
 
 ### 程式架構
-- 將原本單一的應用伺服器拆分為 API Server、Web 前端、LIFF 前端、Line Bot 等模組，使得各個模組可以獨立部署。
+- 將原本單一的應用伺服器拆分為 API Server、Web 前端、LIFF 前端、Line Bot 應用，使得各個模組可以獨立部署。
 - API Server 相較於先前做了分層，以提高程式的可讀性與可維護性。增加使用 sqlalchemy 作為 ORM，alembic 作為資料庫版控工具。
 - Web 和 LIFF 前端選用 React Next.js 框架，以更模組化的方式撰寫前端程式。
 - Line Bot 改以非同步方式撰寫，以處理更多的使用者同時操作。
