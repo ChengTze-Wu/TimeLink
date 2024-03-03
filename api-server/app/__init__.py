@@ -23,7 +23,7 @@ def create_app(test_config=None):
             group_router,
             appointment_router,
         )
-        from .utils import error_handlers
+        from .utils.handlers import error_handlers
         from .tools.cli import create_jwt
 
         app.cli.add_command(create_jwt)
