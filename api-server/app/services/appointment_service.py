@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest, Forbidden
 from app.db.models import RoleName
-from .token_service import JWTService
 from app.repositories import (
     AppointmentRepository,
     ServiceRepository,
@@ -9,24 +8,21 @@ from app.repositories import (
     GroupRepository,
 )
 
-
 class AppointmentService:
     def __init__(self):
         self.appointment_repository = AppointmentRepository()
         self.service_repository = ServiceRepository()
         self.user_repository = UserRepository()
         self.group_repository = GroupRepository()
-        self.payload = JWTService().get_payload()
 
-    def create_one(self, appointment_json_data: dict) -> dict:
-        """Create an appointment by self For LIFF."""
+    def create_one(self, appointment_json_data: dict, payload: dict | None = {}) -> dict:
         service_id = appointment_json_data.get("service_id")
         reserved_at = appointment_json_data.get("reserved_at")
         line_user_id = appointment_json_data.get("line_user_id")
         user_id = (
             self.__convert_line_user_id_to_user_id(line_user_id)
             if line_user_id
-            else self.payload.get("sub")
+            else payload.get("sub")
         )
 
         if user_id is None:
@@ -45,16 +41,16 @@ class AppointmentService:
             },
         )
 
-    def update_one(self, appointment_id: str, appointment_json_data: dict) -> dict:
+    def update_one(self, appointment_id: str, appointment_json_data: dict, payload: dict | None = {}) -> dict:
         reserved_at = appointment_json_data.get("reserved_at")
         is_active = appointment_json_data.get("is_active")
         line_user_id = appointment_json_data.get("line_user_id")
         user_id = (
-            self.payload.get("sub")
-            if self.payload.get("sub")
-            else self.__convert_line_user_id_to_user_id(line_user_id)
+            self.__convert_line_user_id_to_user_id(line_user_id)
+            if line_user_id
+            else payload.get("sub")
         )
-        role = self.payload.get("role")
+        role = payload.get("role")
 
         if user_id is None:
             raise BadRequest(
@@ -83,16 +79,16 @@ class AppointmentService:
             },
         )
 
-    def cancel_one(self, appointment_id: str, line_user_id: str | None = None) -> dict:
+    def cancel_one(self, appointment_id: str, line_user_id: str | None = None, payload: dict | None = {}) -> dict:
         """Cancel an appointment by deleting it. The appointment will
         be removed from the database.
         """
         user_id = (
-            self.payload.get("sub")
-            if self.payload.get("sub")
-            else self.__convert_line_user_id_to_user_id(line_user_id)
+            self.__convert_line_user_id_to_user_id(line_user_id)
+            if line_user_id
+            else payload.get("sub")
         )
-        role = self.payload.get("role")
+        role = payload.get("role")
 
         if user_id is None:
             raise BadRequest(
@@ -107,10 +103,9 @@ class AppointmentService:
 
         return self.appointment_repository.delete_one(appointment_id=appointment_id)
 
-    def get_one(self, appointment_id: str) -> dict:
-        """For Web App"""
-        user_id = self.payload.get("sub")
-        role = self.payload.get("role")
+    def get_one(self, appointment_id: str, payload: dict | None = {}) -> dict:
+        user_id = payload.get("sub")
+        role = payload.get("role")
 
         if role == RoleName.GROUP_OWNER.value:
             self.__check_appointment_belongs_owner_groups(appointment_id, user_id)
@@ -121,53 +116,72 @@ class AppointmentService:
         return self.appointment_repository.select_one_by_fields(
             appointment_id=appointment_id
         )
+    
+    def get_the_most_coming_appointment(self, line_user_id: str | None = None) -> dict:
+        user_id = self.__convert_line_user_id_to_user_id(line_user_id)
+        return self.appointment_repository.select_the_most_coming_appointment(user_id)
 
     def get_all(
         self,
         page: int = 1,
         per_page: int = 10,
         line_user_id: str | None = None,
-        service_id: str | None = None,
+        sort_field: str | None = None,
+        sort_order: str | None = None,
+        query: str | None = None,
         with_total_count: bool = False,
+        payload: dict | None = {},
     ) -> tuple[list[dict], int] | list[dict]:
         user_id = (
-            self.payload.get("sub")
-            if self.payload.get("sub")
-            else self.__convert_line_user_id_to_user_id(line_user_id)
+            self.__convert_line_user_id_to_user_id(line_user_id)
+            if line_user_id
+            else payload.get("sub")
         )
-        role = self.payload.get("role")
-
+        role = payload.get("role")
         if user_id is None:
             raise BadRequest(
                 "user_id must be provided in JWT sub or be provided line_user_id in query string"
             )
-
         if role == RoleName.GROUP_OWNER.value:
             appointments = self.appointment_repository.select_all_by_filter(
-                page=page, per_page=per_page, service_id=service_id, service_owner_id=user_id
+                page=page,
+                per_page=per_page,
+                service_owner_id=user_id,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                query=query,
             )
             if with_total_count:
                 total_count = self.appointment_repository.count_all_by_filter(
-                    service_id=service_id, service_owner_id=user_id
+                    service_owner_id=user_id, query=query
                 )
                 return appointments, total_count
         elif role == RoleName.ADMIN.value:
             appointments = self.appointment_repository.select_all_by_filter(
-                page=page, per_page=per_page, service_id=service_id
+                page=page,
+                per_page=per_page,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                query=query,
             )
             if with_total_count:
                 total_count = self.appointment_repository.count_all_by_filter(
-                    service_id=service_id
+                    query=query
                 )
                 return appointments, total_count
         else:
             appointments = self.appointment_repository.select_all_by_filter(
-                page=page, per_page=per_page, user_id=user_id, service_id=service_id
+                page=page,
+                per_page=per_page,
+                user_id=user_id,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                query=query,
             )
-
         if with_total_count:
             return appointments, self.appointment_repository.count_all_by_filter(
-                user_id=user_id, service_id=service_id
+                user_id=user_id,
+                query=query,
             )
         return appointments
 
