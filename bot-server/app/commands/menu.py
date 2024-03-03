@@ -60,10 +60,6 @@ class ChatMenuTemplate(MenuTemplate):
                         label='即將到來預約',
                         data='即將到來預約'
                     ),
-                    PostbackAction(
-                        label='所有預約記錄',
-                        data='所有記錄'
-                    ),
                 ]
             )
         )
