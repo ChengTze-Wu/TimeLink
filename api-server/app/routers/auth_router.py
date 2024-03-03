@@ -8,12 +8,12 @@ from requests.exceptions import RequestException
 
 
 bp = Blueprint("auth_router", __name__)
+user_service = UserService()
 
 
 @bp.route("", methods=["POST"])
 def auth_endpoint():
     try:
-        user_service = UserService()
         request_validator = RequestValidator(
             request_type="json",
             required_fields=["username", "password"],
