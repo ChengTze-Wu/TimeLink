@@ -1,8 +1,8 @@
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from app.db.connect import get_session
-from app.db.models import Group, User
+from app.db.models import Group, User, Service
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from werkzeug.exceptions import NotFound, Conflict
+from werkzeug.exceptions import NotFound, Conflict, Forbidden
 
 
 class GroupRepository:
@@ -42,7 +42,7 @@ class GroupRepository:
 
             session.commit()
             session.refresh(group)
-            return group.to_dict()
+            return group.with_owner_dict()
 
     def logical_delete_one_by_id(self, group_id: str):
         with get_session() as session:
@@ -54,25 +54,24 @@ class GroupRepository:
             group.is_deleted = True
             session.commit()
             session.refresh(group)
-            return group.to_dict()
+            return group.with_owner_dict()
 
     def select_one_by_unique_filed(
         self, group_id: str = None, line_group_id: str = None, owner_id: str = None
     ):
         with get_session() as session:
-            search_filter = or_(
-                Group.id == group_id,
-                Group.line_group_id == line_group_id,
-                Group.owner_id == owner_id,
-            )
-            group = (
-                session.query(Group)
-                .filter(search_filter, Group.is_deleted == False)
-                .first()
-            )
+            base_query = select(Group).filter(Group.is_deleted == False)
+            if group_id is not None:
+                base_query = base_query.filter(Group.id == group_id)
+            if line_group_id is not None:
+                base_query = base_query.filter(Group.line_group_id == line_group_id)
+            if owner_id is not None:
+                base_query = base_query.filter(Group.owner_id == owner_id)
+
+            group = session.execute(base_query).scalar_one_or_none()
             if group is None:
-                raise NotFound(f"Group not found")
-            return group.to_dict()
+                raise NotFound("Group not found")
+            return group.with_owner_dict()
 
     def count_all_by_filter(
         self,
@@ -82,9 +81,8 @@ class GroupRepository:
     ):
         with get_session() as session:
             base_query = (
-                select(Group)
+                select(func.count(Group.id))
                 .filter(Group.is_deleted == False)
-                .order_by(Group.created_at.desc())
             )
             if status == 0:
                 base_query = base_query.filter(Group.is_active == False)
@@ -99,7 +97,8 @@ class GroupRepository:
             if owner_id is not None:
                 base_query = base_query.filter(Group.owner_id == owner_id)
 
-            return len(session.scalars(base_query).all())
+            count_result = session.execute(base_query).scalar_one()
+            return count_result
 
     def select_all_by_filter(
         self,
@@ -108,6 +107,8 @@ class GroupRepository:
         query: str = None,
         status: int = None,
         owner_id: str = None,
+        service_id: str = None,
+        with_by: str = "self",
     ):
         with get_session() as session:
             base_query = (
@@ -128,9 +129,21 @@ class GroupRepository:
             if owner_id is not None:
                 base_query = base_query.filter(Group.owner_id == owner_id)
 
+            if service_id is not None:
+                base_query = base_query.join(Service, Group.services).filter(
+                    Service.id == service_id
+                )
+
             base_query = base_query.offset((page - 1) * per_page).limit(per_page)
             groups = session.scalars(base_query)
-            return [group.to_dict() for group in groups] if groups else []
+
+            match with_by:
+                case "self":
+                    return [group.to_self_dict() for group in groups] if groups else []
+                case "owner":
+                    return [group.with_owner_dict() for group in groups] if groups else []
+                case _:
+                    raise ValueError("with_by must be one of 'self', 'services', 'owner'")
 
     def add_user_to_group_by_line_ids(self, line_group_id: str, line_user_id: str):
         with get_session() as session:
@@ -155,7 +168,7 @@ class GroupRepository:
 
             group.users.append(user)
             session.commit()
-            return group.to_dict()
+            return group.with_owner_dict()
 
     def remove_user_from_group_by_line_ids(self, line_group_id: str, line_user_id: str):
         with get_session() as session:
@@ -180,4 +193,16 @@ class GroupRepository:
 
             group.users.remove(user)
             session.commit()
-            return group.to_dict()
+            return group.with_owner_dict()
+
+    def check_groups_owner_by_user_id(self, user_id: str, group_ids: list):
+        with get_session() as session:
+            groups = (
+                session.query(Group)
+                .filter(Group.id.in_(group_ids), Group.is_deleted == False)
+                .all()
+            )
+            for group in groups:
+                if str(group.owner_id) != user_id:
+                    return False
+            return True

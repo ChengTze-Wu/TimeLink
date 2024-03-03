@@ -1,7 +1,6 @@
 import Table from "@/app/ui/accounts/table";
 import SearchBar from "@/app/ui/common/search";
 import Pagination from "@/app/ui/common/pagination";
-import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { getJson } from "@/app/lib/fetch-api-data";
 import { Metadata } from "next";
 import { Suspense } from "react";
@@ -33,12 +32,6 @@ export default async function Page({
 
   return (
     <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: "儀表板", href: "/dashboard" },
-          { label: "系統帳號", href: "/dashboard/accounts", active: true },
-        ]}
-      />
       <div className="flex justify-between gap-4 mb-4">
         <SearchBar placeholder="Name, Username, Email, Phone..." />
         <Link

@@ -4,7 +4,7 @@ import { PlusCircleIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 import { createGroup } from "@/app/lib/groups/actions";
 import { useFormState } from "react-dom";
 
-export default function CreateForm() {
+export default function CreateForm({ placeholder }: { placeholder: string }) {
   const initialState = { message: "", errors: {} };
   const [state, dispatch] = useFormState(createGroup, initialState);
 
@@ -24,7 +24,7 @@ export default function CreateForm() {
         name="lineGroupId"
         id="lineGroupId"
         className="w-full rounded-md border border-gray-200 py-1.5 pl-10 pr-20 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-primary-green focus:outline-primary-green focus:ring-1 focus:ring-primary-green focus:border-primary-green"
-        placeholder="Line Group ID"
+        placeholder={placeholder}
         defaultValue={undefined}
         aria-describedby="error-message"
       />

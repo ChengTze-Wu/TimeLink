@@ -1,20 +1,19 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import NotFound, Forbidden, Unauthorized
-from app.repositories import UserRepository
+from app.repositories import UserRepository, GroupRepository
 from typing import List, Tuple
 from app.db.models import RoleName
 from werkzeug.exceptions import BadRequest
-from .token_service import JWTService
+from app.utils.handlers.jwt_handler import JWTHandler
 
 
 class UserService:
     def __init__(self):
         self.user_repository = UserRepository()
-        self.jwt_service = JWTService()
+        self.group_repository = GroupRepository()
 
-    def create_one(self, user_json_data: dict) -> dict:
-        jwt_payload = self.jwt_service.get_payload()
-        client_role = jwt_payload.get("role")
+    def create_one(self, user_json_data: dict, payload: dict | None = {}) -> dict:
+        client_role = payload.get("role")
         create_role = user_json_data.get("role")
 
         if client_role != RoleName.ADMIN.value and create_role == RoleName.ADMIN.value:
@@ -38,10 +37,9 @@ class UserService:
             new_user_data, create_role.upper() if create_role is not None else None
         )
 
-    def update_one(self, user_id: str, user_json_data: dict) -> dict:
-        jwt_payload = self.jwt_service.get_payload()
+    def update_one(self, user_id: str, user_json_data: dict, payload: dict | None = {}) -> dict:
         create_role = user_json_data.get("role")
-        client_role = jwt_payload.get("role")
+        client_role = payload.get("role")
 
         if client_role != RoleName.ADMIN.value and create_role == RoleName.ADMIN.value:
             raise Forbidden("Only admin can select admin")
@@ -72,14 +70,15 @@ class UserService:
     def delete_one(self, user_id: str) -> dict:
         return self.user_repository.logical_delete_one_by_id(user_id)
 
-    def get_one(self, user_id: str = None, line_user_id: str = None) -> dict:
+    def get_one(self, user_id: str = None, line_user_id: str = None):
         if user_id:
-            return self.user_repository.select_one_by_unique_filed(user_id=user_id)
-        if line_user_id:
-            return self.user_repository.select_one_by_unique_filed(
-                line_user_id=line_user_id
-            )
-        raise BadRequest("user_id or line_user_id must be provided")
+            user_data = self.user_repository.select_one_by_unique_filed(user_id=user_id)
+        elif line_user_id:
+            user_data = self.user_repository.select_one_by_unique_filed(line_user_id=line_user_id)
+        else:
+            raise BadRequest("User id or line user id is required")
+
+        return user_data
 
     def get_all(
         self,
@@ -87,18 +86,28 @@ class UserService:
         per_page: int = 10,
         query: str = None,
         status: int = None,
+        group_id: str = None,
         with_total_items: bool = False,
+        payload: dict | None = {},
     ) -> List[dict] | Tuple[List[dict], int]:
+        if payload.get("role") == RoleName.GROUP_OWNER.value:
+            is_user_own_groups = self.group_repository.check_groups_owner_by_user_id(
+                user_id=payload.get("sub"), group_ids=[group_id]
+            )
+            if not is_user_own_groups:
+                raise Forbidden("You are not owner of this group")
+
         list_dict_users = self.user_repository.select_all_by_filter(
-            page, per_page, query, status
+            page, per_page, query, status, group_id
         )
         if with_total_items:
-            total_items_count = self.user_repository.count_all_by_filter(query, status)
+            total_items_count = self.user_repository.count_all_by_filter(group_id, query, status)
             return list_dict_users, total_items_count
         return list_dict_users
 
     def auth(self, credentialsObject) -> dict:
         try:
+            jwt = JWTHandler()
             username = credentialsObject.get("username")
             password = credentialsObject.get("password")
             user_data = self.user_repository.select_one_by_username(username=username)
@@ -126,8 +135,8 @@ class UserService:
             "email": user_data.get("email"),
             "role": user_data.get("role"),
             "token": {
-                "access_token": self.jwt_service.generate(payload),
+                "access_token": jwt.generate(payload),
                 "token_type": "bearer",
-                "expires_in": self.jwt_service.exp_second,
+                "expires_in": jwt.exp_second,
             },
         }

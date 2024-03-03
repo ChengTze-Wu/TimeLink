@@ -29,35 +29,25 @@ class ServiceCommand(Command):
             raise ValueError("ServiceCommand needs a GroupSource event.")
 
         line_group_id: str = self.event.source.group_id
-        group_resp = await self.fetch_client.get(f'/api/groups/{line_group_id}/services')
+        group_services_resp = await self.fetch_client.get(f'/api/groups/{line_group_id}/services', params={'popular': 3})
 
-        group_resp.raise_for_status()
+        group_services_resp.raise_for_status()
 
-        services: list[dict] = group_resp.json().get("services")
+        group_services: list[dict] = group_services_resp.json()
 
-        if not services:
+        if not group_services:
             return TextMessage(text=ViewMessage.NO_SERVICE)
 
-        top5_services = await self.__top_by_appointment(services, top=5)
-
-        template_message = await self.__template_message(top5_services)
+        template_message = await self.__template_message(group_services)
         return template_message
-    
-    async def __top_by_appointment(self, services, top: int = 5):
-        rank_services = {}
-        for service in services:
-            rank_services.update({
-                len(service.get("appointments")): service
-            })
-        return [rank_services.get(key) for key in sorted(rank_services.keys(), reverse=True)][:top]
 
     async def __template_message(self, services: list[dict]) -> TemplateMessage:
         columns = [
             ImageCarouselColumn(
-                image_url=service.get("image") or "https://via.placeholder.com/1024x1024.png?text=No+Image",
+                image_url=service.get("service_image") or "https://via.placeholder.com/1024x1024.png?text=No+Image",
                 action=URIAction(
-                    label=service.get("name"),
-                    uri=f"{LIFF_URL}/services/{service.get('id')}",
+                    label=service.get("service_name"),
+                    uri=f"{LIFF_URL}/services/{service.get('service_name_id')}",
                 )
             ) for service in services
         ]

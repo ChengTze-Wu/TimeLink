@@ -1,5 +1,5 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from werkzeug.exceptions import NotFound, Conflict, BadRequest
 from app.db.connect import get_session
 from app.db.models import User, Role
@@ -19,7 +19,7 @@ class UserRepository:
                 session.add(new_user)
                 session.commit()
                 session.refresh(new_user)
-                return new_user.to_dict()
+                return new_user.to_self_dict()
         except SQLAlchemyError as e:
             if isinstance(e, IntegrityError):
                 if "Key (email)" in str(e.orig):
@@ -59,7 +59,7 @@ class UserRepository:
 
                 session.commit()
                 session.refresh(user)
-                return user.to_dict()
+                return user.to_self_dict()
         except SQLAlchemyError as e:
             if isinstance(e, IntegrityError):
                 if "Key (email)" in str(e.orig):
@@ -81,7 +81,7 @@ class UserRepository:
             user.is_deleted = True
             session.commit()
             session.refresh(user)
-            return user.to_dict()
+            return user.to_self_dict()
 
     def select_one_by_unique_filed(
         self,
@@ -90,19 +90,24 @@ class UserRepository:
         email: str = None,
     ):
         with get_session() as session:
-            search_filter = or_(
-                User.id == user_id,
-                User.line_user_id == line_user_id,
-                User.email == email,
-            )
-            user = (
-                session.query(User)
-                .filter(search_filter, User.is_deleted == False)
-                .first()
-            )
+            base_query = select(User).filter(User.is_deleted == False)
+            if user_id is not None:
+                user = session.execute(base_query.filter(User.id == user_id)).scalar_one()
+
+            if line_user_id is not None:
+                user = (
+                    session.execute(base_query.filter(User.line_user_id == line_user_id))
+                    .scalar_one()
+                )
+
+            if email is not None:
+                user = (
+                    session.execute(base_query.filter(User.email == email)).scalar_one()
+                )
+
             if user is None:
                 raise NotFound("User not found")
-            return user.to_dict()
+            return user.to_self_dict()
 
     def select_one_by_username(self, username: str):
         with get_session() as session:
@@ -115,12 +120,11 @@ class UserRepository:
                 raise NotFound("User not found")
             return user.to_auth()
 
-    def count_all_by_filter(self, query: str = None, status: int = None):
+    def count_all_by_filter(self, group_id: str = None, query: str = None, status: int = None):
         with get_session() as session:
             base_query = (
-                select(User)
+                select(func.count(User.id))
                 .filter(User.is_deleted == False)
-                .order_by(User.created_at.desc())
             )
             if status == 0:
                 base_query = base_query.filter(User.is_active == False)
@@ -137,7 +141,11 @@ class UserRepository:
                 )
                 base_query = base_query.filter(search_filter)
 
-            return len(session.scalars(base_query).all())
+            if group_id is not None:
+                base_query = base_query.filter(User.groups.any(id=group_id))
+
+            count_result = session.execute(base_query).scalar_one()
+            return count_result
 
     def select_all_by_filter(
         self,
@@ -145,6 +153,7 @@ class UserRepository:
         per_page: int,
         query: str,
         status: int,
+        group_id: str = None,
     ):
         with get_session() as session:
             base_query = (
@@ -166,6 +175,10 @@ class UserRepository:
                     User.phone.ilike(f"%{query}%"),
                 )
                 base_query = base_query.filter(search_filter)
+
+            if group_id is not None:
+                base_query = base_query.filter(User.groups.any(id=group_id))
+            
             base_query = base_query.offset((page - 1) * per_page).limit(per_page)
             users = session.scalars(base_query)
-            return [user.to_dict() for user in users] if users else []
+            return [user.to_self_dict() for user in users] if users else []

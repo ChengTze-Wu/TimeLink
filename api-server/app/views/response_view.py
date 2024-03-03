@@ -1,8 +1,3 @@
-"""
-Author: Cheng-Tze Wu
-Date: 2023-12-18
-Contact: chengtzewu@gmail.com
-"""
 from typing import Tuple, Optional, List, Dict, Union
 
 

@@ -16,7 +16,7 @@ export default function Error({
 
   return (
     <main className="flex h-full flex-col items-center justify-center">
-      <h2 className="text-center">Something went wrong!</h2>
+      <h2 className="text-center">伺服器錯誤，請稍候再試一次。</h2>
       <button
         className="mt-4 rounded-md bg-primary-green px-4 py-2 text-sm text-white transition-colors hover:bg-green-400"
         onClick={() => reset()}

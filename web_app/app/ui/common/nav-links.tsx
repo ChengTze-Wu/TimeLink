@@ -13,31 +13,31 @@ import clsx from "clsx";
 
 const links = [
   {
-    name: "儀表板",
-    href: "/dashboard",
-    icon: RectangleGroupIcon,
-    roles: ["admin", "group_owner"],
+    name: "預約查詢",
+    href: "/dashboard/bookings",
+    icon: CalendarDaysIcon,
+    roles: ["admin", "group_owner", "group_member"],
   },
+  // {
+  //   name: "儀表板",
+  //   href: "/dashboard",
+  //   icon: RectangleGroupIcon,
+  //   roles: ["admin", "group_owner"],
+  // },
   {
-    name: "群組",
+    name: "Line 群組管理",
     href: "/dashboard/groups",
     icon: UserGroupIcon,
     roles: ["admin", "group_owner"],
   },
   {
-    name: "服務",
+    name: "服務管理",
     href: "/dashboard/services",
     icon: SquaresPlusIcon,
     roles: ["admin", "group_owner"],
   },
   {
-    name: "預約",
-    href: "/dashboard/bookings",
-    icon: CalendarDaysIcon,
-    roles: ["admin", "group_owner", "group_member"],
-  },
-  {
-    name: "系統帳號",
+    name: "系統帳號管理",
     href: "/dashboard/accounts",
     icon: UserIcon,
     roles: ["admin"],

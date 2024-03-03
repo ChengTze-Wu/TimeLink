@@ -1,4 +1,3 @@
-import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getJson } from "@/app/lib/fetch-api-data";
@@ -8,6 +7,12 @@ import { UUID } from "crypto";
 
 export const metadata: Metadata = {
   title: "Accounts | Dashboard",
+};
+
+const roleMapping: any = {
+  admin: "管理員",
+  group_owner: "群組管理員",
+  group_member: "群組成員",
 };
 
 export default async function Page({ params }: { params: { userId: UUID } }) {
@@ -46,8 +51,8 @@ export default async function Page({ params }: { params: { userId: UUID } }) {
     },
     {
       key: "5",
-      label: "角色",
-      children: user.role,
+      label: "身份",
+      children: roleMapping[user.role],
     },
     {
       key: "6",
@@ -68,16 +73,6 @@ export default async function Page({ params }: { params: { userId: UUID } }) {
 
   return (
     <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: "儀表板", href: "/dashboard" },
-          {
-            label: "使用者資訊",
-            href: `/dashboard/accounts/${user_id}`,
-            active: true,
-          },
-        ]}
-      />
       <Descriptions title="使用者資訊" layout="vertical" items={items} />
     </main>
   );

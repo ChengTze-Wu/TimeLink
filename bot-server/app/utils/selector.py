@@ -4,7 +4,6 @@ from linebot.v3.webhooks import (
 )
 from ..commands import (
     ComingRecordCommand,
-    AllRecordCommand,
     ServiceCommand,
     DefaultCommand,
     MenuCommand,
@@ -25,7 +24,6 @@ class CommandSelector:
     COMMAND_MAPPING = {
         "熱門服務": ServiceCommand,
         "即將到來預約": ComingRecordCommand,
-        "所有記錄": AllRecordCommand,
     }
 
     @staticmethod
