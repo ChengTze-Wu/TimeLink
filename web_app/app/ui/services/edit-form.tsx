@@ -158,7 +158,6 @@ export default function EditForm({ service }: { service: Service }) {
       message.error("You can only upload image file!");
     }
     const isLt2M = file.size / 1024 / 1024 < 2.005;
-    console.log("file.size", file.size);
     if (!isLt2M) {
       message.error("Image must smaller than 2MB!");
     }

@@ -114,34 +114,6 @@ class Service(BaseModel, CommonColumns):
 
     owner: Mapped["User"] = relationship("User", back_populates="own_services")
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "price": self.price,
-            "image": self.image,
-            "description": self.description,
-            "working_period": self.working_period,
-            "owner": self.owner.to_self_dict() if self.owner else None,
-            "working_hours": [
-                working_hour.to_dict() for working_hour in self.working_hours
-            ],
-            "unavailable_periods": [
-                unavailable_period.to_dict()
-                for unavailable_period in self.unavailable_periods
-            ],
-            "is_active": self.is_active,
-            "is_deleted": self.is_deleted,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "groups": [group.to_self_dict() for group in self.groups],
-            "appointments": [
-                appointment.to_self_dict()
-                for appointment in self.appointments
-                if not appointment.is_deleted
-            ],
-        }
-
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -162,6 +134,15 @@ class Service(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
+
+    def with_groups_dict(self):
+        return self.to_self_dict() | {"groups": [
+            {
+                "id": group.id,
+                "name": group.name,
+            }
+            for group in self.groups
+        ]}
 
 
 class WorkingHour(BaseModel):
@@ -235,27 +216,6 @@ class User(BaseModel, CommonColumns):
         "Service", back_populates="owner"
     )
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            "username": self.username,
-            "name": self.name,
-            "line_user_id": self.line_user_id,
-            "phone": self.phone,
-            "role": self.role.name.value if self.role else None,
-            "is_active": self.is_active,
-            "is_deleted": self.is_deleted,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "groups": [group.to_self_dict() for group in self.groups],
-            "appointments": [
-                appointment.to_self_dict()
-                for appointment in self.appointments
-                if not appointment.is_deleted
-            ],
-        }
-
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -299,21 +259,6 @@ class Appointment(BaseModel, CommonColumns):
     user: Mapped["User"] = relationship("User", back_populates="appointments")
     service: Mapped["Service"] = relationship("Service", back_populates="appointments")
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "service_id": self.service_id,
-            "reserved_at": self.reserved_at,
-            "notes": self.notes,
-            "is_active": self.is_active,
-            "is_deleted": self.is_deleted,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "user": self.user.to_self_dict() if self.user else None,
-            "service": self.service.to_self_dict() if self.service else None,
-        }
-
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -325,6 +270,31 @@ class Appointment(BaseModel, CommonColumns):
             "is_deleted": self.is_deleted,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
+        }
+    
+    def with_user_service_dict(self):
+        return self.to_self_dict() | {
+            "user": {
+                "id": self.user.id,
+                "username": self.user.username,
+                "name": self.user.name,
+            },
+            "service": {
+                "id": self.service.id,
+                "name": self.service.name,
+                "price": self.service.price,
+                "owner": {
+                    "id": self.service.owner.id,
+                    "name": self.service.owner.name,
+                },
+                "groups": [
+                    {
+                        "id": group.id,
+                        "name": group.name,
+                    }
+                    for group in self.service.groups
+                ],
+            },
         }
 
 
@@ -355,26 +325,6 @@ class Group(BaseModel, CommonColumns):
 
     owner: Mapped[User] = relationship("User", back_populates="own_groups")
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "line_group_id": self.line_group_id,
-            "is_active": self.is_active,
-            "is_deleted": self.is_deleted,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "owner": self.owner.to_self_dict(),
-            "users": [
-                user.to_self_dict() for user in self.users if not user.is_deleted
-            ],
-            "services": [
-                service.to_self_dict()
-                for service in self.services
-                if not service.is_deleted
-            ],
-        }
-
     def to_self_dict(self):
         return {
             "id": self.id,
@@ -385,3 +335,10 @@ class Group(BaseModel, CommonColumns):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
+
+    def with_owner_dict(self):
+        return self.to_self_dict() | {"owner": {
+            "id": self.owner.id,
+            "username": self.owner.username,
+            "name": self.owner.name,
+        }}

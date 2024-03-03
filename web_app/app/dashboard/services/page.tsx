@@ -1,16 +1,18 @@
-import Table from "@/app/ui/services/table";
+import ServicesTable from "@/app/ui/services/table";
 import SearchBar from "@/app/ui/common/search";
-import Pagination from "@/app/ui/common/pagination";
-import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { getJson } from "@/app/lib/fetch-api-data";
 import { Metadata } from "next";
-import { Suspense } from "react";
 import { SquaresPlusIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import { Service } from "@/app/lib/definitions";
 
 export const metadata: Metadata = {
   title: "Services | Dashboard",
 };
+
+function formatDate(date: string) {
+  return new Date(date).toISOString().slice(0, 19).replace("T", " ");
+}
 
 export default async function Page({
   searchParams,
@@ -24,23 +26,28 @@ export default async function Page({
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const status = searchParams?.status || "";
+  const pageSize = 6;
 
-  const serviceDataSet = await getJson(
-    `/api/services?per_page=6&query=${query}&status=${status}`
+  const servicesResp = await getJson(
+    `/api/services?per_page=${pageSize}&query=${query}&status=${status}`
   );
-  const totalPages = serviceDataSet?.pagination?.total_pages || 1;
-  const totalItems = serviceDataSet?.pagination?.total_items || 0;
+  const totalItems = servicesResp?.pagination?.total_items || 0;
+
+  const displayDataSet = servicesResp?.data?.map((service: Service) => ({
+    name: service.name,
+    image: service.image,
+    groups: service.groups,
+    duration: service.working_period,
+    price: service.price,
+    isActive: service.is_active,
+    updatedAt: formatDate(service.updated_at),
+    key: service.id,
+  }));
 
   return (
     <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: "儀表板", href: "/dashboard" },
-          { label: "服務", href: "/dashboard/services", active: true },
-        ]}
-      />
-      <div className="flex justify-between gap-4 mb-4">
-        <SearchBar placeholder="搜尋名稱" />
+      <div className="flex justify-between gap-4 mb-6">
+        <SearchBar placeholder="搜尋服務項目名稱" />
         <Link
           href="/dashboard/services/create"
           className="flex place-items-center p-2 text-sm text-white bg-primary-green rounded-md hover:bg-green-600"
@@ -49,18 +56,12 @@ export default async function Page({
           <p className="hidden md:block">建立</p>
         </Link>
       </div>
-      <Suspense key={query + currentPage} fallback={<div>Loading...</div>}>
-        <Table query={query} status={status} currentPage={currentPage} />
-      </Suspense>
-      <div className="w-full flex mt-7">
-        <div className="basis-1/3"></div>
-        <div className="flex justify-center basis-1/3">
-          <Pagination totalPages={totalPages} />
-        </div>
-        <p className="text-sm text-gray-400 flex basis-1/3 justify-end items-start">
-          共 {totalItems} 筆資料
-        </p>
-      </div>
+      <ServicesTable
+        displayData={displayDataSet}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalItems={totalItems}
+      />
     </main>
   );
 }

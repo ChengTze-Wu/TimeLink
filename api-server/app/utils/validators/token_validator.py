@@ -1,8 +1,3 @@
-"""
-Author: Tze
-Date: 2023-12-28
-Contact: chengtzewu@gmail.com
-"""
 from functools import wraps, partial
 from werkzeug.exceptions import (
     Forbidden,
@@ -11,7 +6,7 @@ from werkzeug.exceptions import (
     BadRequest,
 )
 from app.db.models import RoleName
-from app.services import JWTService
+from app.utils.handlers.jwt_handler import JWTHandler
 
 
 def verify_access_token(func=None, *, access_roles: list = None, check_owner=False):
@@ -47,7 +42,7 @@ def verify_access_token(func=None, *, access_roles: list = None, check_owner=Fal
     @wraps(func)
     def decorated_function(*args, **kwargs):
         try:
-            payload = JWTService().get_payload()
+            payload = JWTHandler().get_payload_from_flask()
 
             if not payload:
                 raise BadRequest("Missing access token")
@@ -59,7 +54,7 @@ def verify_access_token(func=None, *, access_roles: list = None, check_owner=Fal
 
             if access_roles and "role" in payload:
                 if payload_role not in access_roles:
-                    raise Forbidden("Access denied, role is not allowed.")
+                    raise Forbidden(f"Access denied, role `{payload_role}` is not allowed.")
 
             if check_owner and "user_id" in kwargs:
                 if payload.get("sub") != str(kwargs.get("user_id")):

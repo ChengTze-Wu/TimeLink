@@ -1,5 +1,4 @@
 import Form from "@/app/ui/services/edit-form";
-import Breadcrumbs from "@/app/ui/common/breadcrumbs";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getJson } from "@/app/lib/fetch-api-data";
@@ -23,17 +22,6 @@ export default async function Page({
 
   return (
     <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: "儀表板", href: "/dashboard" },
-          { label: "服務", href: "/dashboard/services" },
-          {
-            label: `修改 ${service.name}`,
-            href: `/dashboard/services/${serviceId}/edit`,
-            active: true,
-          },
-        ]}
-      />
       <Form service={service} />
     </main>
   );

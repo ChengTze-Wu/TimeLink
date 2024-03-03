@@ -58,7 +58,7 @@ export async function createGroup(prevState: State, formData: FormData) {
 
     if (result.status === 404) {
       return {
-        message: "Line Group id 不存在. 群組建立失敗.",
+        message: "請確認 ID 是否正確或是您的群組已加進 TimeLink 機器人.",
       };
     }
 
@@ -124,5 +124,26 @@ export async function deleteGroup(uuid: UUID) {
     };
   }
 
+  revalidatePath("/dashboard/groups");
+}
+
+export async function switchStatus(uuid: UUID, status: boolean) {
+  try {
+    // set fake pending time
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    const result = await putJson(`/api/groups/${uuid}`, {
+      is_active: status,
+    });
+
+    if (result.status != 200) {
+      return {
+        message: result?.message,
+      };
+    }
+  } catch (error) {
+    return {
+      message: "Failed to Switch Group Status.",
+    };
+  }
   revalidatePath("/dashboard/groups");
 }

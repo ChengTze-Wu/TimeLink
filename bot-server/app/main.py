@@ -4,7 +4,7 @@ load_dotenv()
 import os
 import sys
 import logging
-
+import asyncio
 from contextlib import asynccontextmanager
 from fastapi import Request, FastAPI, HTTPException
 from linebot.v3.messaging import (
@@ -30,7 +30,7 @@ from linebot.v3.webhooks import (
 )
 from http import HTTPStatus
 from app.lib.webhook import AsyncWebhookHandler
-from app.lib.fetch import APIServerFetchClient
+from app.lib.fetch import APIServerFetchClient, RedisClient
 from app.utils.selector import CommandSelector
 from app.messages import ViewMessage
 
@@ -52,6 +52,7 @@ configuration = Configuration(
 async def lifespan(app: FastAPI):
     yield
     await async_api_client.close()  # Close client session
+    await redis_client.close()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -59,6 +60,7 @@ async_api_client = AsyncApiClient(configuration)
 line_bot_api = AsyncMessagingApi(async_api_client)
 async_handler = AsyncWebhookHandler(channel_secret)
 fetch = APIServerFetchClient()
+redis_client = RedisClient(ttl_seconds=60*10)
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -118,10 +120,7 @@ async def handle_member_join(event: MemberJoinedEvent):
         line_user_id = event.joined.members[0].user_id
         line_group_id = event.source.group_id
 
-        resp = await fetch.post('/api/groups/users', {
-            'line_user_id': line_user_id,
-            'line_group_id': line_group_id
-        })
+        resp = await fetch.post(f'/api/groups/{line_group_id}/users/{line_user_id}')
 
         if resp.status_code == HTTPStatus.CONFLICT:
             reply_message = ViewMessage.WELCOME_BACK
@@ -146,9 +145,13 @@ async def handle_member_left(event: MemberLeftEvent):
     try:
         line_user_id = event.left.members[0].user_id
         line_group_id = event.source.group_id
+        
+        delete_redis_task = redis_client.delete(f'line:user:{line_user_id}:group:{line_group_id}')
+        delete_api_task = fetch.delete(f'/api/groups/{line_group_id}/users/{line_user_id}')
 
-        resp = await fetch.delete('/api/groups/{line_group_id}/users/{line_user_id}')
+        results = await asyncio.gather(delete_redis_task, delete_api_task)
 
+        resp = results[1]
         resp.raise_for_status()
 
     except Exception as e:
@@ -228,9 +231,14 @@ async def __check_group_linked(event: Event):
     If not, notify the message to line.
     '''
     line_group_id = event.source.group_id
-    group_api_response = await fetch.get(f'/api/groups/{line_group_id}')
+
+    if await redis_client.get(f'line:group:{line_group_id}'):
+        return True
+
+    group_api_response = await fetch.get(f'/api/groups/line/{line_group_id}')
 
     if group_api_response.status_code == HTTPStatus.OK:
+        await redis_client.set(f'line:group:{line_group_id}', 1)
         return True
 
     if group_api_response.status_code == HTTPStatus.NOT_FOUND:
@@ -247,19 +255,26 @@ async def __check_group_linked(event: Event):
 
 
 async def __register_user(line_user_id):
+    if await redis_client.get(f'line:user:{line_user_id}'):
+        return
+
     user_profile = await line_bot_api.get_profile(line_user_id)
     user_api_response = await fetch.post('/api/users', {
         "username": line_user_id,
         "name": user_profile.display_name,
         "email": f"{line_user_id}@mail.com",
-        "password": __generate_random_password(),
+        "password": await __generate_random_password(),
         'line_user_id': line_user_id,
         'role': 'group_member'
     })
+
+    if user_api_response.status_code in [HTTPStatus.CREATED, HTTPStatus.CONFLICT]:
+        await redis_client.set(f'line:user:{line_user_id}', 1)
+
     return user_api_response
 
 
-def __generate_random_password(length: int = 12):
+async def __generate_random_password(length: int = 12):
     import random
     import string
     characters = [
@@ -275,10 +290,11 @@ def __generate_random_password(length: int = 12):
 
 
 async def __connect_user_to_group(line_user_id, line_group_id):
-    user_group_api_response = await fetch.post('/api/groups/users', {
-        "line_user_id": line_user_id,
-        "line_group_id": line_group_id
-    })
+    if await redis_client.get(f'line:user:{line_user_id}:group:{line_group_id}'):
+        return True
+
+    user_group_api_response = await fetch.post(f'/api/groups/{line_group_id}/users/{line_user_id}')
     if user_group_api_response.status_code in [HTTPStatus.CONFLICT, HTTPStatus.CREATED]:
+        await redis_client.set(f'line:user:{line_user_id}:group:{line_group_id}', 1)
         return True
     return False

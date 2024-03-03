@@ -1,6 +1,6 @@
 import ServiceMenu from "@/app/ui/menu";
 import { getJson } from "@/app/lib/api-server-fetch";
-import { Group } from "@/app/lib/definitions";
+import { Service } from "@/app/lib/definitions";
 
 export default async function Page({
   searchParams,
@@ -10,7 +10,9 @@ export default async function Page({
   };
 }) {
   const lineGroupId = searchParams?.lineGroupId;
-  const group: Group = await getJson(`/api/groups/${lineGroupId}`);
-  const services = group?.services;
+  const groupServicesResp = await getJson(
+    `/api/groups/${lineGroupId}/services`
+  );
+  const services: Service[] = groupServicesResp?.data;
   return <ServiceMenu services={services} />;
 }
