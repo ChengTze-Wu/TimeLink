@@ -1,5 +1,5 @@
 import click
-from app.services import JWTService
+from app.utils.handlers.jwt_handler import JWTHandler
 
 
 """
@@ -24,7 +24,7 @@ payload:
 )
 @click.option("--exp", "-x", type=int, default=None, help="Expire time in minutes")
 def create_jwt(name, username, email, role, exp):
-    jwt_service = JWTService()
+    jwt_service = JWTHandler()
 
     payload = {}
     if name:

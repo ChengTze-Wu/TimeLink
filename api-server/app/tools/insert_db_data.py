@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import text
 from faker import Faker
 from werkzeug.security import generate_password_hash
+import time
 
 DATABASE = os.getenv("DATABASE")
 if DATABASE is None:
@@ -126,5 +127,68 @@ def insert_role_data():
         conn.commit()
 
 
+def insert_appointments_data(num: int = 1000000):
+    USERS = [
+        'b49c010b-8aa9-4b52-a4be-13a626aec022',
+        'f8fa5ed5-6895-40e3-8bc3-67d5257aff0c',
+        '32d2581c-53ec-4e36-aed5-f1d25fcc4e14'
+    ]
+
+    SERVICES = [
+        '54c7484d-36a6-4ce2-ace7-986aed2df2cb',
+        '9603f819-ee44-4a4a-a903-ba7fb8c120fe',
+        '07f7b593-08a1-4510-bd62-1097a6bdc632',
+        'fad06634-312a-43ce-892e-312bde613b74',
+        '0d5f2640-e9f2-4a4a-96f9-eb88e9ad9569',
+    ]
+
+    fake = Faker(locale="zh_TW")
+    list_of_fake_data = []
+
+    fake_data_produce_start_time = time.time()
+    print("Fake Data Produce Start:")
+    for _ in range(num):
+        print(f"\r{'#' * int(_ / num * 100)}", end="")
+        datetime = fake.date_time_between(start_date="-1y", end_date="now", tzinfo=None)
+        reserved_at = fake.date_time_between(start_date="-1y", end_date="now", tzinfo=None)
+        list_of_fake_data.append(
+            {
+                "id": fake.uuid4(),
+                "user_id": fake.random_element(USERS),
+                "service_id": fake.random_element(SERVICES),
+                "notes": fake.text(200),
+                "reserved_at": reserved_at,
+                "is_active": True,
+                "is_deleted": False,
+                "created_at": datetime,
+                "updated_at": datetime,
+            }
+        )
+    fake_data_produce_end_time = time.time()
+    print(f"Fake Data Produce End, Spend Time: {fake_data_produce_end_time - fake_data_produce_start_time: .3f} seconds")
+    print("Insert DB Start...")
+    insert_db_start_time = time.time()
+    with engine.connect() as conn:
+        conn.execute(text("TRUNCATE TABLE appointment CASCADE;"))
+        conn.execute(
+            text(
+                """
+                INSERT INTO appointment (id, user_id, service_id, reserved_at, notes, is_active, is_deleted, created_at, updated_at)
+                VALUES (:id, :user_id, :service_id, :reserved_at, :notes, :is_active, :is_deleted, :created_at, :updated_at)
+                """
+            ),
+            list_of_fake_data,
+        )
+        conn.commit()
+    insert_db_end_time = time.time()
+    print(f"Insert DB End, Spend Time: {insert_db_end_time - insert_db_start_time: .3f} seconds")
+    print(f"\nAll Done. Total Time: {insert_db_end_time - fake_data_produce_start_time :.3f} seconds")
+
+
+def turncate_table(table_name: str):
+    with engine.connect() as conn:
+        conn.execute(text(f"TRUNCATE TABLE {table_name} CASCADE;"))
+        conn.commit()
+
 if __name__ == "__main__":
-    insert_role_data()
+    insert_appointments_data(10000)
