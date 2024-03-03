@@ -169,3 +169,23 @@ export async function uploadImageToGCS(
   const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${uuidWithFileName}`;
   return publicUrl;
 }
+
+export async function switchStatus(service_id: UUID, status: boolean) {
+  try {
+    const result = await putJson(`/api/services/${service_id}`, {
+      is_active: status,
+    });
+
+    if (result.status !== 200) {
+      return {
+        message: result.message,
+      };
+    }
+  } catch (error) {
+    return {
+      message: "Failed to Switch Service Status.",
+    };
+  }
+
+  revalidatePath("/dashboard/services");
+}

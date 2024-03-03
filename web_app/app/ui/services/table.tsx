@@ -1,90 +1,182 @@
-import { PencilIcon } from "@heroicons/react/24/solid";
-import { DeleteService } from "@/app/ui/services/buttons";
-import { getJson } from "@/app/lib/fetch-api-data";
-import StatusFilter from "@/app/ui/common/statusFilter";
-import clsx from "clsx";
-import { Service } from "@/app/lib/definitions";
-import Link from "next/link";
-import Image from "next/image";
+"use client";
 
-export default async function ServicesTable({
-  query,
-  status,
+import {
+  Table,
+  Tag,
+  ConfigProvider,
+  Button,
+  Popconfirm,
+  Switch,
+  Avatar,
+} from "antd";
+import type { TableProps } from "antd";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { Group, Service } from "@/app/lib/definitions";
+import {
+  QuestionCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import { deleteService, switchStatus } from "@/app/lib/services/actions";
+import { UUID } from "crypto";
+import { PhotoIcon } from "@heroicons/react/24/solid";
+import Link from "next/link";
+
+export default function ServicesTable({
+  displayData,
+  pageSize,
   currentPage,
+  totalItems,
 }: {
-  query: string;
-  status: string;
+  displayData: Service[];
+  pageSize: number;
   currentPage: number;
+  totalItems: number;
 }) {
-  const serviceJsonResponse = await getJson(
-    `/api/services?per_page=6&query=${query}&status=${status}&page=${currentPage}`
-  );
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const handleDelete = async (id: UUID) => {
+    const result = await deleteService(id);
+    return result?.message;
+  };
+
+  const handleSwitch = async (id: UUID, status: boolean) => {
+    const result = await switchStatus(id, status);
+    return result?.message;
+  };
+
+  const columns: TableProps<Service>["columns"] = [
+    {
+      title: "服務項目名稱",
+      dataIndex: "name",
+      key: "name",
+      width: "15%",
+      render: (name: string, row: Service) => (
+        <span className="flex gap-2 items-center">
+          <Avatar
+            size="large"
+            src={row.image}
+            alt={name}
+            icon={<PhotoIcon />}
+          />
+          <span>{name}</span>
+        </span>
+      ),
+    },
+    {
+      title: "隸屬群組",
+      dataIndex: "groups",
+      key: "groups",
+      width: "20%",
+      render: (groups: Group[]) => (
+        <span>
+          {groups.map((group) => {
+            return <Tag key={group.id}>{group.name}</Tag>;
+          })}
+        </span>
+      ),
+    },
+    {
+      title: "單位時間",
+      dataIndex: "duration",
+      key: "duration",
+      render: (duration) => <span>{duration} 分鐘</span>,
+    },
+    {
+      title: "價格",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => <span>NT$ {price} 元</span>,
+    },
+    {
+      title: "狀態",
+      dataIndex: "",
+      key: "isActive",
+      render: (row) => (
+        <Popconfirm
+          title="狀態"
+          description={`你確定要"${row.isActive ? "停用" : "啟用"}"此服務嗎？`}
+          icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+          okText="確定"
+          cancelText="取消"
+          onConfirm={() => handleSwitch(row.key, !row.isActive)}
+        >
+          <Switch
+            checkedChildren="啟用中"
+            unCheckedChildren="停用中"
+            defaultChecked={row.isActive}
+            checked={row.isActive}
+          />
+        </Popconfirm>
+      ),
+    },
+    {
+      title: "上次修改時間",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+    },
+    {
+      title: "",
+      dataIndex: "",
+      key: "x",
+      render: (row) => (
+        <div className=" flex gap-2">
+          <Link href={`/dashboard/services/${row.key}/edit`}>
+            <Button icon={<EditOutlined />} />
+          </Link>
+          <Popconfirm
+            title="刪除服務項目"
+            description="確定要刪除嗎？"
+            icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+            onConfirm={() => handleDelete(row.key)}
+            okText="確定"
+            cancelText="取消"
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <table className="w-full h-full table-fixed">
-      <thead className="border-b-[1px] border-gray-300">
-        <tr className="text-left font-light">
-          <th>項目</th>
-          <th>隸屬群組</th>
-          <th>服務單位時間</th>
-          <th>價格</th>
-          <th>
-            <StatusFilter status={status} />
-          </th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {serviceJsonResponse?.data?.map((service: Service) => (
-          <tr
-            key={service.id}
-            className="border-b-[1px] border-gray-300 last:border-b-0 h-[4.5rem]"
-          >
-            <td className="flex items-center gap-2 h-full">
-              <Image
-                src={
-                  service.image ||
-                  "https://via.placeholder.com/1024x1024.png?text=No+Image"
-                }
-                className="rounded-full w-12 h-12"
-                width={48}
-                height={48}
-                alt="服務的示意圖"
-              />
-              <p>{service.name}</p>
-            </td>
-            <td>
-              {service.groups.length === 0 ? (
-                <p className="text-gray-500 font-light">尚未隸屬於任何群組</p>
-              ) : (
-                service.groups.map((group) => (
-                  <p key={group.id}>{group.name}</p>
-                ))
-              )}
-            </td>
-            <td className={clsx(service.working_period || "text-gray-400")}>
-              {service.working_period || "待定"}
-            </td>
-            <td>{service.price}</td>
-            <td
-              className={clsx(
-                service.is_active ? "text-primary-green" : "text-pink-600"
-              )}
-            >
-              {service.is_active ? "● 啟用" : "● 停用"}
-            </td>
-            <td className="md:flex gap-4 items-center h-full">
-              <Link
-                href={`/dashboard/services/${service.id}/edit`}
-                className="rounded-md border hover:bg-gray-100 p-2"
-              >
-                <PencilIcon className="w-5 text-gray-500" />
-              </Link>
-              <DeleteService service={service} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#44ad53",
+        },
+      }}
+    >
+      <Table
+        columns={columns}
+        dataSource={displayData}
+        pagination={{
+          pageSize: pageSize,
+          position: ["bottomCenter"],
+          current: currentPage,
+          total: totalItems,
+          showSizeChanger: false,
+        }}
+        onChange={(pagination, filters, sorter: any) => {
+          const params = new URLSearchParams(searchParams);
+          params.delete("sortField");
+          params.delete("sortOrder");
+          if (pagination.current) {
+            params.set("page", pagination.current.toString());
+          }
+          if (sorter.field && sorter.order) {
+            params.set("sortField", sorter.field);
+            params.set("sortOrder", sorter.order);
+          }
+          if (Object.keys(filters).length > 0) {
+            params.set("filters", JSON.stringify(filters));
+          }
+          replace(`${pathname}?${params.toString()}`);
+        }}
+        footer={() => <p className="text-right">共 {totalItems} 筆資料</p>}
+      />
+    </ConfigProvider>
   );
 }
