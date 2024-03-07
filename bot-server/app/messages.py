@@ -2,7 +2,7 @@ from string import Template
 
 class ViewMessage:
     # static messages
-    WELCOME_BACK = "歡迎回來"
+    WELCOME_BACK = "歡迎您再次使用 TimeLink！\n請輸入`/`以查看各項功能。"
     WELCOME_MEMBER_JOIN = "歡迎加入\n請輸入`/`以查看各項功能。"
     BOT_JOIN_SUCCESS = "TimeLink Bot 加入成功!\n請輸入`/`以查看各項功能。"
     USER_NOT_LINKED = "請點選 TimeLink 頭像加入好友！並完成註冊。"
