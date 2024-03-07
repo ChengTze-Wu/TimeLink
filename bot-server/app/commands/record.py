@@ -9,7 +9,7 @@ from datetime import datetime, tzinfo
 
 
 class ComingRecordCommand(Command):
-    '''RecordCommand is a class that handles the user record command. It
+    '''ComingRecordCommand is a class that handles the user record command. It
     will fetch the user's record from the API server and return it to the
     user.
     '''
@@ -18,15 +18,15 @@ class ComingRecordCommand(Command):
         self.fetch_client = APIServerFetchClient()
 
     async def async_execute(self) -> TextMessage | None:
-        the_comming_appointment = await self.__get_the_comming_appointment()
-        the_comming_appointments_json: dict = the_comming_appointment.json()
+        comming_appointment_resp = await self.__get_the_comming_appointment()
+        comming_appointment_json: dict = comming_appointment_resp.json()
 
-        if the_comming_appointment.status_code != HTTPStatus.OK:
+        if comming_appointment_resp.status_code != HTTPStatus.OK:
              return TextMessage(text=ViewMessage.NO_COMING_RECORD)
 
-        reserved_at = the_comming_appointments_json.get('reserved_at')
+        reserved_at = comming_appointment_json.get('reserved_at')
         format_reserved_at = datetime.strptime(reserved_at, '%a, %d %b %Y %H:%M:%S %Z')
-        service = the_comming_appointments_json.get('service')
+        service: dict = comming_appointment_json.get('service')
         service_name = service.get('name')
         price = service.get('price')
 
