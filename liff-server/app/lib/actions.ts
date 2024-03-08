@@ -51,10 +51,12 @@ export async function createReserve(
       reserved_at: reservedAt,
     });
 
+    const message = result.message ? result.message.join(", ") : "";
+
     if (result.status !== 201) {
-      console.error("Failed to Create Reserve", result.message);
+      console.error("Failed to Create Reserve", message);
       return {
-        message: result.message,
+        message: message,
       };
     }
   } catch (error) {
