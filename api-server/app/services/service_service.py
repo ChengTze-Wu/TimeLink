@@ -157,8 +157,8 @@ class ServiceService:
         if role not in ["admin"] and not is_user_own_service:
             raise Forbidden("You are not the owner of service")
 
-        input_unavailable_periods = service_json_data.get("unavailable_periods", [])
-        input_working_hours = service_json_data.get("working_hours", [])
+        input_unavailable_periods = service_json_data.get("unavailable_periods")
+        input_working_hours = service_json_data.get("working_hours")
         group_ids = service_json_data.get("groups")
 
         update_service_data = {

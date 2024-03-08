@@ -65,7 +65,13 @@ export default function ReserveForm({ service }: { service: Service }) {
         </p>
       ))}
       <hr />
-      {state.message !== "" && <p className="text-red-600">*請填合理時間</p>}
+      {state.message !== "" && (
+        <p className="text-red-600">
+          {state.message.includes("not active")
+            ? "*該服務目前暫停預約"
+            : "*請填合理時間"}
+        </p>
+      )}
       <form action={dispatch}>
         <p className="text">請選擇預約時間: </p>
         <em>* 請填未來時間以及營業時間範圍內（不超過預約時間+服務時長）</em>

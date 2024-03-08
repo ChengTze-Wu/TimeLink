@@ -202,6 +202,10 @@ class AppointmentService:
         service_data = self.service_repository.select_one_by_unique_filed(
             service_id=service_id
         )
+
+        if not service_data.get("is_active"):
+            raise BadRequest("The service is not active")
+
         working_hours = service_data.get("working_hours")  # 該服務每日營業時間
         working_period = service_data.get("working_period")  # 該服務每次服務時間
 

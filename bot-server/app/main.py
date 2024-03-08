@@ -91,13 +91,10 @@ async def handle_callback(request: Request):
 @async_handler.add(FollowEvent)
 async def handle_member_follow(event: FollowEvent):
     try:
-        reply_message = None
+        reply_message = ViewMessage.WELCOME_BACK
         resp = await __register_user(event.source.user_id)
 
-        if resp.status_code == HTTPStatus.CONFLICT:
-            reply_message = ViewMessage.WELCOME_BACK
-
-        if resp.status_code == HTTPStatus.CREATED:
+        if resp and resp.status_code == HTTPStatus.CREATED:
             name = resp.json().get('name')
             reply_message = ViewMessage.WELCOME_NEW_USER.substitute(name=name)
 
