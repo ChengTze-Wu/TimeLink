@@ -9,6 +9,7 @@ class ViewMessage:
     NO_RECORD = "你尚未有預約"
     NO_COMING_RECORD = "你尚未有即將到來的預約"
     NO_SERVICE = "本群組尚未有服務"
+    GROUP_NOT_ACTIVE = "機器人目前暫停在此群組服務。"
     
     # template messages
     WELCOME_NEW_USER = Template("歡迎 $name 加入 TimeLink!")
