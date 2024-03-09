@@ -79,7 +79,7 @@ export default async function Page({
     notFound();
   }
 
-  const displayAppointments = appointmentsResp.data.map((Appointment) => {
+  const displayAppointments = appointmentsResp.data?.map((Appointment) => {
     return {
       key: Appointment.id,
       serviceName: Appointment.service.name,
@@ -102,7 +102,7 @@ export default async function Page({
       displayAppointments={displayAppointments}
       pageSize={perPage}
       currentPage={currentPage}
-      totalItems={appointmentsResp.pagination.total_items}
+      totalItems={appointmentsResp.pagination?.total_items}
     />
   );
 }
