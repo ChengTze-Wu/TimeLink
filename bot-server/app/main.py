@@ -91,13 +91,10 @@ async def handle_callback(request: Request):
 @async_handler.add(FollowEvent)
 async def handle_member_follow(event: FollowEvent):
     try:
-        reply_message = None
+        reply_message = ViewMessage.WELCOME_BACK
         resp = await __register_user(event.source.user_id)
 
-        if resp.status_code == HTTPStatus.CONFLICT:
-            reply_message = ViewMessage.WELCOME_BACK
-
-        if resp.status_code == HTTPStatus.CREATED:
+        if resp and resp.status_code == HTTPStatus.CREATED:
             name = resp.json().get('name')
             reply_message = ViewMessage.WELCOME_NEW_USER.substitute(name=name)
 
@@ -238,6 +235,22 @@ async def __check_group_linked(event: Event):
     group_api_response = await fetch.get(f'/api/groups/line/{line_group_id}')
 
     if group_api_response.status_code == HTTPStatus.OK:
+        user_command = None
+        if isinstance(event, MessageEvent):
+            user_command = event.message.text
+        if isinstance(event, PostbackEvent):
+            user_command = "/"
+
+        is_active = group_api_response.json().get('is_active', False)
+        if user_command == "/" and not is_active:
+            await line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=ViewMessage.GROUP_NOT_ACTIVE)]
+                )
+            )
+            return False
+
         await redis_client.set(f'line:group:{line_group_id}', 1)
         return True
 
