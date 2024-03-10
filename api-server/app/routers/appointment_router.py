@@ -26,7 +26,7 @@ def create_endpoint():
                 "line_user_id": str,
                 "service_id": str,
                 "reserved_at": str,
-                "note": str,
+                "notes": str,
             },
         )
         appointment_json_data = request_validator.process(request)
