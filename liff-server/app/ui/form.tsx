@@ -103,6 +103,16 @@ export default function ReserveForm({ service }: { service: Service }) {
             預約
           </button>
         </div>
+        <div className="w-full mt-4 border-2 border-gray-200 rounded-lg p-1">
+          <textarea
+            id="notes"
+            name="notes"
+            rows={3}
+            cols={40}
+            placeholder="請填寫備註"
+            className="w-full"
+          />
+        </div>
       </form>
     </div>
   );

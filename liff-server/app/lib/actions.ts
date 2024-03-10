@@ -11,6 +11,7 @@ const reserveSchema = z.object({
   }),
   lineUserId: z.string(),
   serviceId: z.string(),
+  notes: z.string().optional(),
 });
 
 export type ReserveState = {
@@ -18,6 +19,7 @@ export type ReserveState = {
     date?: string[];
     lineUserId?: string[];
     serviceId?: string[];
+    notes?: string[];
   };
   message?: string | null;
 };
@@ -30,6 +32,7 @@ export async function createReserve(
     date: formData.get("date"),
     lineUserId: formData.get("lineUserId"),
     serviceId: formData.get("serviceId"),
+    notes: formData.get("notes"),
   });
 
   if (!validatedFields.success) {
@@ -49,6 +52,7 @@ export async function createReserve(
       line_user_id: validatedFields.data.lineUserId,
       service_id: validatedFields.data.serviceId,
       reserved_at: reservedAt,
+      notes: validatedFields.data.notes,
     });
 
     const message = result.message ? result.message.join(", ") : "";
