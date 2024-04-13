@@ -47,4 +47,4 @@ TimeLink 是一個連接消費者與商家之間的橋樑。消費者可以透�
 - 使用 GCP Cloud SQL 作為資料庫，設在 VPC，且只讓 API Server 可以存取，以提高資料庫的安全性。
 - 使用 GCP Cloud Storage 作為靜態檔案存放。
 - 使用 Redis 作為 Bot Server 的快取資料庫，快取使用者身份。
-- 考量到成本, 目前 Load balance 部分以替換為 nginx 作 proxy.
+- 考量到成本, 目前 Load balance 部分已替換為 nginx 作 proxy.
