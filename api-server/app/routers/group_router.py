@@ -102,7 +102,6 @@ def get_all_endpoint():
 @verify_access_token(access_roles=["admin", "group_owner"])
 def get_one_endpoint(group_id):
     try:
-        print(type(group_id))
         jwt_payload = jwt_handler.get_payload(request.headers.get("Authorization"))
         group_data = group_service.get_one(group_id=group_id, payload=jwt_payload)
         return RESTfulResponse(group_data).to_serializable()
