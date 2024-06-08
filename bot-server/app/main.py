@@ -1,22 +1,8 @@
-from dotenv import load_dotenv
-load_dotenv()
-
-import os
-import sys
-import logging
-import asyncio
-from contextlib import asynccontextmanager
-from fastapi import Request, FastAPI, HTTPException
-from linebot.v3.messaging import (
-    AsyncApiClient,
-    AsyncMessagingApi,
-    Configuration,
-    ReplyMessageRequest,
-    TextMessage,
-)
-from linebot.v3.exceptions import (
-    InvalidSignatureError
-)
+from app.messages import ViewMessage
+from app.utils.selector import CommandSelector
+from app.lib.fetch import APIServerFetchClient, RedisClient
+from app.lib.webhook import AsyncWebhookHandler
+from http import HTTPStatus
 from linebot.v3.webhooks import (
     FollowEvent,
     MessageEvent,
@@ -28,11 +14,25 @@ from linebot.v3.webhooks import (
     Event,
     GroupSource,
 )
-from http import HTTPStatus
-from app.lib.webhook import AsyncWebhookHandler
-from app.lib.fetch import APIServerFetchClient, RedisClient
-from app.utils.selector import CommandSelector
-from app.messages import ViewMessage
+from linebot.v3.exceptions import (
+    InvalidSignatureError
+)
+from linebot.v3.messaging import (
+    AsyncApiClient,
+    AsyncMessagingApi,
+    Configuration,
+    ReplyMessageRequest,
+    TextMessage,
+)
+from fastapi import Request, FastAPI, HTTPException
+from contextlib import asynccontextmanager
+import asyncio
+import logging
+import sys
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
@@ -142,9 +142,11 @@ async def handle_member_left(event: MemberLeftEvent):
     try:
         line_user_id = event.left.members[0].user_id
         line_group_id = event.source.group_id
-        
-        delete_redis_task = redis_client.delete(f'line:user:{line_user_id}:group:{line_group_id}')
-        delete_api_task = fetch.delete(f'/api/groups/{line_group_id}/users/{line_user_id}')
+
+        delete_redis_task = redis_client.delete(
+            f'line:user:{line_user_id}:group:{line_group_id}')
+        delete_api_task = fetch.delete(
+            f'/api/groups/{line_group_id}/users/{line_user_id}')
 
         results = await asyncio.gather(delete_redis_task, delete_api_task)
 
@@ -163,7 +165,7 @@ async def handle_bot_join(event: JoinEvent):
             return
 
         reply_message = ViewMessage.BOT_JOIN_SUCCESS
-        
+
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -210,7 +212,7 @@ async def handle_postback(event: PostbackEvent):
 
         command = CommandSelector.get_command(event)
         reply_message = await command.async_execute()
-        
+
         if reply_message:
             await line_bot_api.reply_message(
                 ReplyMessageRequest(
@@ -255,7 +257,8 @@ async def __check_group_linked(event: Event):
         return True
 
     if group_api_response.status_code == HTTPStatus.NOT_FOUND:
-        unbound_group_message = ViewMessage.GROUP_NOT_LINKED.substitute(line_group_id=line_group_id)
+        unbound_group_message = ViewMessage.GROUP_NOT_LINKED.substitute(
+            line_group_id=line_group_id)
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -296,7 +299,8 @@ async def __generate_random_password(length: int = 12):
         random.choice(string.digits),  # At least one digit
         random.choice('@$!%*?&.')  # At least one special character
     ]
-    characters += random.choices(string.ascii_letters + string.digits, k=length-4)
+    characters += random.choices(string.ascii_letters +
+                                 string.digits, k=length-4)
     random.shuffle(characters)
     password = ''.join(characters)
     return password
