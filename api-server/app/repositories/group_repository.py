@@ -13,7 +13,7 @@ class GroupRepository:
                 session.add(new_group)
                 session.commit()
                 session.refresh(new_group)
-                return new_group.to_dict()
+                return new_group.to_self_dict()
         except SQLAlchemyError as e:
             if isinstance(e, IntegrityError):
                 if "Key (line_group_id)" in str(e.orig):
