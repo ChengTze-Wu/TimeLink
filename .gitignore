@@ -26,4 +26,6 @@ alembic.ini
 # React Component Preview
 previewConfig.json
 
+**/migration/versions/*
+
 !**/.gitkeep
