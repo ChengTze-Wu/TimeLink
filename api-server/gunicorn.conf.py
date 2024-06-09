@@ -4,7 +4,7 @@ PORT = os.environ.get("PORT", 8000)
 
 # Description: Gunicorn configuration file
 wsgi_app = "app:create_app()"
-bind = f"0.0.0.0:{PORT}"
+bind = f"127.0.0.1:{PORT}"
 workers = 1
 
 # Logging
