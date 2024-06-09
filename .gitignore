@@ -28,4 +28,6 @@ previewConfig.json
 
 **/migration/versions/*
 
+nohup.out
+
 !**/.gitkeep
