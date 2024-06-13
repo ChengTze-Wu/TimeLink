@@ -26,13 +26,13 @@ class ServiceService:
 
         if user_id is None:
             raise BadRequest("sub must be provided in JWT payload")
-
-        is_user_owns_groups = self.group_repository.check_groups_owner_by_user_id(
-            user_id=user_id, group_ids=group_ids
-        )
-
-        if role not in ["admin"] and not is_user_owns_groups:
-            raise Forbidden("You are not the owner of one of the groups")
+        
+        if group_ids is not None:
+            is_user_owns_groups = self.group_repository.check_groups_owner_by_user_id(
+                user_id=user_id, group_ids=group_ids
+            )
+            if role not in ["admin"] and not is_user_owns_groups:
+                raise Forbidden("You are not the owner of one of the groups")
 
         # Validate working_hours
         days_of_week = set()
